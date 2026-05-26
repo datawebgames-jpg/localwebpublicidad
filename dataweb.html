@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>DataWeb — Guía de Ventas</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root {
+  --verde: #10b981; --teal: #0d9488; --azul: #0ea5e9;
+  --naranja: #f59e0b; --rojo: #ef4444; --violeta: #7c3aed;
+  --bg: #0f172a; --card: #1e293b; --border: #334155;
+  --text: #f1f5f9; --muted: #94a3b8;
+}
+body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); height:100dvh; display:flex; flex-direction:column; overflow:hidden; user-select:none; }
+
+/* NAV */
+.topbar { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#0a0f1e; border-bottom:1px solid var(--border); flex-shrink:0; }
+.topbar a { color:var(--muted); text-decoration:none; font-size:13px; }
+.topbar .title { font-size:13px; font-weight:700; color:var(--verde); }
+.slide-counter { font-size:12px; color:var(--muted); }
+.progress-bar { height:3px; background:var(--border); flex-shrink:0; }
+.progress-fill { height:100%; background:linear-gradient(90deg,var(--verde),var(--azul)); transition:width .35s ease; }
+.slides-wrapper { flex:1; overflow:hidden; position:relative; }
+.slides-track { display:flex; height:100%; transition:transform .38s cubic-bezier(.4,0,.2,1); }
+.slide { min-width:100%; height:100%; overflow-y:auto; padding-bottom:80px; }
+.nav { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#0a0f1e; border-top:1px solid var(--border); flex-shrink:0; gap:12px; }
+.btn-nav { flex:1; padding:13px; border-radius:12px; border:none; font-size:15px; font-weight:700; cursor:pointer; transition:opacity .15s,transform .1s; }
+.btn-nav:active { transform:scale(.96); }
+.btn-prev { background:var(--card); color:var(--muted); border:1px solid var(--border); }
+.btn-next { background:linear-gradient(135deg,var(--verde),var(--azul)); color:#fff; }
+.btn-nav:disabled { opacity:.3; cursor:default; }
+.dots { display:flex; gap:5px; align-items:center; flex-shrink:0; flex-wrap:wrap; max-width:80px; justify-content:center; }
+.dot { width:6px; height:6px; border-radius:50%; background:var(--border); transition:background .3s,width .3s; }
+.dot.active { background:var(--verde); width:16px; border-radius:3px; }
+
+/* SECTIONS */
+.section { padding:22px 18px 8px; }
+.sbadge { display:inline-block; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:3px 10px; border-radius:20px; margin-bottom:10px; }
+.b-green  { color:#4ade80; background:rgba(16,185,129,.12); border:1px solid rgba(16,185,129,.25); }
+.b-teal   { color:#2dd4bf; background:rgba(13,148,136,.12); border:1px solid rgba(13,148,136,.25); }
+.b-blue   { color:#38bdf8; background:rgba(14,165,233,.12); border:1px solid rgba(14,165,233,.25); }
+.b-orange { color:var(--naranja); background:rgba(245,158,11,.12); border:1px solid rgba(245,158,11,.25); }
+.b-violet { color:#c084fc; background:rgba(124,58,237,.12); border:1px solid rgba(124,58,237,.25); }
+.b-red    { color:#f87171; background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.25); }
+.section h2 { font-size:21px; font-weight:800; line-height:1.2; margin-bottom:8px; }
+.section p  { font-size:14px; color:var(--muted); line-height:1.6; margin-bottom:8px; }
+.section p strong { color:var(--text); }
+.hl { margin:10px 18px; padding:14px 16px; border-radius:12px; border-left:4px solid var(--verde); background:rgba(16,185,129,.07); font-size:13px; line-height:1.6; color:var(--muted); }
+.hl strong { color:var(--text); display:block; font-size:14px; margin-bottom:3px; }
+
+/* COVER */
+.slide-cover { background:linear-gradient(160deg,#0d2a1a 0%,#0f172a 60%); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:36px 24px 80px; min-height:100%; }
+.cover-bolt { font-size:64px; margin-bottom:4px; }
+.cover-brand { font-size:36px; font-weight:900; letter-spacing:-1px; margin-bottom:4px; }
+.cover-brand span { color:var(--verde); }
+.cover-tagline { font-size:14px; color:var(--verde); font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:16px; }
+.cover-desc { font-size:15px; color:var(--muted); line-height:1.6; max-width:340px; margin-bottom:20px; }
+.cover-badges { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:20px; }
+.cover-badge { font-size:12px; font-weight:700; padding:5px 14px; border-radius:20px; }
+.cb-green  { background:rgba(16,185,129,.15); color:#4ade80; border:1px solid rgba(16,185,129,.3); }
+.cb-blue   { background:rgba(14,165,233,.15); color:#38bdf8; border:1px solid rgba(14,165,233,.3); }
+.cb-orange { background:rgba(245,158,11,.15); color:var(--naranja); border:1px solid rgba(245,158,11,.3); }
+.cover-pillars { display:flex; gap:10px; max-width:340px; width:100%; }
+.pillar { flex:1; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:14px 8px; text-align:center; }
+.pillar .p-icon { font-size:26px; margin-bottom:6px; }
+.pillar .p-name { font-size:12px; font-weight:800; line-height:1.3; }
+.pillar .p-count { font-size:10px; color:var(--muted); margin-top:3px; }
+
+/* PILLAR CARDS */
+.pillar-cards { margin:10px 18px; display:flex; flex-direction:column; gap:10px; }
+.pc { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px; }
+.pc.green  { border-color:rgba(16,185,129,.4); background:rgba(16,185,129,.05); }
+.pc.blue   { border-color:rgba(14,165,233,.4); background:rgba(14,165,233,.05); }
+.pc.orange { border-color:rgba(245,158,11,.4); background:rgba(245,158,11,.05); }
+.pc-header { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.pc-icon { font-size:28px; flex-shrink:0; }
+.pc-title { font-size:15px; font-weight:800; }
+.pc-sub   { font-size:11px; color:var(--muted); margin-top:1px; }
+.pc-chips { display:flex; flex-wrap:wrap; gap:5px; }
+.pc-chip { font-size:11px; padding:3px 10px; border-radius:20px; background:var(--bg); border:1px solid var(--border); color:var(--muted); }
+
+/* SERVICE SELECTOR */
+.services-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:10px 18px; }
+.svc-btn { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px 10px; text-align:left; cursor:pointer; display:flex; gap:10px; align-items:center; transition:all .15s; }
+.svc-btn:active { transform:scale(.97); }
+.svc-btn.selected { border-color:var(--verde); background:rgba(16,185,129,.1); }
+.svc-btn .svc-icon { font-size:24px; flex-shrink:0; }
+.svc-btn .svc-name { font-size:12px; font-weight:700; line-height:1.3; }
+.svc-btn .svc-sub  { font-size:10px; color:var(--muted); margin-top:1px; }
+
+/* SERVICE PANEL */
+.svc-panel { margin:10px 18px; display:none; }
+.svc-panel.visible { display:block; }
+.svc-panel-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; padding:14px; background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.25); border-radius:12px; }
+.sph-icon { font-size:34px; flex-shrink:0; }
+.sph-name { font-size:17px; font-weight:900; }
+.sph-sub  { font-size:12px; color:var(--muted); margin-top:2px; }
+.svc-target { display:flex; align-items:center; gap:8px; margin-bottom:10px; padding:10px 12px; background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.2); border-radius:10px; font-size:12px; color:var(--naranja); }
+.svc-benefits { display:flex; flex-direction:column; gap:7px; }
+.sb-item { display:flex; gap:10px; align-items:flex-start; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px; }
+.sb-icon { font-size:20px; flex-shrink:0; margin-top:2px; }
+.sb-txt strong { display:block; font-size:13px; color:var(--text); margin-bottom:1px; }
+.sb-txt span   { font-size:12px; color:var(--muted); line-height:1.4; }
+.svc-cta { margin-top:10px; padding:12px 14px; background:rgba(16,185,129,.07); border:1px solid rgba(16,185,129,.2); border-radius:10px; font-size:12px; color:#6ee7b7; line-height:1.5; }
+.svc-cta strong { color:#fff; display:block; margin-bottom:3px; }
+
+/* WHY LIST */
+.why-list { margin:10px 18px; display:flex; flex-direction:column; gap:8px; }
+.why-item { display:flex; gap:12px; align-items:flex-start; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; }
+.wi-icon { font-size:24px; flex-shrink:0; }
+.wi-text strong { display:block; font-size:14px; color:var(--text); margin-bottom:2px; }
+.wi-text span { font-size:13px; color:var(--muted); line-height:1.5; }
+
+/* STATS */
+.stats2x2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:12px 18px; }
+.stat { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 12px; text-align:center; }
+.stat .num { font-size:28px; font-weight:900; line-height:1; }
+.stat .lbl { font-size:11px; color:var(--muted); margin-top:5px; line-height:1.4; }
+.stat.green .num { color:#4ade80; }
+.stat.blue  .num { color:#38bdf8; }
+.stat.orange.num { color:var(--naranja); }
+.stat.teal  .num { color:#2dd4bf; }
+
+/* CTA */
+.slide-cta { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:32px 26px 80px; min-height:100%; background:linear-gradient(160deg,#0d2a1a 0%,#0f172a 60%); }
+.cta-icon { font-size:54px; margin-bottom:12px; }
+.slide-cta h2 { font-size:24px; font-weight:900; margin-bottom:10px; }
+.slide-cta h2 span { color:var(--verde); }
+.slide-cta > p { font-size:14px; color:var(--muted); line-height:1.6; max-width:320px; margin-bottom:20px; }
+.cta-contact { width:100%; max-width:320px; display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+.cta-row { display:flex; gap:8px; align-items:center; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; }
+.cta-row .ci { font-size:22px; flex-shrink:0; }
+.cta-row .ct { font-size:13px; }
+.cta-row .ct strong { display:block; color:var(--text); }
+.cta-row .ct span { color:var(--muted); font-size:12px; }
+.btn-wa { display:flex; align-items:center; justify-content:center; gap:8px; background:#16a34a; color:#fff; padding:15px 28px; border-radius:14px; font-size:16px; font-weight:800; text-decoration:none; width:100%; max-width:320px; }
+.btn-web { display:flex; align-items:center; justify-content:center; gap:8px; background:var(--card); color:var(--verde); padding:12px 28px; border-radius:14px; font-size:14px; font-weight:700; text-decoration:none; width:100%; max-width:320px; border:1px solid rgba(16,185,129,.3); margin-top:10px; }
+
+/* SECTION DIVIDER */
+.sect-divider { margin:14px 18px 6px; display:flex; align-items:center; gap:10px; }
+.sd-line { flex:1; height:1px; background:var(--border); }
+.sd-label { font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html">← Volver</a>
+  <div class="title">⚡ DataWeb</div>
+  <div class="slide-counter"><span id="cur">1</span> / <span id="tot">5</span></div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="slides-wrapper">
+<div class="slides-track" id="track">
+
+<!-- ══════════════════════════════════════
+     SLIDE 1 — COVER
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-cover">
+    <div class="cover-bolt">⚡</div>
+    <div class="cover-brand">DATA<span>WEB</span></div>
+    <div class="cover-tagline">Tu trámite, resuelto</div>
+    <p class="cover-desc">Trámites, tecnología y electrónica. Más de <strong style="color:#f1f5f9">8 años</strong> resolviendo lo que a otros les complica, 100% online y con respuesta en 24 horas.</p>
+
+    <div class="cover-badges">
+      <span class="cover-badge cb-green">✓ 8+ años</span>
+      <span class="cover-badge cb-blue">⚡ 24hs de respuesta</span>
+      <span class="cover-badge cb-orange">📱 100% Online</span>
+    </div>
+
+    <div class="cover-pillars">
+      <div class="pillar">
+        <div class="p-icon">🏛️</div>
+        <div class="p-name">Trámites y Gestoría</div>
+        <div class="p-count">5 servicios</div>
+      </div>
+      <div class="pillar">
+        <div class="p-icon">💻</div>
+        <div class="p-name">Tecnología</div>
+        <div class="p-count">4 servicios</div>
+      </div>
+      <div class="pillar">
+        <div class="p-icon">📱</div>
+        <div class="p-name">Electrónica</div>
+        <div class="p-count">2 servicios</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 2 — QUÉ HACEMOS
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="section">
+    <div class="sbadge b-green">Nuestros servicios</div>
+    <h2>Todo lo que resolvemos en un solo lugar</h2>
+    <p>Tres grandes áreas para ayudar a personas y comercios de toda Argentina.</p>
+  </div>
+
+  <div class="pillar-cards">
+    <div class="pc green">
+      <div class="pc-header">
+        <div class="pc-icon">🏛️</div>
+        <div>
+          <div class="pc-title">Trámites y Gestoría</div>
+          <div class="pc-sub">Lo que la burocracia complica, nosotros lo resolvemos</div>
+        </div>
+      </div>
+      <div class="pc-chips">
+        <span class="pc-chip">🏦 ARCA / Impuestos</span>
+        <span class="pc-chip">🛂 Ciudadanías</span>
+        <span class="pc-chip">🚗 Automotriz</span>
+        <span class="pc-chip">🧾 Pago de facturas</span>
+        <span class="pc-chip">📋 Gestoría general</span>
+      </div>
+    </div>
+
+    <div class="pc blue">
+      <div class="pc-header">
+        <div class="pc-icon">💻</div>
+        <div>
+          <div class="pc-title">Tecnología</div>
+          <div class="pc-sub">Servidores, hosting y asesoramiento digital</div>
+        </div>
+      </div>
+      <div class="pc-chips">
+        <span class="pc-chip">🎮 Servidores de juegos</span>
+        <span class="pc-chip">🌐 Host / Hosting</span>
+        <span class="pc-chip">🛒 Comprar en internet</span>
+        <span class="pc-chip">💡 Consultoría digital</span>
+      </div>
+    </div>
+
+    <div class="pc orange">
+      <div class="pc-header">
+        <div class="pc-icon">📱</div>
+        <div>
+          <div class="pc-title">Electrónica</div>
+          <div class="pc-sub">Venta, compra y reparación de dispositivos</div>
+        </div>
+      </div>
+      <div class="pc-chips">
+        <span class="pc-chip">📦 Venta de electrónica</span>
+        <span class="pc-chip">🔧 Reparaciones</span>
+        <span class="pc-chip">💾 Recupero de datos</span>
+        <span class="pc-chip">🖥️ Formateos</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hl">
+    <strong>¿Quién nos contrata?</strong>
+    Personas que no saben cómo hacer un trámite online, comercios que necesitan soluciones tecnológicas, gamers que quieren su servidor, y cualquiera con un dispositivo roto.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 3 — SELECTOR DE SERVICIOS
+══════════════════════════════════════ -->
+<div class="slide" id="slide-svcs">
+  <div class="section" style="padding-bottom:6px">
+    <div class="sbadge b-teal">Por servicio</div>
+    <h2>Tocá el servicio que le interesa al cliente</h2>
+    <p style="margin-bottom:0">Te mostramos el pitch específico para cerrar la venta.</p>
+  </div>
+
+  <!-- TRÁMITES -->
+  <div class="sect-divider">
+    <div class="sd-line"></div>
+    <div class="sd-label">🏛️ Trámites y Gestoría</div>
+    <div class="sd-line"></div>
+  </div>
+
+  <div class="services-grid">
+    <div class="svc-btn" onclick="selectSvc('arca', this)">
+      <div class="svc-icon">🏦</div>
+      <div><div class="svc-name">ARCA / AFIP</div><div class="svc-sub">Impuestos y monotributo</div></div>
+    </div>
+    <div class="svc-btn" onclick="selectSvc('ciudadania', this)">
+      <div class="svc-icon">🛂</div>
+      <div><div class="svc-name">Ciudadanías</div><div class="svc-sub">Italiana, española</div></div>
+    </div>
+    <div class="svc-btn" onclick="selectSvc('auto', this)">
+      <div class="svc-icon">🚗</div>
+      <div><div class="svc-name">Automotriz</div><div class="svc-sub">Transferencias, informe</div></div>
+    </div>
+    <div class="svc-btn" onclick="selectSvc('gestoria', this)">
+      <div class="svc-icon">📋</div>
+      <div><div class="svc-name">Gestoría General</div><div class="svc-sub">Trámites y pagos</div></div>
+    </div>
+  </div>
+
+  <!-- TECNOLOGÍA -->
+  <div class="sect-divider">
+    <div class="sd-line"></div>
+    <div class="sd-label">💻 Tecnología</div>
+    <div class="sd-line"></div>
+  </div>
+
+  <div class="services-grid">
+    <div class="svc-btn" onclick="selectSvc('gaming', this)">
+      <div class="svc-icon">🎮</div>
+      <div><div class="svc-name">Servidores de Juegos</div><div class="svc-sub">Minecraft, FiveM, Rust...</div></div>
+    </div>
+    <div class="svc-btn" onclick="selectSvc('host', this)">
+      <div class="svc-icon">🌐</div>
+      <div><div class="svc-name">Host / Hosting</div><div class="svc-sub">Web, dominio, email</div></div>
+    </div>
+    <div class="svc-btn" onclick="selectSvc('compras', this)">
+      <div class="svc-icon">🛒</div>
+      <div><div class="svc-name">Comprar en Internet</div><div class="svc-sub">Temu, Mercado Libre</div></div>
+    </div>
+    <div class="svc-btn" onclick="selectSvc('consulting', this)">
+      <div class="svc-icon">💡</div>
+      <div><div class="svc-name">Consultoría Digital</div><div class="svc-sub">Asesoramiento tech</div></div>
+    </div>
+  </div>
+
+  <!-- ELECTRÓNICA -->
+  <div class="sect-divider">
+    <div class="sd-line"></div>
+    <div class="sd-label">📱 Electrónica</div>
+    <div class="sd-line"></div>
+  </div>
+
+  <div class="services-grid">
+    <div class="svc-btn" onclick="selectSvc('venta', this)">
+      <div class="svc-icon">📦</div>
+      <div><div class="svc-name">Venta de Electrónica</div><div class="svc-sub">Celulares, PC, accesorios</div></div>
+    </div>
+    <div class="svc-btn" onclick="selectSvc('reparacion', this)">
+      <div class="svc-icon">🔧</div>
+      <div><div class="svc-name">Reparaciones</div><div class="svc-sub">Celulares, PC, datos</div></div>
+    </div>
+  </div>
+
+  <!-- PANEL DE SERVICIO -->
+  <div class="svc-panel" id="svc-panel">
+    <div class="svc-panel-header">
+      <div class="sph-icon" id="sph-icon"></div>
+      <div>
+        <div class="sph-name" id="sph-name"></div>
+        <div class="sph-sub" id="sph-sub"></div>
+      </div>
+    </div>
+    <div class="svc-target" id="sph-target"></div>
+    <div class="svc-benefits" id="sph-benefits"></div>
+    <div class="svc-cta" id="sph-cta"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 4 — POR QUÉ DATAWEB
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="section">
+    <div class="sbadge b-green">¿Por qué elegirnos?</div>
+    <h2>8 años resolviendo lo que otros no saben cómo hacer</h2>
+    <p>No somos un call center ni una agencia grande. Somos un equipo que da la cara, responde rápido y tiene experiencia real.</p>
+  </div>
+
+  <div class="stats2x2">
+    <div class="stat green"><div class="num">8+</div><div class="lbl">años simplificando trámites</div></div>
+    <div class="stat blue"><div class="num">24hs</div><div class="lbl">tiempo de respuesta máximo</div></div>
+    <div class="stat teal"><div class="num">100%</div><div class="lbl">online — sin ir a ninguna oficina</div></div>
+    <div class="stat" style="--num-color:#c084fc"><div class="num" style="color:#c084fc">11</div><div class="lbl">categorías de servicios disponibles</div></div>
+  </div>
+
+  <div class="why-list">
+    <div class="why-item">
+      <div class="wi-icon">💬</div>
+      <div class="wi-text">
+        <strong>Atención por WhatsApp, directa y real</strong>
+        <span>Sin bots, sin menús interminables. Hablás con una persona que sabe del tema y te resuelve el problema sin vueltas.</span>
+      </div>
+    </div>
+    <div class="why-item">
+      <div class="wi-icon">🔒</div>
+      <div class="wi-text">
+        <strong>Confianza respaldada por trayectoria</strong>
+        <span>Más de 8 años de trabajo real avalan cada servicio. Tenemos clientes que vuelven una y otra vez porque saben que les resolvemos.</span>
+      </div>
+    </div>
+    <div class="why-item">
+      <div class="wi-icon">📍</div>
+      <div class="wi-text">
+        <strong>Atendemos a toda Argentina, 100% online</strong>
+        <span>No importa dónde estés. Todo se gestiona digitalmente, sin que tengas que moverte ni hacer filas en ningún organismo.</span>
+      </div>
+    </div>
+    <div class="why-item">
+      <div class="wi-icon">⚡</div>
+      <div class="wi-text">
+        <strong>Rapidez real — respuesta en 24 horas</strong>
+        <span>Lo que en una oficina pública tarda semanas, nosotros lo gestionamos en días. Y siempre te avisamos el estado de tu trámite.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 5 — CTA
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-cta">
+    <div class="cta-icon">⚡</div>
+    <h2>¿Cómo <span>empezamos</span>?</h2>
+    <p>Es simple: contanos qué necesitás y en menos de 24 horas te decimos cómo lo resolvemos y cuánto cuesta.</p>
+
+    <div class="cta-contact">
+      <div class="cta-row">
+        <div class="ci">💬</div>
+        <div class="ct">
+          <strong>WhatsApp (el más rápido)</strong>
+          <span>+54 2954 320639 — respuesta en el día</span>
+        </div>
+      </div>
+      <div class="cta-row">
+        <div class="ci">📧</div>
+        <div class="ct">
+          <strong>Email</strong>
+          <span>dataweb76@gmail.com</span>
+        </div>
+      </div>
+      <div class="cta-row">
+        <div class="ci">🌐</div>
+        <div class="ct">
+          <strong>Web con todos los servicios</strong>
+          <span>datawebgames-jpg.github.io/dataweb</span>
+        </div>
+      </div>
+    </div>
+
+    <a href="https://wa.me/5492954320639?text=Hola!%20Quiero%20consultar%20por%20los%20servicios%20de%20DataWeb" class="btn-wa">
+      <span style="font-size:22px">💬</span> Escribir por WhatsApp ahora
+    </a>
+    <a href="https://datawebgames-jpg.github.io/dataweb/#inicio" class="btn-web">
+      🌐 Ver sitio web completo
+    </a>
+  </div>
+</div>
+
+</div><!-- /track -->
+</div><!-- /wrapper -->
+
+<div class="nav">
+  <button class="btn-nav btn-prev" id="btnPrev" onclick="move(-1)" disabled>← Anterior</button>
+  <div class="dots" id="dots"></div>
+  <button class="btn-nav btn-next" id="btnNext" onclick="move(1)">Siguiente →</button>
+</div>
+
+<script>
+/* ── SLIDES ── */
+const TOTAL = 5;
+let cur = 0;
+const track = document.getElementById('track');
+const progress = document.getElementById('progress');
+const btnPrev = document.getElementById('btnPrev');
+const btnNext = document.getElementById('btnNext');
+const dotsEl = document.getElementById('dots');
+const curEl = document.getElementById('cur');
+document.getElementById('tot').textContent = TOTAL;
+for(let i=0;i<TOTAL;i++){const d=document.createElement('div');d.className='dot'+(i===0?' active':'');dotsEl.appendChild(d);}
+
+function update(){
+  track.style.transform=`translateX(-${cur*100}%)`;
+  progress.style.width=`${((cur+1)/TOTAL)*100}%`;
+  btnPrev.disabled=cur===0; btnNext.disabled=cur===TOTAL-1;
+  btnNext.textContent=cur===TOTAL-2?'Finalizar ✓':cur===TOTAL-1?'—':'Siguiente →';
+  curEl.textContent=cur+1;
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===cur));
+  document.querySelectorAll('.slide')[cur].scrollTop=0;
+}
+function move(dir){cur=Math.max(0,Math.min(TOTAL-1,cur+dir));update();}
+
+let sx=0,sy=0;
+const wrap=document.querySelector('.slides-wrapper');
+wrap.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
+wrap.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>40)move(dx<0?1:-1);},{passive:true});
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown')move(1);if(e.key==='ArrowLeft'||e.key==='ArrowUp')move(-1);});
+update();
+
+/* ── SERVICIOS ── */
+const SVCS = {
+  arca: {
+    icon:'🏦', name:'ARCA / AFIP — Impuestos',
+    sub:'Monotributo, declaraciones, constancias, regularización',
+    target:'👤 Para: autónomos, comerciantes, emprendedores — cualquiera con obligaciones impositivas',
+    benefits:[
+      {icon:'📝', t:'Alta y baja en Monotributo', d:'Inscribimos o damos de baja en Monotributo. También gestionamos el cambio de categoría cuando corresponde.'},
+      {icon:'📊', t:'Declaraciones juradas y vencimientos', d:'Presentamos las DDJJ mensuales y anuales. Avisamos los vencimientos para evitar multas e intereses.'},
+      {icon:'📄', t:'Constancias de inscripción y situación fiscal', d:'Obtenemos la constancia de ARCA al instante. Necesaria para proveedores, alquileres y trámites bancarios.'},
+      {icon:'⚖️', t:'Regularización de deudas', d:'Planes de pago, moratorias, condonación de intereses. Analizamos la deuda y buscamos la mejor salida.'},
+      {icon:'🔑', t:'Clave fiscal y acceso a servicios ARCA', d:'Creamos o recuperamos la clave fiscal. Habilitamos todos los servicios que el contribuyente necesita.'},
+    ],
+    cta:'<strong>Frase para usar con el cliente:</strong> "¿Tenés algo pendiente con ARCA o no sabés cómo regularizarte? Nosotros te lo resolvemos sin que vayas a ninguna oficina, con respuesta en 24 horas."'
+  },
+  ciudadania: {
+    icon:'🛂', name:'Ciudadanías — Italiana y Española',
+    sub:'Documentación europea, apostillas, legalizaciones',
+    target:'👤 Para: personas con ascendencia italiana o española que quieren el pasaporte europeo',
+    benefits:[
+      {icon:'🇮🇹', t:'Ciudadanía italiana — jus sanguinis', d:'Buscamos los antepasados italianos, gestionamos la documentación en Argentina y acompañamos todo el proceso.'},
+      {icon:'🇪🇸', t:'Ciudadanía española — ley de nietos', d:'Tramitamos la ciudadanía para nietos y bisnietos de exiliados españoles. Analizamos el caso sin costo.'},
+      {icon:'📑', t:'Apostillas y legalizaciones', d:'Apostillamos documentos argentinos para presentar en el exterior. Traducciones certificadas incluidas si se necesita.'},
+      {icon:'🔍', t:'Investigación genealógica', d:'Buscamos registros de nacimiento, matrimonio y defunción de antepasados europeos para armar el árbol genealógico.'},
+      {icon:'✈️', t:'Asesoramiento completo del proceso', d:'Te explicamos cada paso, qué documentos necesitás y cuánto tiempo lleva. Sin sorpresas.'},
+    ],
+    cta:'<strong>Frase para usar con el cliente:</strong> "¿Tus abuelos o bisabuelos eran italianos o españoles? Podés tener derecho a la ciudadanía europea. Te analizamos el caso gratis y sin compromiso."'
+  },
+  auto: {
+    icon:'🚗', name:'Trámites Automotriz',
+    sub:'Transferencias, informes de dominio, patentamiento',
+    target:'👤 Para: compradores y vendedores de vehículos, cualquiera que necesite trámites de auto',
+    benefits:[
+      {icon:'🔄', t:'Transferencia de titularidad', d:'Gestionamos el traspaso del auto del vendedor al comprador. Todo el papeleo sin que vayas al registro.'},
+      {icon:'🔍', t:'Informe de dominio', d:'Antes de comprar un auto, verificamos si tiene deudas, prendas, multas o problemas legales. Evitás estafas.'},
+      {icon:'🪪', t:'Patentamiento y documentación', d:'Tramitamos la patente, el título y toda la documentación de vehículos nuevos o importados.'},
+      {icon:'🧾', t:'Multas e infracciones', d:'Consultamos el estado de multas y gestionamos el pago o la impugnación según corresponda.'},
+      {icon:'💰', t:'Valuación para compra/venta', d:'Te asesoramos sobre el precio justo de un vehículo para que no compres caro ni vendas barato.'},
+    ],
+    cta:'<strong>Frase para usar con el cliente:</strong> "¿Comprás o vendés un auto y no sabés cómo hacer la transferencia? Nosotros lo gestionamos todo sin filas ni idas al registro."'
+  },
+  gestoria: {
+    icon:'📋', name:'Gestoría General',
+    sub:'Trámites varios, pago de facturas, certificados',
+    target:'👤 Para: personas sin tiempo o conocimiento para gestionar trámites burocráticos',
+    benefits:[
+      {icon:'💡', t:'Pago de facturas de servicios e impuestos', d:'ABL, ARBA, Ingresos Brutos, luz, gas, agua. Gestionamos el pago y te mandamos el comprobante.'},
+      {icon:'🏛️', t:'Trámites ante organismos públicos', d:'Municipios, ANSES, PAMI, Rentas. Presentamos documentación, retiramos resoluciones y hacemos seguimiento.'},
+      {icon:'📜', t:'Certificados y constancias', d:'Antecedentes penales, constancias de CUIL, certificados de domicilio, nacimiento, estado civil.'},
+      {icon:'🏢', t:'Habilitaciones municipales', d:'Habilitamos comercios, locales y emprendimientos ante el municipio. Sabemos qué pide cada uno.'},
+      {icon:'📩', t:'Gestión postal y documental', d:'Retiramos documentación, enviamos por correo, realizamos presentaciones que requieren presencia física.'},
+    ],
+    cta:'<strong>Frase para usar con el cliente:</strong> "Si tenés un trámite que no sabés cómo hacer o no tenés tiempo para hacerlo, decinos cuál es y nosotros te cotizamos la gestión."'
+  },
+  gaming: {
+    icon:'🎮', name:'Servidores de Juegos',
+    sub:'Minecraft, FiveM (GTA RP), Rust, CS2 y más',
+    target:'👤 Para: gamers, comunidades de juego, streamers, grupos de amigos',
+    benefits:[
+      {icon:'⛏️', t:'Servidor de Minecraft a medida', d:'Vanilla, modpacks, Spigot o Paper con plugins. Configuramos todo para tu comunidad o server privado con amigos.'},
+      {icon:'🚓', t:'FiveM — servidor de GTA V roleplay', d:'Montamos el servidor, instalamos scripts de RP, configuramos trabajos, vehicles y economía. Listo para jugar.'},
+      {icon:'🏝️', t:'Rust, CS2, Valheim y otros', d:'Cualquier juego con servidor dedicado. Instalación, configuración y soporte técnico incluido.'},
+      {icon:'🔧', t:'Plugins, mods y configuraciones avanzadas', d:'Instalamos plugins adicionales, mapas personalizados, sistemas de economía, whitelist y permisos.'},
+      {icon:'📊', t:'Mantenimiento y soporte técnico', d:'Si el servidor se cae o hay problemas, lo resolvemos. Actualizaciones y backups periódicos.'},
+    ],
+    cta:'<strong>Frase para usar con el cliente:</strong> "¿Querés tu propio servidor para jugar con amigos o armar una comunidad? Te lo configuramos listo para usar, sin que sepas nada de programación."'
+  },
+  host: {
+    icon:'🌐', name:'Host / Hosting Web',
+    sub:'Hosting, dominio, email corporativo, VPS',
+    target:'👤 Para: negocios que necesitan hospedar su web, email profesional o proyectos online',
+    benefits:[
+      {icon:'🖥️', t:'Hosting web con panel de control', d:'Espacio en servidor para tu web con cPanel o similar. Instalación de WordPress, PHP, bases de datos.'},
+      {icon:'🌍', t:'Dominio .com.ar, .com y más', d:'Registramos y renovamos tu dominio. Si ya tenés uno, lo trasladamos. También conseguimos dominios premium.'},
+      {icon:'📧', t:'Email corporativo (tu@tuempresa.com)', d:'Correo con tu dominio propio para transmitir profesionalismo. Se configura en el celular o computadora.'},
+      {icon:'⚡', t:'VPS para proyectos que necesitan más', d:'Servidor virtual privado para apps, bots, servidores de juegos o proyectos que necesitan más recursos.'},
+      {icon:'🔒', t:'SSL (candado de seguridad) incluido', d:'Certificado SSL gratuito para que tu web muestre "https" y Google no la marque como insegura.'},
+    ],
+    cta:'<strong>Frase para usar con el cliente:</strong> "¿Necesitás hosting para tu web o un email con tu nombre de empresa? Lo configuramos y te enseñamos a usarlo sin complicaciones."'
+  },
+  compras: {
+    icon:'🛒', name:'Cómo Comprar en Internet',
+    sub:'Mercado Libre, Temu, Amazon y más',
+    target:'👤 Para: personas que nunca compraron online o tuvieron malas experiencias',
+    benefits:[
+      {icon:'🛍️', t:'Guía paso a paso para Mercado Libre', d:'Crear cuenta, agregar tarjeta, hacer una compra segura, entender el estado de envío. Sin miedo a perder plata.'},
+      {icon:'🇨🇳', t:'Cómo comprar en Temu (desde China)', d:'La plataforma más económica. Explicamos cómo funciona, los tiempos de entrega y cómo evitar errores.'},
+      {icon:'🔒', t:'Evitar estafas al comprar online', d:'Enseñamos a detectar vendedores falsos, publicaciones trampa y medios de pago seguros. Cero riesgos.'},
+      {icon:'📱', t:'Configuración de cuenta y medios de pago', d:'Instalamos Mercado Pago o cualquier billetera virtual. Cargamos la tarjeta y hacemos la primera compra juntos.'},
+      {icon:'🛒', t:'También compramos por vos', d:'Si no querés aprender o no podés, nosotros hacemos la compra en tu nombre y te mandamos el producto.'},
+    ],
+    cta:'<strong>Frase para usar con el cliente:</strong> "¿Nunca compraste por internet porque no sabés cómo o le tenés desconfianza? Te enseñamos en 30 minutos o compramos por vos."'
+  },
+  consulting: {
+    icon:'💡', name:'Consultoría Digital',
+    sub:'Asesoramiento tecnológico para personas y negocios',
+    target:'👤 Para: personas y empresas que necesitan orientación sobre tecnología y digitalización',
+    benefits:[
+      {icon:'📱', t:'Qué celular, PC o dispositivo comprar', d:'Analizamos tus necesidades y presupuesto y te recomendamos la mejor opción sin que te vendan algo innecesario.'},
+      {icon:'🔐', t:'Seguridad digital y contraseñas', d:'Configuramos contraseñas seguras, autenticación en dos pasos y te enseñamos a proteger tus cuentas.'},
+      {icon:'☁️', t:'Backup y almacenamiento en la nube', d:'Google Drive, OneDrive, Dropbox. Configuramos la copia automática de fotos, documentos y archivos importantes.'},
+      {icon:'📲', t:'Configuración de celular y aplicaciones', d:'Configuramos el celular de cero, instalamos apps, sincronizamos cuentas de email y redes sociales.'},
+      {icon:'🤖', t:'Uso de Inteligencia Artificial', d:'Enseñamos a usar ChatGPT, Gemini y otras herramientas de IA para trabajo, estudio y vida cotidiana.'},
+    ],
+    cta:'<strong>Frase para usar con el cliente:</strong> "¿Tenés alguna duda sobre tecnología o no sabés cómo hacer algo con tu celular, PC o internet? Consultanos — si no lo sabemos, investigamos y te respondemos."'
+  },
+  venta: {
+    icon:'📦', name:'Venta de Electrónica',
+    sub:'Celulares, PC, tablets, accesorios, gaming',
+    target:'👤 Para: cualquier persona que quiera comprar tecnología a buen precio',
+    benefits:[
+      {icon:'📱', t:'Celulares y smartphones', d:'Nuevos y usados. Marca propia e importados. Te asesoramos cuál elegir según tu uso y presupuesto.'},
+      {icon:'🖥️', t:'Computadoras y notebooks', d:'PC de escritorio, laptops, netbooks. Armamos PC a medida para gaming, diseño o uso cotidiano.'},
+      {icon:'🎮', t:'Periféricos y accesorios gaming', d:'Teclados, mouses, headsets, monitores, sillas gaming. Todo para el setup que querés.'},
+      {icon:'🔋', t:'Accesorios y repuestos', d:'Baterías, pantallas, cargadores, auriculares, fundas. Compatibles y de buena calidad.'},
+      {icon:'🔄', t:'Compra/venta de usados', d:'Compramos tu dispositivo para que puedas actualizar el equipo. También valuamos antes de que lo vendas vos solo.'},
+    ],
+    cta:'<strong>Frase para usar con el cliente:</strong> "¿Necesitás un celular, PC o algún accesorio? Consultanos el modelo y el presupuesto — te conseguimos la mejor opción al mejor precio."'
+  },
+  reparacion: {
+    icon:'🔧', name:'Reparaciones de Electrónica',
+    sub:'Celulares, PCs, recupero de datos, formateos',
+    target:'👤 Para: cualquier persona con un dispositivo roto, lento o con problemas',
+    benefits:[
+      {icon:'📱', t:'Reparación de celulares', d:'Pantalla rota, batería que no dura, cámara que no funciona, botones que no responden. Presupuesto sin cargo.'},
+      {icon:'💻', t:'Reparación de PC y notebooks', d:'No enciende, pantalla azul, teclado dañado, placa de video. Diagnóstico y presupuesto antes de reparar.'},
+      {icon:'⚡', t:'Limpieza y optimización (PC lenta)', d:'Eliminamos virus, programas basura y optimizamos el sistema. Tu PC vuelve a andar rápido sin cambiarlo.'},
+      {icon:'💾', t:'Recupero de datos', d:'Fotos, documentos, contactos perdidos por formateo accidental, virus o pantalla rota. Intentamos recuperar todo.'},
+      {icon:'🖥️', t:'Formateos e instalación de programas', d:'Formateamos y reinstalamos Windows, macOS o Linux. Instalamos los programas que necesitás listos para usar.'},
+    ],
+    cta:'<strong>Frase para usar con el cliente:</strong> "¿Tenés el celular con la pantalla rota o la PC que va lenta? Mandanos foto del problema y te damos presupuesto gratis al toque."'
+  }
+};
+
+let lastBtn = null;
+
+function selectSvc(key, btn) {
+  const data = SVCS[key];
+  if(!data) return;
+  if(lastBtn) lastBtn.classList.remove('selected');
+  btn.classList.add('selected');
+  lastBtn = btn;
+
+  document.getElementById('sph-icon').textContent     = data.icon;
+  document.getElementById('sph-name').textContent     = data.name;
+  document.getElementById('sph-sub').textContent      = data.sub;
+  document.getElementById('sph-target').textContent   = data.target;
+  document.getElementById('sph-benefits').innerHTML   = data.benefits.map(b =>
+    `<div class="sb-item"><div class="sb-icon">${b.icon}</div><div class="sb-txt"><strong>${b.t}</strong><span>${b.d}</span></div></div>`
+  ).join('');
+  document.getElementById('sph-cta').innerHTML = data.cta;
+
+  const panel = document.getElementById('svc-panel');
+  panel.classList.add('visible');
+  setTimeout(() => panel.scrollIntoView({behavior:'smooth', block:'nearest'}), 80);
+}
+</script>
+</body>
+</html>

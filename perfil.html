@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LocalWeb · Mi Perfil</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #fff; min-height: 100vh; }
+
+  /* ── Header ── */
+  .topbar {
+    background: linear-gradient(135deg, #1e40af, #0ea5e9);
+    padding: 16px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(255,255,255,.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; flex-shrink: 0;
+    overflow: hidden;
+  }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .topbar-name { font-weight: 700; font-size: 16px; }
+  .topbar-sub  { font-size: 12px; opacity: .75; }
+  .btn-logout {
+    background: rgba(255,255,255,.15); border: none; color: #fff;
+    padding: 8px 14px; border-radius: 20px; font-size: 13px;
+    cursor: pointer; font-family: inherit; font-weight: 600;
+  }
+  .btn-home {
+    background: rgba(255,255,255,.15); border: none; color: #fff;
+    padding: 8px 14px; border-radius: 20px; font-size: 13px;
+    font-weight: 600; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+
+  /* ── Views ── */
+  .view { display: none; padding: 20px 16px; max-width: 540px; margin: 0 auto; }
+  .view.active { display: block; }
+
+  /* ── Home cards ── */
+  .home-cards { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }
+  .home-card {
+    background: #1e293b; border-radius: 16px; border: 1px solid #334155;
+    padding: 22px 20px; display: flex; align-items: center; gap: 16px;
+    cursor: pointer; transition: transform .15s, border-color .15s;
+    text-decoration: none; color: inherit;
+  }
+  .home-card:active { transform: scale(.98); }
+  .home-card:hover  { border-color: #475569; }
+  .home-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; flex-shrink: 0;
+  }
+  .ic-azul   { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+  .ic-verde  { background: linear-gradient(135deg, #10b981, #0ea5e9); }
+  .ic-naranja{ background: linear-gradient(135deg, #f59e0b, #ef4444); }
+  .home-card-title { font-size: 17px; font-weight: 700; }
+  .home-card-sub   { font-size: 13px; color: #94a3b8; margin-top: 3px; }
+  .chevron { margin-left: auto; color: #475569; font-size: 20px; }
+
+  /* ── Section header ── */
+  .sec-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  }
+  .btn-back {
+    background: #1e293b; border: 1px solid #334155; color: #94a3b8;
+    padding: 8px 14px; border-radius: 20px; font-size: 13px;
+    cursor: pointer; font-family: inherit;
+  }
+  .sec-title { font-size: 20px; font-weight: 800; }
+
+  /* ── Forms ── */
+  .form-group { margin-bottom: 16px; }
+  label { display: block; font-size: 11px; color: #64748b; margin-bottom: 5px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; }
+  input[type="text"], input[type="tel"], input[type="email"],
+  select, textarea {
+    width: 100%; padding: 13px 14px;
+    background: #0f172a; border: 1px solid #334155;
+    border-radius: 10px; color: #fff; font-size: 15px;
+    outline: none; transition: border-color .15s;
+    font-family: inherit;
+  }
+  input:focus, select:focus, textarea:focus { border-color: #38bdf8; }
+  select option { background: #1e293b; }
+  textarea { resize: vertical; min-height: 90px; }
+  input::placeholder, textarea::placeholder { color: #475569; }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* ── Toggle buttons (interesado / pagina) ── */
+  .toggle-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .toggle-btn {
+    flex: 1; min-width: 80px; padding: 12px 8px; border-radius: 10px;
+    border: 1.5px solid #334155; background: #0f172a; color: #64748b;
+    font-size: 14px; font-weight: 600; cursor: pointer; text-align: center;
+    transition: all .15s; font-family: inherit;
+  }
+  .toggle-btn.sel-si      { border-color: #22c55e; background: #052e16; color: #4ade80; }
+  .toggle-btn.sel-no      { border-color: #ef4444; background: #450a0a; color: #fca5a5; }
+  .toggle-btn.sel-indeciso{ border-color: #f59e0b; background: #431407; color: #fcd34d; }
+  .toggle-btn.sel-pag     { border-color: #38bdf8; background: #1e3a5f; color: #93c5fd; }
+
+  /* ── Primary button ── */
+  .btn-primary {
+    width: 100%; padding: 15px; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: #fff; font-size: 16px; font-weight: 700;
+    cursor: pointer; font-family: inherit; margin-top: 8px;
+  }
+  .btn-primary:disabled { opacity: .45; cursor: default; }
+
+  /* ── Messages ── */
+  .msg { padding: 12px 14px; border-radius: 10px; font-size: 13px; margin-top: 14px; display: none; line-height: 1.5; }
+  .msg.error   { background: #450a0a; color: #fca5a5; border: 1px solid #7f1d1d; display: block; }
+  .msg.success { background: #052e16; color: #4ade80; border: 1px solid #14532d; display: block; }
+
+  /* ── Client list ── */
+  .cliente-card {
+    background: #1e293b; border-radius: 14px; border: 1px solid #334155;
+    margin-bottom: 12px; overflow: hidden; cursor: pointer;
+  }
+  .cliente-card-head {
+    padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .dot.si       { background: #22c55e; }
+  .dot.no       { background: #ef4444; }
+  .dot.indeciso { background: #f59e0b; }
+  .cliente-name { font-weight: 700; font-size: 15px; }
+  .cliente-sub  { font-size: 12px; color: #64748b; margin-top: 2px; }
+  .pag-badge {
+    margin-left: auto; font-size: 11px; font-weight: 700;
+    padding: 3px 9px; border-radius: 20px;
+  }
+  .pag-tc   { background: #431407; color: #fb923c; }
+  .pag-lw   { background: #1e1b4b; color: #a78bfa; }
+  .pag-dw   { background: #052e16; color: #34d399; }
+  .pag-none { background: #1e293b; color: #64748b; }
+
+  .cliente-detail {
+    display: none; padding: 0 16px 14px;
+    border-top: 1px solid #334155;
+  }
+  .cliente-detail.open { display: block; padding-top: 12px; }
+  .detail-row { font-size: 13px; color: #94a3b8; margin-bottom: 6px; }
+  .detail-row strong { color: #cbd5e1; }
+  .fotos-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .fotos-grid img { width: 72px; height: 72px; object-fit: cover; border-radius: 8px; }
+
+  .empty-state { text-align: center; padding: 48px 20px; color: #475569; }
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+
+  /* ── Bienvenida ── */
+  .welcome-card {
+    background: linear-gradient(135deg, #1e3a8a, #0369a1);
+    border-radius: 16px; padding: 20px; margin-bottom: 16px;
+    border: 1px solid #1d4ed8;
+  }
+  .welcome-saludo { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+  .welcome-msg    { font-size: 13px; opacity: .85; line-height: 1.6; }
+
+  /* ── Panel WhatsApp ── */
+  .wa-panel {
+    background: #052e16; border: 1px solid #14532d;
+    border-radius: 14px; overflow: hidden; margin-top: 14px;
+  }
+  .wa-panel-head {
+    padding: 14px 16px; font-size: 14px; font-weight: 700;
+    color: #4ade80; display: flex; align-items: center; gap: 8px;
+  }
+  .wa-btn {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px; border-top: 1px solid #14532d;
+    text-decoration: none; color: #fff; font-size: 14px;
+    transition: background .15s;
+  }
+  .wa-btn:active { background: rgba(255,255,255,.05); }
+  .wa-btn-icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #25D366; display: flex; align-items: center;
+    justify-content: center; font-size: 20px; flex-shrink: 0;
+  }
+  .wa-btn-name  { font-weight: 700; font-size: 14px; }
+  .wa-btn-num   { font-size: 12px; color: #4ade80; margin-top: 2px; }
+
+  /* ── Avatar edit ── */
+  .avatar-edit {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; font-weight: 700; margin: 0 auto 20px; overflow: hidden;
+    cursor: pointer; position: relative;
+  }
+  .avatar-edit img { width: 100%; height: 100%; object-fit: cover; }
+  .avatar-edit-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,.6); font-size: 10px; text-align: center;
+    padding: 4px; font-weight: 600;
+  }
+  input[type="file"] { display: none; }
+
+  /* ── Fotos preview ── */
+  .fotos-preview { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .fotos-preview img { width: 72px; height: 72px; object-fit: cover; border-radius: 8px; }
+  .foto-add-btn {
+    width: 72px; height: 72px; border-radius: 8px;
+    border: 2px dashed #334155; background: #0f172a;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: #475569; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="avatar" id="topbar-avatar">?</div>
+    <div>
+      <div class="topbar-name" id="topbar-name">Cargando...</div>
+      <div class="topbar-sub">Vendedora</div>
+    </div>
+  </div>
+  <div style="display:flex; gap:8px; align-items:center">
+    <a href="index.html" class="btn-home">🏠 Inicio</a>
+    <button class="btn-logout" onclick="logout()">Salir</button>
+  </div>
+</div>
+
+<!-- VIEW: HOME -->
+<div id="view-home" class="view active">
+
+  <!-- Bienvenida personalizada -->
+  <div class="welcome-card">
+    <div class="welcome-saludo" id="welcome-saludo">¡Bienvenida! 👋</div>
+    <div class="welcome-msg" id="welcome-msg">Que tengas un gran día de ventas. Cada visita es una nueva oportunidad — ¡mucho éxito hoy! 🚀</div>
+  </div>
+
+  <div style="font-size:12px; color:#64748b; margin-bottom:12px;">¿Qué querés hacer?</div>
+
+  <div class="home-cards">
+    <div class="home-card" onclick="showView('datos')">
+      <div class="home-icon ic-azul">👤</div>
+      <div>
+        <div class="home-card-title">Datos personales</div>
+        <div class="home-card-sub">Modificá tu nombre, teléfono y foto</div>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="home-card" onclick="showView('clientes')">
+      <div class="home-icon ic-verde">📋</div>
+      <div>
+        <div class="home-card-title">Mis clientes</div>
+        <div class="home-card-sub">Listado de comercios que visitaste</div>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="home-card" onclick="showView('nuevo')">
+      <div class="home-icon ic-naranja">➕</div>
+      <div>
+        <div class="home-card-title">Registrar cliente</div>
+        <div class="home-card-sub">Cargá un nuevo comercio visitado</div>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+  </div>
+
+  <!-- Consultas por WhatsApp -->
+  <div class="wa-panel">
+    <div class="wa-panel-head">💬 ¿Tenés alguna duda? Consultanos</div>
+    <a id="wa-daniel" href="#" class="wa-btn" target="_blank">
+      <div class="wa-btn-icon">💬</div>
+      <div>
+        <div class="wa-btn-name">Enviar consulta a Daniel</div>
+        <div class="wa-btn-num">+54 2954 320639</div>
+      </div>
+    </a>
+    <a id="wa-nicolas" href="#" class="wa-btn" target="_blank">
+      <div class="wa-btn-icon">💬</div>
+      <div>
+        <div class="wa-btn-name">Enviar consulta a Nicolás</div>
+        <div class="wa-btn-num">+54 2954 298700</div>
+      </div>
+    </a>
+  </div>
+
+</div>
+
+<!-- VIEW: DATOS PERSONALES -->
+<div id="view-datos" class="view">
+  <div class="sec-header">
+    <button class="btn-back" onclick="showView('home')">← Volver</button>
+    <div class="sec-title">Datos personales</div>
+  </div>
+
+  <div class="avatar-edit" id="avatar-edit-btn" onclick="document.getElementById('inp-avatar').click()">
+    <span id="avatar-initials">?</span>
+    <div class="avatar-edit-overlay">Cambiar</div>
+  </div>
+  <input type="file" id="inp-avatar" accept="image/*" onchange="previewAvatar(this)">
+
+  <div class="row2">
+    <div class="form-group" style="margin:0">
+      <label>Nombre</label>
+      <input type="text" id="d-nombre" placeholder="Tu nombre">
+    </div>
+    <div class="form-group" style="margin:0">
+      <label>Apellido</label>
+      <input type="text" id="d-apellido" placeholder="Tu apellido">
+    </div>
+  </div>
+  <div class="form-group" style="margin-top:14px">
+    <label>Teléfono</label>
+    <input type="tel" id="d-tel" placeholder="2954 123456">
+  </div>
+
+  <button class="btn-primary" id="btn-guardar" onclick="guardarDatos()">Guardar cambios</button>
+  <div id="msg-datos" class="msg"></div>
+</div>
+
+<!-- VIEW: MIS CLIENTES -->
+<div id="view-clientes" class="view">
+  <div class="sec-header">
+    <button class="btn-back" onclick="showView('home')">← Volver</button>
+    <div class="sec-title">Mis clientes</div>
+  </div>
+  <div id="lista-clientes">
+    <div class="empty-state"><div class="icon">📋</div>Cargando...</div>
+  </div>
+</div>
+
+<!-- VIEW: NUEVO CLIENTE -->
+<div id="view-nuevo" class="view">
+  <div class="sec-header">
+    <button class="btn-back" onclick="showView('home')">← Volver</button>
+    <div class="sec-title">Registrar cliente</div>
+  </div>
+
+  <div class="form-group">
+    <label>Nombre del negocio *</label>
+    <input type="text" id="n-negocio" placeholder="Ej: Ferretería El Clavo">
+  </div>
+
+  <div class="row2">
+    <div class="form-group" style="margin:0">
+      <label>Rubro</label>
+      <select id="n-rubro">
+        <option value="">— Seleccionar —</option>
+        <option>Ferretería / Corralón</option>
+        <option>Pinturería</option>
+        <option>Inmobiliaria</option>
+        <option>Gastronomía</option>
+        <option>Farmacia / Perfumería</option>
+        <option>Salud / Clínica</option>
+        <option>Indumentaria / Calzado</option>
+        <option>Estudio contable / legal</option>
+        <option>Gimnasio / Deporte</option>
+        <option>Educación</option>
+        <option>Electrónica / Tecnología</option>
+        <option>Comercio general</option>
+        <option>Empresa / PYME</option>
+        <option>Otro</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin:0">
+      <label>Propietario</label>
+      <input type="text" id="n-propietario" placeholder="Nombre (opcional)">
+    </div>
+  </div>
+
+  <div class="row2" style="margin-top:14px">
+    <div class="form-group" style="margin:0">
+      <label>Teléfono *</label>
+      <input type="tel" id="n-tel" placeholder="2954 xxxxxxx">
+    </div>
+    <div class="form-group" style="margin:0">
+      <label>Email</label>
+      <input type="email" id="n-email" placeholder="(opcional)">
+    </div>
+  </div>
+
+  <div class="form-group" style="margin-top:14px">
+    <label>Dirección *</label>
+    <input type="text" id="n-dir" placeholder="Calle, número, localidad">
+  </div>
+
+  <!-- Interesado -->
+  <div class="form-group">
+    <label>¿Le interesó?</label>
+    <div class="toggle-group">
+      <button class="toggle-btn" id="tb-si"       onclick="selInteresado('si')">✅ Sí</button>
+      <button class="toggle-btn" id="tb-no"        onclick="selInteresado('no')">❌ No</button>
+      <button class="toggle-btn" id="tb-indeciso"  onclick="selInteresado('indeciso')">🤔 Indeciso</button>
+    </div>
+  </div>
+
+  <!-- Plataforma -->
+  <div class="form-group">
+    <label>¿Qué plataforma?</label>
+    <div class="toggle-group">
+      <button class="toggle-btn" id="tb-tc"  onclick="selPagina('trabajoscerca')">🔨 TC</button>
+      <button class="toggle-btn" id="tb-lw"  onclick="selPagina('localweb')">🌐 LocalWeb</button>
+      <button class="toggle-btn" id="tb-dw"  onclick="selPagina('dataweb')">💻 DataWeb</button>
+      <button class="toggle-btn" id="tb-ng"  onclick="selPagina('ninguna')">— Ninguna</button>
+    </div>
+  </div>
+
+  <!-- Plan (dinámico) -->
+  <div class="form-group" id="grupo-plan" style="display:none">
+    <label>Plan elegido</label>
+    <select id="n-plan"><option value="">— Seleccionar plan —</option></select>
+  </div>
+
+  <div class="form-group">
+    <label>Observaciones</label>
+    <textarea id="n-obs" placeholder="Anotá detalles de la visita, lo que comentó el cliente, próximos pasos..."></textarea>
+  </div>
+
+  <!-- Fotos -->
+  <div class="form-group">
+    <label>Fotos del local (opcional)</label>
+    <div class="fotos-preview" id="fotos-preview">
+      <div class="foto-add-btn" onclick="document.getElementById('inp-fotos').click()">+</div>
+    </div>
+    <input type="file" id="inp-fotos" accept="image/*" multiple onchange="agregarFotos(this)">
+  </div>
+
+  <button class="btn-primary" id="btn-registrar" onclick="registrarCliente()">Guardar cliente</button>
+  <div id="msg-nuevo" class="msg"></div>
+</div>
+
+<script>
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const PLANES = {
+  trabajoscerca: ['Buscador — $50.000/mes','Inicio (portada) — $100.000/mes','Pack Buscador + Inicio — $120.000/mes'],
+  localweb:      ['Web básica','Web + Community Manager','Plan personalizado / A cotizar'],
+  dataweb:       ['Trámite puntual','Soporte mensual','Consultoría digital','Venta de equipo','Reparación'],
+  ninguna:       ['No aplica']
+};
+
+let sesion = null;
+let perfil = null;
+let interesado = '';
+let pagina = '';
+let fotosFiles = [];
+
+// ── Auth guard ──
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'login.html'; return; }
+  sesion = session;
+
+  const { data: p } = await sb.from('perfiles').select('*').eq('id', session.user.id).single();
+  if (!p || p.rol === 'pendiente') { window.location.href = 'login.html'; return; }
+  perfil = p;
+
+  // topbar
+  const initials = (p.nombre[0] + p.apellido[0]).toUpperCase();
+  const avatarEl = document.getElementById('topbar-avatar');
+  if (p.avatar_url) {
+    avatarEl.innerHTML = `<img src="${p.avatar_url}">`;
+  } else {
+    avatarEl.textContent = initials;
+  }
+  document.getElementById('topbar-name').textContent = `${p.nombre} ${p.apellido}`;
+
+  // Bienvenida personalizada
+  const hora = new Date().getHours();
+  const saludo = hora < 12 ? '¡Buenos días' : hora < 19 ? '¡Buenas tardes' : '¡Buenas noches';
+  document.getElementById('welcome-saludo').textContent = `${saludo}, ${p.nombre}! 👋`;
+  const frases = [
+    'Que tengas un gran día de ventas. Cada visita es una nueva oportunidad — ¡mucho éxito hoy! 🚀',
+    '¡A por todas hoy! Cada "no" te acerca más al próximo "sí". Confiá en lo que ofrecés. 💪',
+    'El éxito en ventas se construye visita a visita. ¡Hoy puede ser un gran día! ⭐',
+    '¡Ánimo! Tenés todo para lograr un día increíble. ¡Mucha suerte en cada visita! 🌟',
+    'Recordá: cada comercio que visitás es una oportunidad de ayudarles a crecer. ¡A brillar! ✨'
+  ];
+  document.getElementById('welcome-msg').textContent = frases[new Date().getDay() % frases.length];
+
+  // Links WhatsApp con nombre de la vendedora
+  const nombreCompleto = `${p.nombre} ${p.apellido}`;
+  const msg = encodeURIComponent(`Hola, soy ${nombreCompleto} y quiero hacerte una consulta.`);
+  document.getElementById('wa-daniel').href  = `https://wa.me/542954320639?text=${msg}`;
+  document.getElementById('wa-nicolas').href = `https://wa.me/542954298700?text=${msg}`;
+
+  // pre-llenar datos
+  document.getElementById('d-nombre').value   = p.nombre;
+  document.getElementById('d-apellido').value = p.apellido;
+  document.getElementById('d-tel').value      = p.telefono || '';
+  document.getElementById('avatar-initials').textContent = initials;
+  if (p.avatar_url) {
+    document.getElementById('avatar-edit-btn').innerHTML =
+      `<img src="${p.avatar_url}"><div class="avatar-edit-overlay">Cambiar</div>`;
+  }
+}
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  if (name === 'clientes') cargarClientes();
+  if (name === 'nuevo') resetForm();
+  window.scrollTo(0, 0);
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  window.location.href = 'login.html';
+}
+
+// ── Datos personales ──
+function previewAvatar(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('avatar-edit-btn').innerHTML =
+      `<img src="${e.target.result}"><div class="avatar-edit-overlay">Cambiar</div>`;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function guardarDatos() {
+  const nombre   = document.getElementById('d-nombre').value.trim();
+  const apellido = document.getElementById('d-apellido').value.trim();
+  const tel      = document.getElementById('d-tel').value.trim();
+  if (!nombre || !apellido) return showMsg('msg-datos','error','Completá nombre y apellido.');
+
+  const btn = document.getElementById('btn-guardar');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+
+  let avatar_url = perfil.avatar_url;
+  const file = document.getElementById('inp-avatar').files[0];
+  if (file) {
+    const ext  = file.name.split('.').pop();
+    const path = `avatars/${perfil.id}.${ext}`;
+    const { error: upErr } = await sb.storage.from('fotos-clientes').upload(path, file, { upsert: true });
+    if (!upErr) {
+      const { data: urlData } = sb.storage.from('fotos-clientes').getPublicUrl(path);
+      avatar_url = urlData.publicUrl;
+    }
+  }
+
+  const { error } = await sb.from('perfiles').update({ nombre, apellido, telefono: tel, avatar_url })
+    .eq('id', perfil.id);
+
+  if (error) {
+    showMsg('msg-datos','error','Error al guardar. Intentá de nuevo.');
+  } else {
+    perfil.nombre = nombre; perfil.apellido = apellido;
+    perfil.telefono = tel; perfil.avatar_url = avatar_url;
+    document.getElementById('topbar-name').textContent = `${nombre} ${apellido}`;
+    showMsg('msg-datos','success','¡Datos actualizados correctamente!');
+  }
+  btn.disabled = false; btn.textContent = 'Guardar cambios';
+}
+
+// ── Clientes ──
+async function cargarClientes() {
+  const lista = document.getElementById('lista-clientes');
+  lista.innerHTML = '<div class="empty-state"><div class="icon">⏳</div>Cargando...</div>';
+
+  const { data, error } = await sb.from('clientes')
+    .select('*')
+    .eq('vendedora_id', perfil.id)
+    .order('created_at', { ascending: false });
+
+  if (error || !data?.length) {
+    lista.innerHTML = '<div class="empty-state"><div class="icon">📋</div>Todavía no registraste ningún cliente.<br><br><button onclick="showView(\'nuevo\')" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);border:none;color:#fff;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">➕ Registrar primer cliente</button></div>';
+    return;
+  }
+
+  lista.innerHTML = data.map(c => `
+    <div class="cliente-card" onclick="toggleDetalle('det-${c.id}')">
+      <div class="cliente-card-head">
+        <div class="dot ${c.interesado}"></div>
+        <div>
+          <div class="cliente-name">${c.nombre_negocio}</div>
+          <div class="cliente-sub">${c.rubro || '—'} · ${fmtFecha(c.created_at)}</div>
+        </div>
+        <span class="pag-badge ${badgeCls(c.pagina)}">${pagNombre(c.pagina)}</span>
+      </div>
+      <div class="cliente-detail" id="det-${c.id}">
+        ${c.propietario ? `<div class="detail-row">👤 <strong>Propietario:</strong> ${c.propietario}</div>` : ''}
+        ${c.telefono    ? `<div class="detail-row">📞 <strong>Tel:</strong> ${c.telefono}</div>` : ''}
+        ${c.email       ? `<div class="detail-row">📧 <strong>Email:</strong> ${c.email}</div>` : ''}
+        ${c.direccion   ? `<div class="detail-row">📍 <strong>Dir:</strong> ${c.direccion}</div>` : ''}
+        ${c.plan        ? `<div class="detail-row">📦 <strong>Plan:</strong> ${c.plan}</div>` : ''}
+        ${c.observaciones ? `<div class="detail-row">📝 <strong>Obs:</strong> ${c.observaciones}</div>` : ''}
+        ${c.fotos?.length ? `<div class="fotos-grid">${c.fotos.map(f=>`<img src="${f}">`).join('')}</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleDetalle(id) {
+  document.getElementById(id)?.classList.toggle('open');
+}
+
+// ── Nuevo cliente ──
+function resetForm() {
+  ['n-negocio','n-rubro','n-propietario','n-tel','n-email','n-dir','n-obs'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.tagName === 'SELECT' ? el.selectedIndex = 0 : el.value = '';
+  });
+  interesado = ''; pagina = ''; fotosFiles = [];
+  document.querySelectorAll('.toggle-btn').forEach(b => b.className = 'toggle-btn');
+  document.getElementById('grupo-plan').style.display = 'none';
+  document.getElementById('fotos-preview').innerHTML = '<div class="foto-add-btn" onclick="document.getElementById(\'inp-fotos\').click()">+</div>';
+  document.getElementById('msg-nuevo').className = 'msg';
+}
+
+function selInteresado(val) {
+  interesado = val;
+  document.getElementById('tb-si').className       = 'toggle-btn' + (val==='si'       ? ' sel-si'       : '');
+  document.getElementById('tb-no').className        = 'toggle-btn' + (val==='no'        ? ' sel-no'        : '');
+  document.getElementById('tb-indeciso').className  = 'toggle-btn' + (val==='indeciso'  ? ' sel-indeciso'  : '');
+}
+
+function selPagina(val) {
+  pagina = val;
+  ['tb-tc','tb-lw','tb-dw','tb-ng'].forEach(id => document.getElementById(id).className = 'toggle-btn');
+  const map = { trabajoscerca:'tb-tc', localweb:'tb-lw', dataweb:'tb-dw', ninguna:'tb-ng' };
+  if (map[val]) document.getElementById(map[val]).className = 'toggle-btn sel-pag';
+
+  const planes = PLANES[val] || [];
+  const sel = document.getElementById('n-plan');
+  sel.innerHTML = '<option value="">— Seleccionar plan —</option>' +
+    planes.map(p => `<option>${p}</option>`).join('');
+  document.getElementById('grupo-plan').style.display = planes.length > 1 ? 'block' : 'none';
+}
+
+function agregarFotos(input) {
+  const preview = document.getElementById('fotos-preview');
+  Array.from(input.files).forEach(file => {
+    fotosFiles.push(file);
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.style.cssText = 'width:72px;height:72px;object-fit:cover;border-radius:8px;';
+      preview.insertBefore(img, preview.lastElementChild);
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+async function registrarCliente() {
+  const negocio = document.getElementById('n-negocio').value.trim();
+  const tel     = document.getElementById('n-tel').value.trim();
+  const dir     = document.getElementById('n-dir').value.trim();
+
+  if (!negocio || !tel || !dir)
+    return showMsg('msg-nuevo','error','Completá nombre del negocio, teléfono y dirección.');
+  if (!interesado)
+    return showMsg('msg-nuevo','error','Indicá si le interesó o no.');
+
+  const btn = document.getElementById('btn-registrar');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+
+  // Upload fotos
+  let fotosUrls = [];
+  for (const file of fotosFiles) {
+    const ext  = file.name.split('.').pop();
+    const path = `clientes/${perfil.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error } = await sb.storage.from('fotos-clientes').upload(path, file);
+    if (!error) {
+      const { data } = sb.storage.from('fotos-clientes').getPublicUrl(path);
+      fotosUrls.push(data.publicUrl);
+    }
+  }
+
+  const payload = {
+    vendedora_id:   perfil.id,
+    nombre_negocio: negocio,
+    rubro:          document.getElementById('n-rubro').value,
+    propietario:    document.getElementById('n-propietario').value.trim(),
+    telefono:       tel,
+    email:          document.getElementById('n-email').value.trim(),
+    direccion:      dir,
+    interesado,
+    pagina:         pagina || 'ninguna',
+    plan:           document.getElementById('n-plan').value,
+    observaciones:  document.getElementById('n-obs').value.trim(),
+    fotos:          fotosUrls
+  };
+
+  const { error } = await sb.from('clientes').insert(payload);
+
+  if (error) {
+    showMsg('msg-nuevo','error','Error al guardar. Intentá de nuevo.');
+    btn.disabled = false; btn.textContent = 'Guardar cliente';
+  } else {
+    showMsg('msg-nuevo','success','¡Cliente registrado correctamente!');
+    btn.disabled = false; btn.textContent = 'Guardar cliente';
+    setTimeout(() => showView('clientes'), 1500);
+  }
+}
+
+// ── Helpers ──
+function fmtFecha(iso) {
+  return new Date(iso).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'2-digit' });
+}
+function badgeCls(p) {
+  return { trabajoscerca:'pag-tc', localweb:'pag-lw', dataweb:'pag-dw' }[p] || 'pag-none';
+}
+function pagNombre(p) {
+  return { trabajoscerca:'Trab.Cerca', localweb:'LocalWeb', dataweb:'DataWeb', ninguna:'Ninguna' }[p] || '—';
+}
+function showMsg(id, type, text) {
+  const el = document.getElementById(id);
+  el.className = `msg ${type}`;
+  el.textContent = text;
+}
+
+init();
+</script>
+</body>
+</html>

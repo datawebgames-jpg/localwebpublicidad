@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Publicitate en Trabajos Cerca</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --naranja: #f59e0b;
+  --rojo: #ef4444;
+  --azul: #2563eb;
+  --verde: #16a34a;
+  --bg: #0f172a;
+  --card: #1e293b;
+  --border: #334155;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100dvh;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+}
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; background: #0a0f1e;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.topbar a { color: var(--muted); text-decoration: none; font-size: 13px; }
+.topbar .title { font-size: 13px; font-weight: 700; color: var(--naranja); }
+.slide-counter { font-size: 12px; color: var(--muted); }
+
+.progress-bar { height: 3px; background: var(--border); flex-shrink: 0; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--naranja), var(--rojo)); transition: width .35s ease; }
+
+.slides-wrapper { flex: 1; overflow: hidden; position: relative; }
+.slides-track { display: flex; height: 100%; transition: transform .38s cubic-bezier(.4,0,.2,1); }
+.slide { min-width: 100%; height: 100%; overflow-y: auto; padding-bottom: 80px; }
+
+.nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; background: #0a0f1e;
+  border-top: 1px solid var(--border); flex-shrink: 0; gap: 12px;
+}
+.btn-nav {
+  flex: 1; padding: 13px; border-radius: 12px; border: none;
+  font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity .15s, transform .1s;
+}
+.btn-nav:active { transform: scale(.96); }
+.btn-prev { background: var(--card); color: var(--muted); border: 1px solid var(--border); }
+.btn-next { background: linear-gradient(135deg, var(--naranja), var(--rojo)); color: #fff; }
+.btn-nav:disabled { opacity: .3; cursor: default; }
+.dots { display: flex; gap: 5px; align-items: center; flex-shrink: 0; flex-wrap: wrap; max-width: 110px; justify-content: center; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); transition: background .3s, width .3s; }
+.dot.active { background: var(--naranja); width: 16px; border-radius: 3px; }
+
+/* SHARED */
+.section { padding: 22px 18px 8px; }
+.sbadge {
+  display: inline-block; font-size: 11px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 20px; margin-bottom: 10px;
+}
+.b-orange { color: var(--naranja); background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.25); }
+.b-blue   { color: #60a5fa;       background: rgba(37,99,235,.12);   border: 1px solid rgba(37,99,235,.25); }
+.b-green  { color: #4ade80;       background: rgba(22,163,74,.12);   border: 1px solid rgba(22,163,74,.25); }
+.b-red    { color: #f87171;       background: rgba(239,68,68,.12);   border: 1px solid rgba(239,68,68,.25); }
+.b-purple { color: #c084fc;       background: rgba(168,85,247,.12);  border: 1px solid rgba(168,85,247,.25); }
+
+.section h2 { font-size: 21px; font-weight: 800; line-height: 1.2; margin-bottom: 8px; }
+.section p  { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+.section p strong { color: var(--text); }
+
+.highlight {
+  margin: 10px 18px; padding: 14px 16px; border-radius: 12px;
+  border-left: 4px solid var(--naranja); background: rgba(245,158,11,.07);
+  font-size: 13px; line-height: 1.6; color: var(--muted);
+}
+.highlight strong { color: var(--text); display: block; font-size: 14px; margin-bottom: 3px; }
+
+/* ══ COVER ══ */
+.slide-cover {
+  background: linear-gradient(160deg, #1a2a4a 0%, #0f172a 60%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 36px 26px 80px; min-height: 100%;
+}
+.cover-badge {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--naranja); background: rgba(245,158,11,.12);
+  padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(245,158,11,.3);
+  margin-bottom: 18px;
+}
+.cover-icon { font-size: 58px; margin-bottom: 14px; }
+.cover h1 { font-size: 27px; font-weight: 900; line-height: 1.15; margin-bottom: 14px; }
+.cover h1 em { font-style: normal; color: var(--naranja); }
+.cover p { font-size: 15px; color: var(--muted); line-height: 1.6; max-width: 340px; margin-bottom: 22px; }
+.cover-positions {
+  display: flex; gap: 10px; max-width: 340px; width: 100%;
+}
+.cover-pos {
+  flex: 1; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px; padding: 14px 10px; text-align: center;
+}
+.cover-pos .pos-icon { font-size: 28px; margin-bottom: 6px; }
+.cover-pos .pos-name { font-size: 13px; font-weight: 800; }
+.cover-pos .pos-price { font-size: 11px; color: var(--naranja); margin-top: 4px; font-weight: 700; }
+
+/* ══ BROWSER FRAME ══ */
+.browser-frame {
+  margin: 10px 18px; background: #fff;
+  border-radius: 12px; overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,.4); border: 1px solid #e2e8f0;
+}
+.browser-bar {
+  background: #f1f5f9; padding: 7px 12px;
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid #e2e8f0;
+}
+.browser-dots { display: flex; gap: 4px; }
+.browser-dots span { width: 8px; height: 8px; border-radius: 50%; display: block; }
+.browser-url {
+  flex: 1; background: #fff; border: 1px solid #e2e8f0;
+  border-radius: 6px; padding: 4px 10px; font-size: 11px; color: #64748b;
+}
+
+/* ══ TC HOMEPAGE MOCKUP ══ */
+.tc-home-header {
+  background: #1d4ed8; padding: 8px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.tc-home-logo { font-size: 13px; font-weight: 900; color: #fff; }
+.tc-home-nav { display: flex; gap: 8px; }
+.tc-home-nav span { font-size: 10px; color: rgba(255,255,255,.8); }
+
+/* Hero section */
+.tc-hero {
+  background: linear-gradient(135deg, #1e3a8a 30%, #1d4ed8);
+  padding: 16px 14px 12px;
+  position: relative;
+  text-align: center;
+}
+.tc-hero-title { font-size: 14px; font-weight: 900; color: #fff; line-height: 1.3; margin-bottom: 4px; }
+.tc-hero-sub { font-size: 10px; color: rgba(255,255,255,.75); margin-bottom: 10px; }
+.tc-hero-btns { display: flex; gap: 6px; justify-content: center; }
+.tc-hero-btn {
+  padding: 7px 12px; border-radius: 8px;
+  font-size: 10px; font-weight: 700; color: #fff;
+}
+.tc-hero-btn.b1 { background: rgba(255,255,255,.2); }
+.tc-hero-btn.b2 { background: rgba(255,255,255,.2); }
+.tc-hero-btn.b3 { background: rgba(255,255,255,.2); }
+
+/* COMMERCIAL BANNERS EN EL INICIO */
+.tc-banners {
+  display: flex; gap: 6px; padding: 10px 10px 6px;
+  background: #f8fafc;
+}
+.tc-banner-ad {
+  flex: 1; border-radius: 8px; overflow: hidden;
+  border: 2px solid #fbbf24; background: #fff;
+}
+.tc-banner-ad.patrocinado { border-color: #f59e0b; }
+.tc-banner-ad.destacado   { border-color: #3b82f6; }
+.tc-banner-label {
+  font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+  padding: 3px 8px; color: #fff;
+}
+.tc-banner-ad.patrocinado .tc-banner-label { background: #f59e0b; }
+.tc-banner-ad.destacado   .tc-banner-label { background: #3b82f6; }
+.tc-banner-content { padding: 8px; }
+.tc-banner-logo-row { display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+.tc-banner-logo {
+  width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.tc-banner-name { font-size: 10px; font-weight: 800; color: #1e293b; line-height: 1.2; }
+.tc-banner-offer {
+  font-size: 9px; color: #374151; line-height: 1.4;
+  background: #fef9c3; border-radius: 4px; padding: 4px 6px;
+  border-left: 2px solid #f59e0b;
+}
+.tc-banner-offer.blue-accent { background: #eff6ff; border-left-color: #3b82f6; }
+.tc-banner-cta {
+  display: block; margin-top: 6px; padding: 5px;
+  text-align: center; font-size: 9px; font-weight: 700; color: #fff;
+  border-radius: 4px;
+}
+.tc-banner-cta.orange { background: #f59e0b; }
+.tc-banner-cta.blue   { background: #2563eb; }
+
+/* Sections tabs */
+.tc-tabs {
+  display: flex; border-bottom: 2px solid #e2e8f0;
+  padding: 0 10px;
+}
+.tc-tab {
+  flex: 1; text-align: center; padding: 7px 4px;
+  font-size: 10px; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent;
+}
+.tc-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
+
+/* Register CTAs */
+.tc-register-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 5px;
+  padding: 8px 10px;
+}
+.tc-register-item {
+  background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
+  padding: 10px 6px; text-align: center;
+}
+.tc-register-item .ri-icon { font-size: 18px; margin-bottom: 4px; }
+.tc-register-item .ri-name { font-size: 9px; font-weight: 700; color: #1e293b; }
+.tc-register-item .ri-sub  { font-size: 8px; color: #64748b; line-height: 1.3; margin-top: 2px; }
+
+/* ══ BUSCADOR MOCKUP ══ */
+.tc-search-bar {
+  padding: 7px 10px; background: #f8fafc;
+  display: flex; gap: 5px; border-bottom: 1px solid #e2e8f0;
+}
+.tc-field {
+  flex: 1; background: #fff; border: 1px solid #cbd5e1;
+  border-radius: 7px; padding: 6px 10px; font-size: 10px; color: #374151;
+}
+.tc-search-btn { background: #2563eb; color: #fff; padding: 6px 10px; border-radius: 7px; font-size: 10px; font-weight: 700; }
+.tc-prov-banner {
+  background: #eff6ff; border-bottom: 1px solid #bfdbfe;
+  padding: 4px 10px; font-size: 10px; color: #1d4ed8;
+}
+.tc-results-sidebar { display: flex; }
+.tc-results-col { flex: 1; padding: 6px 8px; }
+.tc-sidebar-col { width: 120px; flex-shrink: 0; background: #f8fafc; border-left: 1px solid #e2e8f0; padding: 5px; }
+.tc-result-row {
+  background: #fff; border: 1px solid #e2e8f0; border-radius: 7px;
+  padding: 7px 8px; display: flex; align-items: center; gap: 7px; margin-bottom: 4px;
+}
+.tc-r-avatar { width: 28px; height: 28px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+.tc-r-name { font-size: 10px; font-weight: 700; color: #1e293b; }
+.tc-r-cat  { font-size: 9px; color: #f59e0b; }
+.tc-r-pts  { font-size: 9px; color: #64748b; }
+.tc-r-wa   { background: #16a34a; color: #fff; font-size: 8px; font-weight: 700; padding: 3px 6px; border-radius: 5px; flex-shrink: 0; }
+.tc-sidebar-title-box {
+  background: #1d4ed8; color: #fff; font-size: 8px; font-weight: 800;
+  letter-spacing: .3px; text-transform: uppercase; padding: 4px 5px;
+  border-radius: 4px; text-align: center; margin-bottom: 4px;
+}
+.tc-dest-card {
+  background: #fff; border: 1px solid #fbbf24; border-radius: 5px;
+  padding: 5px; margin-bottom: 4px;
+}
+.tc-dest-row { display: flex; align-items: center; gap: 4px; margin-bottom: 3px; }
+.tc-dest-logo { width: 20px; height: 20px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; }
+.tc-dest-name { font-size: 8px; font-weight: 800; color: #1e293b; line-height: 1.2; }
+.tc-dest-prods { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-bottom: 3px; }
+.tc-dest-prod-cell { background: #f8fafc; border-radius: 3px; padding: 3px; text-align: center; }
+.tc-dest-prod-cell .pi { font-size: 12px; }
+.tc-dest-prod-cell .pp { font-size: 8px; font-weight: 700; color: #f59e0b; }
+.tc-dest-btns { display: flex; gap: 2px; }
+.tc-dest-btn-s { flex: 1; font-size: 7px; font-weight: 700; padding: 2px 3px; border-radius: 3px; text-align: center; }
+.tc-dest-btn-s.ver  { background: #f1f5f9; color: #475569; }
+.tc-dest-btn-s.ofer { background: #2563eb; color: #fff; }
+
+/* ══ COMPARISON TABLE ══ */
+.comp-table { margin: 12px 18px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+.comp-row { display: flex; border-bottom: 1px solid var(--border); }
+.comp-row:last-child { border-bottom: none; }
+.comp-cell { flex: 1; padding: 10px 10px; font-size: 12px; text-align: center; border-right: 1px solid var(--border); }
+.comp-cell:last-child { border-right: none; }
+.comp-header { background: var(--card); font-weight: 700; font-size: 11px; }
+.comp-header .pos-tag { font-size: 10px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+.check { color: #4ade80; font-size: 14px; }
+.dash  { color: var(--border); }
+.comp-cell.feature { text-align: left; background: #151f33; color: var(--muted); font-size: 11px; }
+
+/* ══ PLAN CARDS ══ */
+.plan-cards { margin: 10px 18px; display: flex; flex-direction: column; gap: 10px; }
+.plan-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 18px 16px;
+  position: relative; overflow: hidden;
+}
+.plan-card.best {
+  border-color: var(--naranja);
+  background: linear-gradient(135deg, rgba(245,158,11,.08), rgba(239,68,68,.04));
+}
+.plan-card.best::before {
+  content: '⭐ MEJOR OPCIÓN';
+  position: absolute; top: 12px; right: -1px;
+  background: var(--naranja); color: #fff;
+  font-size: 9px; font-weight: 800; letter-spacing: .5px;
+  padding: 3px 10px; border-radius: 6px 0 0 6px;
+}
+.plan-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+.plan-icon { font-size: 32px; flex-shrink: 0; }
+.plan-name { font-size: 15px; font-weight: 800; line-height: 1.2; }
+.plan-positions { display: flex; gap: 5px; margin-top: 4px; flex-wrap: wrap; }
+.plan-pos-chip {
+  font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 600;
+}
+.plan-pos-chip.inicio  { background: rgba(37,99,235,.15); color: #60a5fa; border: 1px solid rgba(37,99,235,.3); }
+.plan-pos-chip.buscador{ background: rgba(245,158,11,.15); color: var(--naranja); border: 1px solid rgba(245,158,11,.3); }
+.plan-price {
+  font-size: 30px; font-weight: 900; color: var(--naranja); line-height: 1;
+  margin-bottom: 2px;
+}
+.plan-price small { font-size: 12px; font-weight: 400; color: var(--muted); }
+.plan-savings { font-size: 11px; color: #4ade80; font-weight: 700; margin-bottom: 8px; }
+.plan-features { display: flex; flex-direction: column; gap: 5px; }
+.plan-feat {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--muted); line-height: 1.4;
+}
+.plan-feat::before { content: '✓'; color: #4ade80; font-weight: 700; flex-shrink: 0; }
+
+/* ══ WHO LIST ══ */
+.who-list { margin: 10px 18px; display: flex; flex-direction: column; gap: 8px; }
+.who-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px;
+}
+.wi-icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
+.wi-text { font-size: 13px; line-height: 1.5; }
+.wi-text strong { display: block; color: var(--text); margin-bottom: 2px; font-size: 14px; }
+.wi-text span { color: var(--muted); }
+
+/* ══ RECOMMENDATION ══ */
+.rec-cards { margin: 10px 18px; display: flex; flex-direction: column; gap: 8px; }
+.rec-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px;
+  display: flex; gap: 12px; align-items: center;
+}
+.rec-icon { font-size: 30px; flex-shrink: 0; }
+.rec-text .rec-if { font-size: 12px; color: var(--muted); }
+.rec-text .rec-then { font-size: 14px; font-weight: 800; color: var(--naranja); margin: 2px 0; }
+.rec-text .rec-why { font-size: 11px; color: var(--muted); }
+
+/* ══ CTA SLIDE ══ */
+.slide-cta {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 32px 26px 80px; min-height: 100%;
+  background: linear-gradient(160deg, #1a3a1a 0%, #0f172a 60%);
+}
+.cta-icon { font-size: 54px; margin-bottom: 12px; }
+.slide-cta h2 { font-size: 24px; font-weight: 900; margin-bottom: 10px; }
+.slide-cta h2 span { color: #4ade80; }
+.slide-cta > p { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 320px; margin-bottom: 20px; }
+.cta-steps { width: 100%; max-width: 320px; text-align: left; display: flex; flex-direction: column; gap: 8px; margin-bottom: 22px; }
+.cta-step {
+  display: flex; gap: 12px; align-items: center;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px;
+}
+.cta-step .ico { font-size: 20px; flex-shrink: 0; }
+.cta-step .txt strong { display: block; font-size: 13px; color: var(--text); }
+.cta-step .txt span { font-size: 11px; color: var(--muted); }
+.btn-wa {
+  display: flex; align-items: center; gap: 8px;
+  background: #16a34a; color: #fff;
+  padding: 14px 26px; border-radius: 14px;
+  font-size: 16px; font-weight: 800; text-decoration: none;
+}
+
+/* position label callout */
+.pos-label {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 20px;
+  font-size: 12px; font-weight: 700;
+}
+.pos-label.inicio   { background: rgba(37,99,235,.15);  color: #60a5fa; border: 1px solid rgba(37,99,235,.3); }
+.pos-label.buscador { background: rgba(245,158,11,.15); color: var(--naranja); border: 1px solid rgba(245,158,11,.3); }
+
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html">← Volver</a>
+  <div class="title">🏪 Anunciá tu Comercio</div>
+  <div class="slide-counter"><span id="cur">1</span> / <span id="tot">8</span></div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="slides-wrapper">
+<div class="slides-track" id="track">
+
+<!-- ══════════════════════════════════════
+     SLIDE 1 — COVER
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-cover">
+    <div class="cover-badge">Publicidad · Trabajos Cerca</div>
+    <div class="cover-icon">🏪</div>
+    <h1>Tu negocio, donde los profesionales <em>buscan y trabajan</em></h1>
+    <p>Dos posiciones estratégicas en la plataforma de oficios y profesionales más completa de Argentina.</p>
+
+    <div class="cover-positions">
+      <div class="cover-pos">
+        <div class="pos-icon">🔍</div>
+        <div class="pos-name">En el Buscador</div>
+        <div class="pos-price">$50.000/mes</div>
+      </div>
+      <div class="cover-pos" style="border-color:rgba(37,99,235,.3)">
+        <div class="pos-icon">🏠</div>
+        <div class="pos-name">En el Inicio</div>
+        <div class="pos-price">$100.000/mes</div>
+      </div>
+      <div class="cover-pos" style="border-color:rgba(74,222,128,.3)">
+        <div class="pos-icon">🚀</div>
+        <div class="pos-name">Pack los 2</div>
+        <div class="pos-price" style="color:#4ade80">$120.000/mes</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 2 — POSICIÓN 1: EL INICIO
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="section">
+    <div class="sbadge b-blue">Posición 1 · La más vista</div>
+    <h2>Tu banner en la página principal</h2>
+    <p>El inicio es la primera pantalla que ven todos los visitantes. Tu negocio aparece como <strong>Comercio Patrocinado</strong> justo antes de que elijan qué buscar.</p>
+  </div>
+
+  <div class="browser-frame">
+    <div class="browser-bar">
+      <div class="browser-dots">
+        <span style="background:#ef4444"></span>
+        <span style="background:#f59e0b"></span>
+        <span style="background:#22c55e"></span>
+      </div>
+      <div class="browser-url">🔒 trabajoscerca.com.ar</div>
+    </div>
+
+    <div class="tc-home-header">
+      <div class="tc-home-logo">🔨 Trabajos Cerca</div>
+      <div class="tc-home-nav">
+        <span>💬 Dudas</span>
+        <span>🔍 Buscar</span>
+        <span>Entrar</span>
+      </div>
+    </div>
+
+    <div class="tc-hero">
+      <div class="tc-hero-title">El trabajo que buscás,<br>en La Pampa</div>
+      <div class="tc-hero-sub">Conectamos profesionales, trabajadores y empleadores</div>
+      <div class="tc-hero-btns">
+        <div class="tc-hero-btn b1">🔧 Buscar Oficios</div>
+        <div class="tc-hero-btn b2">🎓 Profesionales</div>
+        <div class="tc-hero-btn b3">💼 Empleados</div>
+      </div>
+    </div>
+
+    <!-- BANNERS COMERCIALES — AQUÍ APARECE TU NEGOCIO -->
+    <div style="background:#f8fafc; padding: 5px 10px 2px; font-size: 9px; color: #64748b; text-align: center;">
+      ▼ AQUÍ APARECE TU NEGOCIO ▼
+    </div>
+    <div class="tc-banners">
+      <!-- Banner izquierdo: Patrocinado (TU NEGOCIO) -->
+      <div class="tc-banner-ad patrocinado">
+        <div class="tc-banner-label">★ Comercio Patrocinado</div>
+        <div class="tc-banner-content">
+          <div class="tc-banner-logo-row">
+            <div class="tc-banner-logo" style="background:#fef3c7">🔩</div>
+            <div class="tc-banner-name">FERRETERÍA EL MARTILLO</div>
+          </div>
+          <div class="tc-banner-offer">
+            <strong style="font-size:9px">OFERTA PARA PROFESIONALES</strong><br>
+            Herramientas con 20% OFF. Presentá tu perfil de Trabajos Cerca.
+          </div>
+          <div class="tc-banner-cta orange">Ver oferta →</div>
+        </div>
+      </div>
+      <!-- Banner derecho: Destacado -->
+      <div class="tc-banner-ad destacado">
+        <div class="tc-banner-label">◆ Comercio Destacado</div>
+        <div class="tc-banner-content">
+          <div class="tc-banner-logo-row">
+            <div class="tc-banner-logo" style="background:#eff6ff">🎨</div>
+            <div class="tc-banner-name">PINTURAS PAMPA</div>
+          </div>
+          <div class="tc-banner-offer blue-accent">
+            <strong style="font-size:9px">RENOVÁ TU OBRA</strong><br>
+            Precios especiales para pintores registrados.
+          </div>
+          <div class="tc-banner-cta blue">Ver oferta →</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tc-tabs">
+      <div class="tc-tab">⭐ Ofertas</div>
+      <div class="tc-tab active">🏪 Comercios</div>
+      <div class="tc-tab">📣 Convocatorias</div>
+    </div>
+
+    <div class="tc-register-grid">
+      <div class="tc-register-item"><div class="ri-icon">🔨</div><div class="ri-name">Ingresá tu Oficio</div><div class="ri-sub">Plomeros, electricistas...</div></div>
+      <div class="tc-register-item"><div class="ri-icon">📄</div><div class="ri-name">Ingresá tu CV</div><div class="ri-sub">Trabajadores activos</div></div>
+      <div class="tc-register-item"><div class="ri-icon">🎓</div><div class="ri-name">Tu Profesión</div><div class="ri-sub">Médicos, abogados...</div></div>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <strong>¿Por qué el inicio?</strong>
+    Es la pantalla de entrada. Todos — plomeros, electricistas, albañiles y sus clientes — pasan por acá antes de hacer cualquier búsqueda. Máxima visibilidad.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 3 — POSICIÓN 2: EL BUSCADOR
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="section">
+    <div class="sbadge b-orange">Posición 2 · En el momento justo</div>
+    <h2>Destacado del Comercio en el buscador</h2>
+    <p>Cuando alguien busca "Plomero", tu negocio aparece <strong>al costado de los resultados</strong> — con tus productos, precios y un botón de contacto directo.</p>
+  </div>
+
+  <div class="browser-frame">
+    <div class="browser-bar">
+      <div class="browser-dots">
+        <span style="background:#ef4444"></span>
+        <span style="background:#f59e0b"></span>
+        <span style="background:#22c55e"></span>
+      </div>
+      <div class="browser-url">🔒 trabajoscerca.com.ar/buscador_oficios</div>
+    </div>
+
+    <div style="background:#1d4ed8; padding:7px 10px; display:flex; align-items:center; justify-content:space-between;">
+      <span style="font-size:12px;font-weight:900;color:#fff">🔨 Trabajos Cerca</span>
+      <span style="font-size:10px;color:rgba(255,255,255,.8)">💬 Consultá tus dudas</span>
+    </div>
+    <div class="tc-search-bar">
+      <div class="tc-field">🔧 Plomero</div>
+      <div class="tc-field">📍 Santa Rosa, LA PAMPA</div>
+      <div class="tc-search-btn">Buscar</div>
+    </div>
+    <div class="tc-prov-banner">📍 Mostrando resultados en: LA PAMPA</div>
+
+    <div style="padding:4px 8px; font-size:9px; color:#64748b">7 resultados · 2 comercios destacados</div>
+
+    <div class="tc-results-sidebar">
+      <div class="tc-results-col">
+        <div class="tc-result-row">
+          <div class="tc-r-avatar">👷</div>
+          <div style="flex:1;min-width:0">
+            <div class="tc-r-name">Juan Rodríguez</div>
+            <div class="tc-r-cat">Plomería / Gasista</div>
+            <div class="tc-r-pts">🏆 35 pts</div>
+          </div>
+          <div class="tc-r-wa">WA</div>
+        </div>
+        <div class="tc-result-row" style="opacity:.65">
+          <div class="tc-r-avatar">🔧</div>
+          <div style="flex:1;min-width:0">
+            <div class="tc-r-name">Carlos Méndez</div>
+            <div class="tc-r-cat">Plomería</div>
+            <div class="tc-r-pts">🏆 20 pts</div>
+          </div>
+          <div class="tc-r-wa">WA</div>
+        </div>
+        <div class="tc-result-row" style="opacity:.4">
+          <div class="tc-r-avatar">🪛</div>
+          <div style="flex:1;min-width:0">
+            <div class="tc-r-name">Roberto G.</div>
+            <div class="tc-r-cat">Plomería</div>
+            <div class="tc-r-pts">🏆 10 pts</div>
+          </div>
+          <div class="tc-r-wa">WA</div>
+        </div>
+      </div>
+
+      <div class="tc-sidebar-col">
+        <!-- AQUÍ VA TU COMERCIO -->
+        <div style="background:#fef9c3;border-radius:4px;padding:3px 5px;font-size:7px;color:#78350f;font-weight:700;text-align:center;margin-bottom:3px">
+          ▼ TU NEGOCIO AQUÍ
+        </div>
+        <div class="tc-sidebar-title-box">DESTACADOS DEL COMERCIO</div>
+        <div class="tc-dest-card">
+          <div class="tc-dest-row">
+            <div class="tc-dest-logo" style="background:#fef3c7">🔩</div>
+            <div class="tc-dest-name">FERRETERÍA EL MARTILLO</div>
+          </div>
+          <div class="tc-dest-prods">
+            <div class="tc-dest-prod-cell"><div class="pi">🪣</div><div class="pp">$100</div></div>
+            <div class="tc-dest-prod-cell"><div class="pi">📏</div><div class="pp">$50</div></div>
+          </div>
+          <div class="tc-dest-btns">
+            <div class="tc-dest-btn-s ver">📍 Ver</div>
+            <div class="tc-dest-btn-s ofer">Ofer.</div>
+          </div>
+        </div>
+        <div class="tc-dest-card" style="border-color:#94a3b8;opacity:.7">
+          <div class="tc-dest-row">
+            <div class="tc-dest-logo" style="background:#f0fdf4">🏗️</div>
+            <div class="tc-dest-name">CORRALÓN SAN PEDRO</div>
+          </div>
+          <div class="tc-dest-prods">
+            <div class="tc-dest-prod-cell"><div class="pi">🧱</div><div class="pp">$25</div></div>
+            <div class="tc-dest-prod-cell"><div class="pi">🪚</div><div class="pp">$35</div></div>
+          </div>
+          <div class="tc-dest-btns">
+            <div class="tc-dest-btn-s ver">📍 Ver</div>
+            <div class="tc-dest-btn-s ofer">Ofer.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <strong>¿Qué incluye tu destacado?</strong>
+    Logo, nombre, hasta 3 productos con foto y precio, botón "Ver local" y botón "Ofertar" que abre WhatsApp directo con el profesional.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 4 — COMPARACIÓN DE POSICIONES
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="section">
+    <div class="sbadge b-purple">Comparación</div>
+    <h2>¿En qué se diferencia cada posición?</h2>
+    <p>Cada una tiene su propio tipo de impacto. Las dos juntas se potencian.</p>
+  </div>
+
+  <div style="display:flex;gap:10px;margin:10px 18px">
+    <div style="flex:1;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.3);border-radius:12px;padding:14px;text-align:center">
+      <div style="font-size:28px;margin-bottom:6px">🏠</div>
+      <div style="font-size:14px;font-weight:800;color:#60a5fa">El Inicio</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">
+        Ven tu banner <strong style="color:var(--text)">antes</strong> de buscar.<br>
+        Máximo alcance.<br>
+        Impacto de marca.
+      </div>
+    </div>
+    <div style="flex:1;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:14px;text-align:center">
+      <div style="font-size:28px;margin-bottom:6px">🔍</div>
+      <div style="font-size:14px;font-weight:800;color:var(--naranja)">El Buscador</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">
+        Ven tu local <strong style="color:var(--text)">mientras</strong> buscan.<br>
+        Audiencia exacta.<br>
+        Contacto inmediato.
+      </div>
+    </div>
+  </div>
+
+  <div class="comp-table">
+    <div class="comp-row">
+      <div class="comp-cell feature"></div>
+      <div class="comp-cell comp-header">🏠 Inicio<div class="pos-tag">$100.000/mes</div></div>
+      <div class="comp-cell comp-header">🔍 Buscador<div class="pos-tag">$50.000/mes</div></div>
+    </div>
+    <div class="comp-row">
+      <div class="comp-cell feature">Alcance máximo</div>
+      <div class="comp-cell"><span class="check">✓</span></div>
+      <div class="comp-cell"><span class="dash">—</span></div>
+    </div>
+    <div class="comp-row">
+      <div class="comp-cell feature">Audiencia segmentada</div>
+      <div class="comp-cell"><span class="dash">—</span></div>
+      <div class="comp-cell"><span class="check">✓</span></div>
+    </div>
+    <div class="comp-row">
+      <div class="comp-cell feature">Logo + banner</div>
+      <div class="comp-cell"><span class="check">✓</span></div>
+      <div class="comp-cell"><span class="dash">—</span></div>
+    </div>
+    <div class="comp-row">
+      <div class="comp-cell feature">Productos con precio</div>
+      <div class="comp-cell"><span class="dash">—</span></div>
+      <div class="comp-cell"><span class="check">✓</span></div>
+    </div>
+    <div class="comp-row">
+      <div class="comp-cell feature">Botón WhatsApp directo</div>
+      <div class="comp-cell"><span class="dash">—</span></div>
+      <div class="comp-cell"><span class="check">✓</span></div>
+    </div>
+    <div class="comp-row">
+      <div class="comp-cell feature">Oferta especial al profesional</div>
+      <div class="comp-cell"><span class="check">✓</span></div>
+      <div class="comp-cell"><span class="dash">—</span></div>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <strong>Combinados son más poderosos</strong>
+    El inicio genera reconocimiento de marca. El buscador convierte. Juntos capturás desde la primera impresión hasta el momento de la compra.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 5 — A QUIÉN LLEGÁS
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="section">
+    <div class="sbadge b-green">Tu audiencia</div>
+    <h2>Dos clientes con una sola publicación</h2>
+    <p>Tu publicidad trabaja para dos públicos distintos al mismo tiempo:</p>
+  </div>
+
+  <div class="who-list">
+    <div class="who-item">
+      <div class="wi-icon">👷</div>
+      <div class="wi-text">
+        <strong>Los profesionales (plomero, electricista, albañil...)</strong>
+        <span>Usan la plataforma para conseguir clientes. Cuando ven tu banner o tu destacado, saben dónde comprar los materiales para cada trabajo que les llega. Se convierten en clientes fijos de tu local.</span>
+      </div>
+    </div>
+    <div class="who-item">
+      <div class="wi-icon">🏠</div>
+      <div class="wi-text">
+        <strong>El cliente final (el vecino)</strong>
+        <span>Entró a buscar un electricista y mientras navega ve tu comercio. A veces compra él mismo los materiales o pregunta dónde conseguirlos antes de que llegue el profesional.</span>
+      </div>
+    </div>
+    <div class="who-item">
+      <div class="wi-icon">⏰</div>
+      <div class="wi-text">
+        <strong>Gente en el momento exacto de la necesidad</strong>
+        <span>Quien busca un gasista ya tiene un problema de gas. Quien busca un pintor va a necesitar pinturas. Tu producto es exactamente lo que esa persona necesita en ese momento.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 6 — PLANES Y PRECIOS
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="section">
+    <div class="sbadge b-orange">Planes y precios</div>
+    <h2>Elegí la posición que más te conviene</h2>
+    <p>Sin contratos anuales. Podés cambiar de plan cada mes.</p>
+  </div>
+
+  <div class="plan-cards">
+    <!-- Plan 1: Solo buscador -->
+    <div class="plan-card">
+      <div class="plan-top">
+        <div class="plan-icon">🔍</div>
+        <div>
+          <div class="plan-name">Solo Buscador</div>
+          <div class="plan-positions">
+            <span class="plan-pos-chip buscador">Destacado del Comercio</span>
+          </div>
+        </div>
+      </div>
+      <div class="plan-price">$50.000 <small>/ mes</small></div>
+      <div class="plan-features">
+        <div class="plan-feat">Aparecés en las búsquedas de oficios y profesionales</div>
+        <div class="plan-feat">Logo + nombre + descripción de tu negocio</div>
+        <div class="plan-feat">Hasta 3 productos con foto y precio</div>
+        <div class="plan-feat">Botón "Ofertar" → WhatsApp directo</div>
+        <div class="plan-feat">Filtrás por categoría de oficio (ej: solo Plomería)</div>
+      </div>
+    </div>
+
+    <!-- Plan 2: Solo inicio -->
+    <div class="plan-card">
+      <div class="plan-top">
+        <div class="plan-icon">🏠</div>
+        <div>
+          <div class="plan-name">Solo Inicio</div>
+          <div class="plan-positions">
+            <span class="plan-pos-chip inicio">Banner en la página principal</span>
+          </div>
+        </div>
+      </div>
+      <div class="plan-price">$100.000 <small>/ mes</small></div>
+      <div class="plan-features">
+        <div class="plan-feat">Banner destacado en la página de inicio</div>
+        <div class="plan-feat">Logo + nombre + oferta personalizada</div>
+        <div class="plan-feat">Mensaje especial para profesionales (ej: 20% OFF)</div>
+        <div class="plan-feat">Visible antes de que inicien cualquier búsqueda</div>
+        <div class="plan-feat">Máximo alcance — lo ven todos los visitantes</div>
+      </div>
+    </div>
+
+    <!-- Plan 3: Pack los dos -->
+    <div class="plan-card best">
+      <div class="plan-top">
+        <div class="plan-icon">🚀</div>
+        <div>
+          <div class="plan-name">Pack Completo</div>
+          <div class="plan-positions">
+            <span class="plan-pos-chip inicio">Inicio</span>
+            <span class="plan-pos-chip buscador">Buscador</span>
+          </div>
+        </div>
+      </div>
+      <div class="plan-price">$120.000 <small>/ mes</small></div>
+      <div class="plan-savings">Ahorrás $30.000 vs contratar los dos por separado</div>
+      <div class="plan-features">
+        <div class="plan-feat">Todo lo del plan Buscador</div>
+        <div class="plan-feat">Todo lo del plan Inicio</div>
+        <div class="plan-feat">Presencia en los dos puntos de contacto</div>
+        <div class="plan-feat">Reconocimiento de marca + conversión directa</div>
+        <div class="plan-feat">Prioridad de posición en el sidebar</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 7 — ¿CUÁL CONVIENE?
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="section">
+    <div class="sbadge b-blue">¿Cuál me conviene?</div>
+    <h2>Guía rápida para elegir tu plan</h2>
+    <p>Según el tipo de comercio y lo que querés lograr:</p>
+  </div>
+
+  <div class="rec-cards">
+    <div class="rec-card">
+      <div class="rec-icon">🔩</div>
+      <div class="rec-text">
+        <div class="rec-if">Ferreterías, corralones, pinturerías</div>
+        <div class="rec-then">→ Pack Completo $120.000</div>
+        <div class="rec-why">Necesitás llegar al profesional desde el inicio Y cuando busca herramientas específicas. Los dos puntos de contacto te dan máximo retorno.</div>
+      </div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-icon">🛒</div>
+      <div class="rec-text">
+        <div class="rec-if">Comercios con oferta amplia (supermercados, mayoristas)</div>
+        <div class="rec-then">→ Solo Inicio $100.000</div>
+        <div class="rec-why">Tu negocio vende de todo, no solo a una categoría de oficio. El banner en el inicio te da visibilidad masiva ante toda la audiencia.</div>
+      </div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-icon">🪛</div>
+      <div class="rec-text">
+        <div class="rec-if">Locales especializados (ej: solo materiales eléctricos)</div>
+        <div class="rec-then">→ Solo Buscador $50.000</div>
+        <div class="rec-why">Aparecés exactamente cuando buscan un electricista. Tu producto es 100% relevante para esa búsqueda. Alta conversión con menos inversión.</div>
+      </div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-icon">🆕</div>
+      <div class="rec-text">
+        <div class="rec-if">Comercio nuevo o querés arrancar con poco riesgo</div>
+        <div class="rec-then">→ Solo Buscador $50.000</div>
+        <div class="rec-why">Es la entrada más económica. Medís resultados el primer mes y escalás al pack si ves buenos retornos.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 8 — CTA
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-cta">
+    <div class="cta-icon">🚀</div>
+    <h2>¡Empezá a aparecer <span>hoy mismo</span>!</h2>
+    <p>En menos de 24 horas tu negocio ya está visible ante miles de profesionales y sus clientes en tu zona.</p>
+
+    <div class="cta-steps">
+      <div class="cta-step">
+        <div class="ico">📋</div>
+        <div class="txt">
+          <strong>1. Elegís el plan</strong>
+          <span>Buscador ($50k), Inicio ($100k) o Pack Completo ($120k)</span>
+        </div>
+      </div>
+      <div class="cta-step">
+        <div class="ico">📸</div>
+        <div class="txt">
+          <strong>2. Nos pasás los datos</strong>
+          <span>Logo, oferta, productos destacados y precio</span>
+        </div>
+      </div>
+      <div class="cta-step">
+        <div class="ico">✅</div>
+        <div class="txt">
+          <strong>3. Publicamos en 24 hs</strong>
+          <span>Tu negocio empieza a aparecer ante los profesionales</span>
+        </div>
+      </div>
+    </div>
+
+    <a href="https://wa.me/5492954000000?text=Hola!%20Quiero%20publicitar%20mi%20comercio%20en%20Trabajos%20Cerca" class="btn-wa">
+      <span style="font-size:22px">💬</span> Consultar por WhatsApp
+    </a>
+  </div>
+</div>
+
+</div><!-- /track -->
+</div><!-- /wrapper -->
+
+<div class="nav">
+  <button class="btn-nav btn-prev" id="btnPrev" onclick="move(-1)" disabled>← Anterior</button>
+  <div class="dots" id="dots"></div>
+  <button class="btn-nav btn-next" id="btnNext" onclick="move(1)">Siguiente →</button>
+</div>
+
+<script>
+const TOTAL = 8;
+let cur = 0;
+const track = document.getElementById('track');
+const progress = document.getElementById('progress');
+const btnPrev = document.getElementById('btnPrev');
+const btnNext = document.getElementById('btnNext');
+const dotsEl = document.getElementById('dots');
+const curEl = document.getElementById('cur');
+document.getElementById('tot').textContent = TOTAL;
+
+for (let i = 0; i < TOTAL; i++) {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  dotsEl.appendChild(d);
+}
+
+function update() {
+  track.style.transform = `translateX(-${cur * 100}%)`;
+  progress.style.width = `${((cur + 1) / TOTAL) * 100}%`;
+  btnPrev.disabled = cur === 0;
+  btnNext.disabled = cur === TOTAL - 1;
+  btnNext.textContent = cur === TOTAL - 2 ? 'Finalizar ✓' : cur === TOTAL - 1 ? '—' : 'Siguiente →';
+  curEl.textContent = cur + 1;
+  document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === cur));
+  document.querySelectorAll('.slide')[cur].scrollTop = 0;
+}
+
+function move(dir) {
+  cur = Math.max(0, Math.min(TOTAL - 1, cur + dir));
+  update();
+}
+
+let sx = 0, sy = 0;
+const wrap = document.querySelector('.slides-wrapper');
+wrap.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+wrap.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - sx;
+  const dy = e.changedTouches[0].clientY - sy;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) move(dx < 0 ? 1 : -1);
+}, { passive: true });
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') move(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   move(-1);
+});
+
+update();
+</script>
+</body>
+</html>

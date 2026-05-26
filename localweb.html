@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>LocalWeb — Guía de Ventas</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+  --azul: #2563eb; --violeta: #7c3aed; --verde: #16a34a;
+  --naranja: #f59e0b; --rojo: #ef4444;
+  --bg: #0f172a; --card: #1e293b; --border: #334155;
+  --text: #f1f5f9; --muted: #94a3b8;
+}
+body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); height:100dvh; display:flex; flex-direction:column; overflow:hidden; user-select:none; }
+
+/* NAV */
+.topbar { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#0a0f1e; border-bottom:1px solid var(--border); flex-shrink:0; }
+.topbar a { color:var(--muted); text-decoration:none; font-size:13px; }
+.topbar .title { font-size:13px; font-weight:700; color:#60a5fa; }
+.slide-counter { font-size:12px; color:var(--muted); }
+.progress-bar { height:3px; background:var(--border); flex-shrink:0; }
+.progress-fill { height:100%; background:linear-gradient(90deg,var(--azul),var(--violeta)); transition:width .35s ease; }
+.slides-wrapper { flex:1; overflow:hidden; position:relative; }
+.slides-track { display:flex; height:100%; transition:transform .38s cubic-bezier(.4,0,.2,1); }
+.slide { min-width:100%; height:100%; overflow-y:auto; padding-bottom:80px; }
+.nav { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#0a0f1e; border-top:1px solid var(--border); flex-shrink:0; gap:12px; }
+.btn-nav { flex:1; padding:13px; border-radius:12px; border:none; font-size:15px; font-weight:700; cursor:pointer; transition:opacity .15s,transform .1s; }
+.btn-nav:active { transform:scale(.96); }
+.btn-prev { background:var(--card); color:var(--muted); border:1px solid var(--border); }
+.btn-next { background:linear-gradient(135deg,var(--azul),var(--violeta)); color:#fff; }
+.btn-nav:disabled { opacity:.3; cursor:default; }
+.dots { display:flex; gap:5px; align-items:center; flex-shrink:0; flex-wrap:wrap; max-width:100px; justify-content:center; }
+.dot { width:6px; height:6px; border-radius:50%; background:var(--border); transition:background .3s,width .3s; }
+.dot.active { background:var(--azul); width:16px; border-radius:3px; }
+
+/* SECTION */
+.section { padding:22px 18px 8px; }
+.sbadge { display:inline-block; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:3px 10px; border-radius:20px; margin-bottom:10px; }
+.b-blue   { color:#60a5fa; background:rgba(37,99,235,.12);  border:1px solid rgba(37,99,235,.25); }
+.b-violet { color:#c084fc; background:rgba(124,58,237,.12); border:1px solid rgba(124,58,237,.25); }
+.b-green  { color:#4ade80; background:rgba(22,163,74,.12);  border:1px solid rgba(22,163,74,.25); }
+.b-orange { color:var(--naranja); background:rgba(245,158,11,.12); border:1px solid rgba(245,158,11,.25); }
+.b-red    { color:#f87171; background:rgba(239,68,68,.12);  border:1px solid rgba(239,68,68,.25); }
+.section h2 { font-size:21px; font-weight:800; line-height:1.2; margin-bottom:8px; }
+.section p  { font-size:14px; color:var(--muted); line-height:1.6; margin-bottom:8px; }
+.section p strong { color:var(--text); }
+.hl { margin:10px 18px; padding:14px 16px; border-radius:12px; border-left:4px solid var(--azul); background:rgba(37,99,235,.07); font-size:13px; line-height:1.6; color:var(--muted); }
+.hl strong { color:var(--text); display:block; font-size:14px; margin-bottom:3px; }
+.hl.green { border-left-color:var(--verde); background:rgba(22,163,74,.07); }
+.hl.orange { border-left-color:var(--naranja); background:rgba(245,158,11,.07); }
+
+/* COVER */
+.slide-cover { background:linear-gradient(160deg,#1a2448 0%,#0f172a 60%); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:36px 26px 80px; min-height:100%; }
+.cover-badge { font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#60a5fa; background:rgba(37,99,235,.12); padding:5px 14px; border-radius:20px; border:1px solid rgba(37,99,235,.3); margin-bottom:18px; }
+.cover-icon { font-size:60px; margin-bottom:14px; }
+.cover h1 { font-size:28px; font-weight:900; line-height:1.15; margin-bottom:14px; }
+.cover h1 em { font-style:normal; color:#60a5fa; }
+.cover p { font-size:15px; color:var(--muted); line-height:1.6; max-width:340px; margin-bottom:20px; }
+.cover-url { padding:10px 20px; border-radius:10px; background:rgba(255,255,255,.05); border:1px solid var(--border); font-size:13px; color:var(--muted); }
+.cover-url strong { color:var(--text); }
+.cover-chips { display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:18px; max-width:340px; }
+.cover-chip { font-size:12px; padding:5px 12px; border-radius:20px; background:var(--card); border:1px solid var(--border); color:var(--muted); }
+
+/* STATS */
+.stats3 { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:12px 18px; }
+.stat { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px 8px; text-align:center; }
+.stat .num { font-size:24px; font-weight:900; line-height:1; }
+.stat .lbl { font-size:10px; color:var(--muted); margin-top:4px; line-height:1.4; }
+.stat.blue .num { color:#60a5fa; }
+.stat.green .num { color:#4ade80; }
+.stat.orange .num { color:var(--naranja); }
+
+/* VS TABLE */
+.vs-table { margin:12px 18px; border-radius:12px; overflow:hidden; border:1px solid var(--border); }
+.vs-row { display:flex; border-bottom:1px solid var(--border); }
+.vs-row:last-child { border-bottom:none; }
+.vs-cell { flex:1; padding:10px 10px; font-size:12px; text-align:center; border-right:1px solid var(--border); line-height:1.4; }
+.vs-cell:last-child { border-right:none; }
+.vs-header { background:var(--card); font-weight:800; font-size:13px; }
+.vs-header.bad  { color:#f87171; }
+.vs-header.good { color:#4ade80; }
+.vs-cell.feature { text-align:left; background:#151f33; color:var(--muted); font-size:11px; font-weight:600; }
+.cross { color:#f87171; font-size:16px; }
+.check { color:#4ade80; font-size:16px; }
+
+/* RUBRO SELECTOR */
+.rubros-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:10px 18px; }
+.rubro-btn {
+  background:var(--card); border:1px solid var(--border); border-radius:12px;
+  padding:12px 6px; text-align:center; cursor:pointer;
+  transition:all .15s;
+}
+.rubro-btn:active { transform:scale(.95); }
+.rubro-btn.selected { border-color:var(--azul); background:rgba(37,99,235,.12); }
+.rubro-btn .r-icon { font-size:26px; margin-bottom:5px; }
+.rubro-btn .r-name { font-size:11px; font-weight:700; color:var(--text); line-height:1.3; }
+.rubro-btn .r-sub  { font-size:9px; color:var(--muted); margin-top:2px; }
+
+/* RUBRO CONTENT PANEL */
+.rubro-panel { margin:10px 18px; display:none; }
+.rubro-panel.visible { display:block; }
+.rubro-panel-header { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.rph-icon { font-size:32px; }
+.rph-name { font-size:17px; font-weight:800; }
+.rph-sub  { font-size:12px; color:var(--muted); }
+.rubro-benefits { display:flex; flex-direction:column; gap:8px; }
+.rb-item { display:flex; gap:10px; align-items:flex-start; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px; }
+.rb-icon { font-size:22px; flex-shrink:0; margin-top:2px; }
+.rb-txt strong { display:block; font-size:13px; color:var(--text); margin-bottom:2px; }
+.rb-txt span   { font-size:12px; color:var(--muted); line-height:1.4; }
+.rubro-cta { margin-top:10px; padding:10px 14px; background:rgba(37,99,235,.1); border:1px solid rgba(37,99,235,.25); border-radius:10px; font-size:12px; color:#93c5fd; line-height:1.5; }
+.rubro-cta strong { color:#fff; }
+
+/* CM */
+.cm-services { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:10px 18px; }
+.cm-item { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px 12px; }
+.cm-item .cm-icon { font-size:26px; margin-bottom:6px; }
+.cm-item .cm-name { font-size:13px; font-weight:700; margin-bottom:3px; }
+.cm-item .cm-desc { font-size:11px; color:var(--muted); line-height:1.4; }
+
+/* PLANES */
+.plan-list { margin:10px 18px; display:flex; flex-direction:column; gap:10px; }
+.plan-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; }
+.plan-card.best { border-color:var(--azul); background:rgba(37,99,235,.06); }
+.plan-top { display:flex; gap:12px; align-items:flex-start; margin-bottom:10px; }
+.plan-icon { font-size:30px; flex-shrink:0; }
+.plan-name { font-size:15px; font-weight:800; }
+.plan-tagline { font-size:11px; color:var(--muted); margin-top:2px; }
+.plan-price { font-size:28px; font-weight:900; color:#60a5fa; }
+.plan-price small { font-size:11px; font-weight:400; color:var(--muted); }
+.plan-feats { display:flex; flex-direction:column; gap:5px; margin-top:8px; }
+.pf { display:flex; gap:8px; align-items:flex-start; font-size:12px; color:var(--muted); }
+.pf::before { content:'✓'; color:#4ade80; font-weight:700; flex-shrink:0; }
+.plan-best-badge { display:inline-block; font-size:10px; font-weight:800; background:var(--azul); color:#fff; padding:2px 10px; border-radius:20px; margin-bottom:8px; }
+
+/* WHY LIST */
+.why-list { margin:10px 18px; display:flex; flex-direction:column; gap:8px; }
+.why-item { display:flex; gap:12px; align-items:flex-start; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; }
+.wi-icon { font-size:24px; flex-shrink:0; }
+.wi-text strong { display:block; font-size:14px; color:var(--text); margin-bottom:2px; }
+.wi-text span { font-size:13px; color:var(--muted); line-height:1.5; }
+
+/* CTA */
+.slide-cta { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:32px 26px 80px; min-height:100%; background:linear-gradient(160deg,#1a2448 0%,#0f172a 60%); }
+.cta-icon { font-size:54px; margin-bottom:12px; }
+.slide-cta h2 { font-size:24px; font-weight:900; margin-bottom:10px; }
+.slide-cta h2 span { color:#60a5fa; }
+.slide-cta > p { font-size:14px; color:var(--muted); line-height:1.6; max-width:320px; margin-bottom:20px; }
+.cta-steps { width:100%; max-width:320px; text-align:left; display:flex; flex-direction:column; gap:8px; margin-bottom:22px; }
+.cta-step { display:flex; gap:12px; align-items:center; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px 14px; }
+.cta-step .ico { font-size:20px; flex-shrink:0; }
+.cta-step .txt strong { display:block; font-size:13px; color:var(--text); }
+.cta-step .txt span { font-size:11px; color:var(--muted); }
+.btn-wa { display:flex; align-items:center; gap:8px; background:#16a34a; color:#fff; padding:14px 26px; border-radius:14px; font-size:16px; font-weight:800; text-decoration:none; }
+
+/* PHONE MOCKUP */
+.phone-mockup { width:180px; margin:0 auto 12px; }
+.phone-frame { background:#1e293b; border-radius:20px; border:3px solid #334155; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,.5); }
+.phone-notch { background:#0f172a; height:18px; border-radius:0 0 12px 12px; margin:0 auto 0; width:60px; }
+.phone-screen { background:#fff; min-height:280px; padding:8px; }
+.ps-header { background:#2563eb; border-radius:6px; padding:6px 8px; display:flex; align-items:center; gap:5px; margin-bottom:6px; }
+.ps-logo { width:20px; height:20px; background:#fff; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:900; color:#2563eb; flex-shrink:0; }
+.ps-title { font-size:10px; font-weight:800; color:#fff; }
+.ps-product { display:flex; gap:6px; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:6px; margin-bottom:5px; }
+.ps-prod-img { width:36px; height:36px; border-radius:5px; background:#e2e8f0; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.ps-prod-name { font-size:10px; font-weight:700; color:#1e293b; }
+.ps-prod-price { font-size:11px; font-weight:900; color:#2563eb; }
+.ps-prod-btn { margin-top:2px; background:#2563eb; color:#fff; font-size:8px; font-weight:700; padding:2px 7px; border-radius:4px; display:inline-block; }
+.ps-wa { display:flex; align-items:center; gap:5px; background:#16a34a; border-radius:6px; padding:7px 10px; margin-top:6px; }
+.ps-wa-txt { font-size:10px; font-weight:700; color:#fff; }
+
+/* INMO MOCKUP */
+.inmo-card { background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:6px; margin-bottom:5px; }
+.inmo-img { background:#dbeafe; border-radius:4px; height:40px; display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:4px; }
+.inmo-title { font-size:10px; font-weight:700; color:#1e293b; }
+.inmo-price { font-size:11px; font-weight:900; color:#2563eb; }
+.inmo-chips { display:flex; gap:3px; margin-top:3px; flex-wrap:wrap; }
+.inmo-chip { font-size:8px; padding:1px 5px; border-radius:10px; background:#dbeafe; color:#1d4ed8; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html">← Volver</a>
+  <div class="title">🌐 LocalWeb</div>
+  <div class="slide-counter"><span id="cur">1</span> / <span id="tot">8</span></div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="slides-wrapper">
+<div class="slides-track" id="track">
+
+<!-- ══════════════════════════════════════
+     SLIDE 1 — COVER
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-cover">
+    <div class="cover-badge">LocalWeb · Tu negocio online</div>
+    <div class="cover-icon">🌐</div>
+    <h1>Tu negocio merece una web <em>que realmente venda</em></h1>
+    <p>Páginas web profesionales, a medida, sin WordPress. Para comercios y empresas que quieren crecer online.</p>
+    <div class="cover-url"><strong>localweb.ar</strong></div>
+    <div class="cover-chips">
+      <span class="cover-chip">🛍️ Tiendas</span>
+      <span class="cover-chip">🏠 Inmobiliarias</span>
+      <span class="cover-chip">🍕 Gastronomía</span>
+      <span class="cover-chip">⚕️ Salud</span>
+      <span class="cover-chip">⚖️ Estudios</span>
+      <span class="cover-chip">🏋️ Deporte</span>
+      <span class="cover-chip">🎓 Educación</span>
+      <span class="cover-chip">🔧 Servicios</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 2 — EL PROBLEMA
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="section">
+    <div class="sbadge b-red">La realidad</div>
+    <h2>¿Tu negocio existe en internet?</h2>
+    <p>Cuando alguien necesita algo, lo primero que hace es buscarlo en Google. Si no aparecés, <strong>no existís para ese cliente</strong>.</p>
+  </div>
+
+  <div class="stats3">
+    <div class="stat blue"><div class="num">93%</div><div class="lbl">de los clientes buscan en Google antes de comprar</div></div>
+    <div class="stat orange"><div class="num">75%</div><div class="lbl">no pasa de la primera página de resultados</div></div>
+    <div class="stat green"><div class="num">3×</div><div class="lbl">más confianza generan los negocios con web propia</div></div>
+  </div>
+
+  <div class="why-list">
+    <div class="why-item">
+      <div class="wi-icon">📱</div>
+      <div class="wi-text">
+        <strong>Tu cliente te busca en el celular</strong>
+        <span>Más del 70% de las búsquedas se hacen desde el teléfono. Una web que no funciona bien en mobile pierde esos clientes.</span>
+      </div>
+    </div>
+    <div class="why-item">
+      <div class="wi-icon">🕐</div>
+      <div class="wi-text">
+        <strong>Abierto las 24 horas, los 365 días</strong>
+        <span>Tu web trabaja cuando vos no podés. Un cliente a las 11 de la noche puede ver tus productos, precios y contactarte.</span>
+      </div>
+    </div>
+    <div class="why-item">
+      <div class="wi-icon">🏆</div>
+      <div class="wi-text">
+        <strong>La competencia ya lo tiene</strong>
+        <span>Si tu competidor tiene web y vos no, el cliente elige al que puede ver, conocer y confiar. La web genera confianza antes del primer contacto.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hl">
+    <strong>Instagram no alcanza</strong>
+    Las redes sociales las controla la plataforma. Tu web es tuya: aparece en Google, no depende de algoritmos y no desaparece si cambian las reglas.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 3 — POR QUÉ NO WORDPRESS
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="section">
+    <div class="sbadge b-red">Nuestro diferencial</div>
+    <h2>¿Por qué NO usamos WordPress?</h2>
+    <p>WordPress es la opción fácil para el desarrollador. No para vos.</p>
+  </div>
+
+  <div class="vs-table">
+    <div class="vs-row">
+      <div class="vs-cell feature"></div>
+      <div class="vs-cell vs-header bad">WordPress</div>
+      <div class="vs-cell vs-header good">LocalWeb</div>
+    </div>
+    <div class="vs-row">
+      <div class="vs-cell feature">Velocidad</div>
+      <div class="vs-cell"><span class="cross">✗</span><br><span style="font-size:10px;color:#94a3b8">Lento por plugins</span></div>
+      <div class="vs-cell"><span class="check">✓</span><br><span style="font-size:10px;color:#94a3b8">Código propio, rápido</span></div>
+    </div>
+    <div class="vs-row">
+      <div class="vs-cell feature">Seguridad</div>
+      <div class="vs-cell"><span class="cross">✗</span><br><span style="font-size:10px;color:#94a3b8">Se hackea seguido</span></div>
+      <div class="vs-cell"><span class="check">✓</span><br><span style="font-size:10px;color:#94a3b8">Sin vulnerabilidades</span></div>
+    </div>
+    <div class="vs-row">
+      <div class="vs-cell feature">Diseño</div>
+      <div class="vs-cell"><span class="cross">✗</span><br><span style="font-size:10px;color:#94a3b8">Plantilla genérica</span></div>
+      <div class="vs-cell"><span class="check">✓</span><br><span style="font-size:10px;color:#94a3b8">100% a tu medida</span></div>
+    </div>
+    <div class="vs-row">
+      <div class="vs-cell feature">Mantenimiento</div>
+      <div class="vs-cell"><span class="cross">✗</span><br><span style="font-size:10px;color:#94a3b8">Plugins desactualizados</span></div>
+      <div class="vs-cell"><span class="check">✓</span><br><span style="font-size:10px;color:#94a3b8">Nosotros lo manejamos</span></div>
+    </div>
+    <div class="vs-row">
+      <div class="vs-cell feature">Panel de admin</div>
+      <div class="vs-cell"><span class="cross">✗</span><br><span style="font-size:10px;color:#94a3b8">Complejo para el dueño</span></div>
+      <div class="vs-cell"><span class="check">✓</span><br><span style="font-size:10px;color:#94a3b8">Simple, hecho para vos</span></div>
+    </div>
+    <div class="vs-row">
+      <div class="vs-cell feature">Mobile</div>
+      <div class="vs-cell"><span class="cross">✗</span><br><span style="font-size:10px;color:#94a3b8">Depende del tema</span></div>
+      <div class="vs-cell"><span class="check">✓</span><br><span style="font-size:10px;color:#94a3b8">Siempre perfecto</span></div>
+    </div>
+    <div class="vs-row">
+      <div class="vs-cell feature">Costo real</div>
+      <div class="vs-cell"><span class="cross">✗</span><br><span style="font-size:10px;color:#94a3b8">Plugins pagos acumulados</span></div>
+      <div class="vs-cell"><span class="check">✓</span><br><span style="font-size:10px;color:#94a3b8">Precio fijo mensual</span></div>
+    </div>
+  </div>
+
+  <div class="hl">
+    <strong>Tu web, tu identidad</strong>
+    Hacemos cada sitio desde cero, pensado para tu negocio específico. No hay dos LocalWeb iguales.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 4 — PARA TU RUBRO (SELECTOR)
+══════════════════════════════════════ -->
+<div class="slide" id="slide-rubros">
+  <div class="section" style="padding-bottom:6px">
+    <div class="sbadge b-blue">Por rubro</div>
+    <h2>Tocá el tipo de negocio de tu cliente</h2>
+    <p style="margin-bottom:0">Cada web la diseñamos según lo que necesita el rubro.</p>
+  </div>
+
+  <div class="rubros-grid">
+    <div class="rubro-btn" onclick="selectRubro('tienda')">
+      <div class="r-icon">🛍️</div>
+      <div class="r-name">Tienda / Comercio</div>
+      <div class="r-sub">Librería, ropa, accesorios...</div>
+    </div>
+    <div class="rubro-btn" onclick="selectRubro('inmo')">
+      <div class="r-icon">🏠</div>
+      <div class="r-name">Inmobiliaria</div>
+      <div class="r-sub">Venta y alquiler</div>
+    </div>
+    <div class="rubro-btn" onclick="selectRubro('gastro')">
+      <div class="r-icon">🍕</div>
+      <div class="r-name">Gastronomía</div>
+      <div class="r-sub">Restaurant, bar, cafetería</div>
+    </div>
+    <div class="rubro-btn" onclick="selectRubro('salud')">
+      <div class="r-icon">⚕️</div>
+      <div class="r-name">Salud</div>
+      <div class="r-sub">Médico, dentista, psicólogo</div>
+    </div>
+    <div class="rubro-btn" onclick="selectRubro('estudio')">
+      <div class="r-icon">⚖️</div>
+      <div class="r-name">Estudio Profesional</div>
+      <div class="r-sub">Abogado, contador, arq.</div>
+    </div>
+    <div class="rubro-btn" onclick="selectRubro('gimnasio')">
+      <div class="r-icon">🏋️</div>
+      <div class="r-name">Deporte / Wellness</div>
+      <div class="r-sub">Gimnasio, personal trainer</div>
+    </div>
+    <div class="rubro-btn" onclick="selectRubro('edu')">
+      <div class="r-icon">🎓</div>
+      <div class="r-name">Educación</div>
+      <div class="r-sub">Instituto, academia, clases</div>
+    </div>
+    <div class="rubro-btn" onclick="selectRubro('empresa')">
+      <div class="r-icon">🔧</div>
+      <div class="r-name">Empresa / Servicio</div>
+      <div class="r-sub">Mantenimiento, construcción...</div>
+    </div>
+    <div class="rubro-btn" onclick="selectRubro('hotel')">
+      <div class="r-icon">🏨</div>
+      <div class="r-name">Turismo / Alojamiento</div>
+      <div class="r-sub">Hotel, apart, cabaña</div>
+    </div>
+  </div>
+
+  <!-- PANEL DE RUBRO — se rellena con JS -->
+  <div class="rubro-panel" id="rubro-panel">
+    <div class="rubro-panel-header">
+      <div class="rph-icon" id="rph-icon"></div>
+      <div>
+        <div class="rph-name" id="rph-name"></div>
+        <div class="rph-sub" id="rph-sub"></div>
+      </div>
+    </div>
+    <div class="rubro-benefits" id="rph-benefits"></div>
+    <div class="rubro-cta" id="rph-cta"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 5 — PANEL DE ADMIN
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="section">
+    <div class="sbadge b-green">Autonomía total</div>
+    <h2>Tu panel de administración — sin depender de nadie</h2>
+    <p>Tu web tiene un <strong>panel privado</strong> donde vos mismo podés modificar todo, sin saber programación.</p>
+  </div>
+
+  <div class="why-list">
+    <div class="why-item">
+      <div class="wi-icon">🖼️</div>
+      <div class="wi-text">
+        <strong>Actualizá fotos y precios hoy mismo</strong>
+        <span>¿Subió el precio del producto? ¿Tenés una oferta nueva? Lo cambiás en 2 minutos desde el celular y se ve en la web al instante.</span>
+      </div>
+    </div>
+    <div class="why-item">
+      <div class="wi-icon">📦</div>
+      <div class="wi-text">
+        <strong>Gestioná tu catálogo, propiedades o servicios</strong>
+        <span>Agregás, editás o eliminás lo que quieras. Sin llamar al programador, sin esperar días, sin costo extra.</span>
+      </div>
+    </div>
+    <div class="why-item">
+      <div class="wi-icon">📩</div>
+      <div class="wi-text">
+        <strong>Recibís consultas directas</strong>
+        <span>Cada formulario de contacto llega a tu email o WhatsApp. Sabés de dónde viene el cliente y qué pregunta.</span>
+      </div>
+    </div>
+    <div class="why-item">
+      <div class="wi-icon">📊</div>
+      <div class="wi-text">
+        <strong>Ves cuánta gente visita tu web</strong>
+        <span>Panel de estadísticas: cuántos entraron, qué miraron, desde dónde llegaron. Información real para tomar decisiones.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hl green">
+    <strong>La diferencia con un sitio genérico</strong>
+    Diseñamos el panel pensando en que lo use el dueño del negocio, no un técnico. Simple, claro, en español.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 6 — COMMUNITY MANAGER
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="section">
+    <div class="sbadge b-violet">Servicio adicional</div>
+    <h2>¿Querés que manejemos tus redes también?</h2>
+    <p>La web es tu base. Las redes sociales llevan tráfico hacia ella. Hacemos las dos cosas.</p>
+  </div>
+
+  <div class="cm-services">
+    <div class="cm-item">
+      <div class="cm-icon">📸</div>
+      <div class="cm-name">Contenido mensual</div>
+      <div class="cm-desc">Publicaciones diseñadas, con texto y hashtags para Instagram y Facebook</div>
+    </div>
+    <div class="cm-item">
+      <div class="cm-icon">💬</div>
+      <div class="cm-name">Respuesta a mensajes</div>
+      <div class="cm-desc">Respondemos consultas en tus redes en horario pactado</div>
+    </div>
+    <div class="cm-item">
+      <div class="cm-icon">🎯</div>
+      <div class="cm-name">Publicidad pagada</div>
+      <div class="cm-desc">Armamos y optimizamos anuncios en Meta Ads (Facebook e Instagram)</div>
+    </div>
+    <div class="cm-item">
+      <div class="cm-icon">🗓️</div>
+      <div class="cm-name">Calendario de contenidos</div>
+      <div class="cm-desc">Planificación mensual con fechas, temas y objetivos claros</div>
+    </div>
+    <div class="cm-item">
+      <div class="cm-icon">📈</div>
+      <div class="cm-name">Informe mensual</div>
+      <div class="cm-desc">Resultados reales: alcance, interacciones, seguidores nuevos</div>
+    </div>
+    <div class="cm-item">
+      <div class="cm-icon">🔗</div>
+      <div class="cm-name">Web + redes sincronizadas</div>
+      <div class="cm-desc">Los posts llevan a tu web. La web tiene botones a tus redes. Todo conectado</div>
+    </div>
+  </div>
+
+  <div class="hl">
+    <strong>¿Por qué contratar un Community Manager?</strong>
+    Llevar las redes bien requiere tiempo, creatividad y constancia. Mientras vos te enfocás en tu negocio, nosotros hacemos que te vean más.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 7 — PLANES
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="section">
+    <div class="sbadge b-blue">Planes disponibles</div>
+    <h2>Inversión clara, sin sorpresas</h2>
+    <p>Sin contratos anuales. Hosting, dominio y soporte técnico incluidos.</p>
+  </div>
+
+  <div class="plan-list">
+    <div class="plan-card">
+      <div class="plan-top">
+        <div class="plan-icon">🌱</div>
+        <div>
+          <div class="plan-name">Presencia Web</div>
+          <div class="plan-tagline">Para empezar a existir online</div>
+        </div>
+      </div>
+      <div class="plan-price">Consultá <small>precio</small></div>
+      <div class="plan-feats">
+        <div class="pf">Diseño personalizado, hasta 5 secciones</div>
+        <div class="pf">Optimizado para celular y Google</div>
+        <div class="pf">Formulario de contacto → WhatsApp</div>
+        <div class="pf">Integración con Google Maps</div>
+        <div class="pf">Hosting + dominio incluido</div>
+      </div>
+    </div>
+
+    <div class="plan-card best">
+      <div class="plan-best-badge">⭐ MÁS ELEGIDO</div>
+      <div class="plan-top">
+        <div class="plan-icon">🚀</div>
+        <div>
+          <div class="plan-name">Web + Tienda / Gestión</div>
+          <div class="plan-tagline">Para vender y administrar online</div>
+        </div>
+      </div>
+      <div class="plan-price">Consultá <small>precio</small></div>
+      <div class="plan-feats">
+        <div class="pf">Todo lo del plan Presencia</div>
+        <div class="pf">Catálogo / propiedades / servicios con admin</div>
+        <div class="pf">Pedidos por WhatsApp o formulario</div>
+        <div class="pf">Panel para actualizar precios y contenido</div>
+        <div class="pf">Estadísticas de visitas</div>
+        <div class="pf">SEO básico configurado</div>
+      </div>
+    </div>
+
+    <div class="plan-card">
+      <div class="plan-top">
+        <div class="plan-icon">💎</div>
+        <div>
+          <div class="plan-name">Web + Community Manager</div>
+          <div class="plan-tagline">Presencia completa: web + redes</div>
+        </div>
+      </div>
+      <div class="plan-price">Consultá <small>precio</small></div>
+      <div class="plan-feats">
+        <div class="pf">Todo lo del plan Web + Gestión</div>
+        <div class="pf">Manejo de Instagram y Facebook</div>
+        <div class="pf">12 publicaciones mensuales diseñadas</div>
+        <div class="pf">Respuesta a mensajes en redes</div>
+        <div class="pf">Informe mensual de resultados</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 8 — CTA
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="slide-cta">
+    <div class="cta-icon">🌐</div>
+    <h2>¡Armemos tu web <span>hoy mismo</span>!</h2>
+    <p>En días tu negocio ya tiene presencia online profesional, aparece en Google y empieza a generar clientes.</p>
+
+    <div class="cta-steps">
+      <div class="cta-step">
+        <div class="ico">☎️</div>
+        <div class="txt">
+          <strong>1. Reunión gratuita</strong>
+          <span>Entendemos tu negocio, tus clientes y tus objetivos</span>
+        </div>
+      </div>
+      <div class="cta-step">
+        <div class="ico">🎨</div>
+        <div class="txt">
+          <strong>2. Diseñamos tu web</strong>
+          <span>A medida para tu rubro, con tu marca y colores</span>
+        </div>
+      </div>
+      <div class="cta-step">
+        <div class="ico">🚀</div>
+        <div class="txt">
+          <strong>3. Lanzamos y te enseñamos</strong>
+          <span>Te mostramos cómo usar el panel de admin</span>
+        </div>
+      </div>
+    </div>
+
+    <a href="https://wa.me/5492954000000?text=Hola!%20Me%20interesa%20armar%20una%20web%20con%20LocalWeb" class="btn-wa">
+      <span style="font-size:22px">💬</span> Consultá por WhatsApp
+    </a>
+  </div>
+</div>
+
+</div><!-- /track -->
+</div><!-- /wrapper -->
+
+<div class="nav">
+  <button class="btn-nav btn-prev" id="btnPrev" onclick="move(-1)" disabled>← Anterior</button>
+  <div class="dots" id="dots"></div>
+  <button class="btn-nav btn-next" id="btnNext" onclick="move(1)">Siguiente →</button>
+</div>
+
+<script>
+/* ── SLIDES ── */
+const TOTAL = 8;
+let cur = 0;
+const track = document.getElementById('track');
+const progress = document.getElementById('progress');
+const btnPrev = document.getElementById('btnPrev');
+const btnNext = document.getElementById('btnNext');
+const dotsEl = document.getElementById('dots');
+const curEl = document.getElementById('cur');
+document.getElementById('tot').textContent = TOTAL;
+for(let i=0;i<TOTAL;i++){const d=document.createElement('div');d.className='dot'+(i===0?' active':'');dotsEl.appendChild(d);}
+
+function update(){
+  track.style.transform=`translateX(-${cur*100}%)`;
+  progress.style.width=`${((cur+1)/TOTAL)*100}%`;
+  btnPrev.disabled=cur===0; btnNext.disabled=cur===TOTAL-1;
+  btnNext.textContent=cur===TOTAL-2?'Finalizar ✓':cur===TOTAL-1?'—':'Siguiente →';
+  curEl.textContent=cur+1;
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===cur));
+  document.querySelectorAll('.slide')[cur].scrollTop=0;
+}
+function move(dir){cur=Math.max(0,Math.min(TOTAL-1,cur+dir));update();}
+
+let sx=0,sy=0;
+const wrap=document.querySelector('.slides-wrapper');
+wrap.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
+wrap.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>40)move(dx<0?1:-1);},{passive:true});
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown')move(1);if(e.key==='ArrowLeft'||e.key==='ArrowUp')move(-1);});
+update();
+
+/* ── RUBROS ── */
+const RUBROS = {
+  tienda: {
+    icon:'🛍️', name:'Tienda / Comercio',
+    sub:'Librería, ropa, accesorios, ferretería...',
+    benefits:[
+      {icon:'🛒', title:'Catálogo online con tus productos', desc:'Cada producto con foto, descripción y precio actualizable desde el celular. El cliente ve todo sin venir al local.'},
+      {icon:'📲', title:'Pedidos directos por WhatsApp', desc:'El cliente elige lo que quiere y con un clic te escribe con el pedido armado. Vos solo confirmás y cobrás.'},
+      {icon:'🔍', title:'Aparecer en Google cuando te buscan', desc:'Alguien escribe "librería en Santa Rosa" — tu web aparece primero. Sin web, ese cliente va a la competencia.'},
+      {icon:'🏷️', title:'Ofertas y promociones en tiempo real', desc:'Publicás una promoción hoy y al instante está visible en tu web y compartible en WhatsApp e Instagram.'},
+      {icon:'📍', title:'Horarios, ubicación y contacto siempre visibles', desc:'El cliente sabe cuándo abrís, dónde estás y cómo contactarte sin tener que llamar.'},
+    ],
+    cta:'<strong>Ideal para una librería:</strong> mostrás tus cuadernos, útiles, insumos escolares con precio. El cliente arma su lista, te escribe por WhatsApp y pasa a retirar o pedís delivery.'
+  },
+  inmo: {
+    icon:'🏠', name:'Inmobiliaria',
+    sub:'Propiedades en venta y alquiler',
+    benefits:[
+      {icon:'🏡', title:'Todas tus propiedades online con fotos', desc:'Galería completa de cada propiedad: fotos, precio, m², dormitorios, zona. El interesado filtra lo que busca sin llamarte.'},
+      {icon:'🔍', title:'Filtros de búsqueda para el cliente', desc:'El visitante filtra por tipo (alquiler/venta), zona, precio, ambientes. Llega a lo que le interesa en segundos.'},
+      {icon:'📋', title:'Panel admin para agregar propiedades', desc:'Vos o tu equipo cargan propiedades nuevas, actualizan precios o marcan como vendidas/alquiladas desde el celular.'},
+      {icon:'📩', title:'Consultas por propiedad específica', desc:'Cada propiedad tiene su formulario. El interesado te escribe con el código de la propiedad ya incluido. Nada se pierde.'},
+      {icon:'🤝', title:'Generá confianza con propietarios', desc:'Mostrá a quienes te confían una propiedad que tenés una plataforma profesional para exhibirla. Los captás mejor.'},
+    ],
+    cta:'<strong>Para inmobiliarias:</strong> propietario entra y ve su propiedad publicada con fotos profesionales. El inquilino o comprador filtra por precio y zona. Vos recibís la consulta directa por email o WhatsApp.'
+  },
+  gastro: {
+    icon:'🍕', name:'Gastronomía',
+    sub:'Restaurant, bar, cafetería, pizzería',
+    benefits:[
+      {icon:'🍽️', title:'Menú digital siempre actualizado', desc:'Fotos reales de tus platos con precio. Cuando cambia el precio o el menú, lo actualizás en 2 minutos. Sin reimprimir cartas.'},
+      {icon:'📱', title:'Pedidos para delivery por WhatsApp', desc:'El cliente elige del menú online y con un clic te manda el pedido por WhatsApp. Sin llamadas perdidas.'},
+      {icon:'📅', title:'Reservas online', desc:'Formulario de reserva para mesas. Recibís día, hora y cantidad de personas directamente en tu celular.'},
+      {icon:'📍', title:'Ubicación y horarios en Google Maps', desc:'Cuando alguien busca "donde comer en [ciudad]", tu restaurant aparece con foto, horario y mapa.'},
+      {icon:'📸', title:'Galería de platos y ambiente', desc:'Fotos de lo que servís y cómo se ve tu local. El cliente decide venir antes de conocerte.'},
+    ],
+    cta:'<strong>Para una pizzería:</strong> menú con fotos y precios actualizados, botón de pedido por WhatsApp, horario de atención y la dirección con mapa. Los clientes piden sin llamar.'
+  },
+  salud: {
+    icon:'⚕️', name:'Salud',
+    sub:'Médico, dentista, psicólogo, kinesiólogo',
+    benefits:[
+      {icon:'📅', title:'Turnos online', desc:'El paciente ve los horarios disponibles y reserva su turno sin llamar al consultorio. Vos recibís la solicitud automáticamente.'},
+      {icon:'🩺', title:'Presentación de servicios y especialidades', desc:'Cada servicio explicado claramente. El paciente llega sabiendo qué hace el profesional y qué le va a costar.'},
+      {icon:'⭐', title:'Testimonios de pacientes', desc:'Las experiencias reales generan confianza antes del primer turno. Un paciente nuevo busca señales de que está en buenas manos.'},
+      {icon:'📍', title:'Zona de atención y cobertura de obras sociales', desc:'El paciente sabe de antemano si cubrís su obra social y si llegás a su zona. Filtra él solo.'},
+      {icon:'🔒', title:'Privacidad y profesionalismo', desc:'Una web propia transmite seriedad y confidencialidad. Muy diferente a un Facebook genérico.'},
+    ],
+    cta:'<strong>Para un psicólogo:</strong> presentación, especialidades, modalidad presencial/online, obras sociales aceptadas y botón para reservar turno. El paciente llega ya decidido.'
+  },
+  estudio: {
+    icon:'⚖️', name:'Estudio Profesional',
+    sub:'Abogado, contador, arquitecto, ingeniero',
+    benefits:[
+      {icon:'💼', title:'Portfolio de casos y proyectos', desc:'Mostrás los trabajos realizados con fotos, planos o descripciones. El cliente potencial ve tu trayectoria antes de llamarte.'},
+      {icon:'👥', title:'Presentación del equipo', desc:'Fotos, CV y especialidades de cada profesional. Genera confianza y humaniza el estudio.'},
+      {icon:'📝', title:'Blog o artículos de autoridad', desc:'Publicás novedades legales, impositivas o de tu especialidad. Posicionás tu nombre en Google como referente.'},
+      {icon:'📩', title:'Formulario de consulta inicial gratuita', desc:'El interesado describe brevemente su situación. Llegan leads calificados, no llamadas irrelevantes.'},
+      {icon:'🔗', title:'Google te encuentra cuando te buscan', desc:'"Abogado laboral en [ciudad]" — tu estudio aparece. Sin web, ese cliente llama a la competencia.'},
+    ],
+    cta:'<strong>Para un contador:</strong> servicios (liquidación de sueldos, impuestos, sociedades), quiénes somos, y formulario para pedir presupuesto. Los clientes llegan ya interesados en lo que ofrecés.'
+  },
+  gimnasio: {
+    icon:'🏋️', name:'Deporte / Wellness',
+    sub:'Gimnasio, personal trainer, yoga, pilates',
+    benefits:[
+      {icon:'📋', title:'Horarios de clases y actividades', desc:'Grilla semanal de clases, instructor y disponibilidad. El cliente planifica su semana y decide inscribirse.'},
+      {icon:'💰', title:'Planes y precios online', desc:'Mensual, trimestral, pase libre. El cliente elige sin tener que llamar a preguntar. Vos vendés mientras dormís.'},
+      {icon:'📝', title:'Inscripción o consulta online', desc:'Formulario de inscripción o WhatsApp directo. Sin fricción entre el interés y la acción.'},
+      {icon:'📸', title:'Fotos de instalaciones y equipo', desc:'El cliente quiere ver el espacio antes de ir. Una galería bien hecha reduce la resistencia a probar.'},
+      {icon:'🏆', title:'Testimonios y transformaciones', desc:'Resultados reales de alumnos. La prueba social convierte curiosos en inscritos.'},
+    ],
+    cta:'<strong>Para un gimnasio:</strong> horarios, actividades, planes y precios con botón de inscripción. El interesado ve todo y se anota sin tener que ir primero a preguntar.'
+  },
+  edu: {
+    icon:'🎓', name:'Educación',
+    sub:'Instituto, academia, profesor particular',
+    benefits:[
+      {icon:'📚', title:'Cursos disponibles con detalles', desc:'Cada curso con duración, modalidad, precio y cupos disponibles. El interesado decide solo.'},
+      {icon:'📝', title:'Inscripción online', desc:'Formulario de inscripción que llega a tu email. Sin ir a una oficina, sin llamadas.'},
+      {icon:'⭐', title:'Testimonios de alumnos', desc:'Exalumnos contando su experiencia. La evidencia de resultados es la mejor herramienta de venta.'},
+      {icon:'📅', title:'Calendario de inicio de cursos', desc:'Próximas fechas de inicio siempre visibles. El interesado sabe cuándo arrancar sin preguntar.'},
+      {icon:'📥', title:'Material informativo descargable', desc:'Brochure del curso en PDF para que el interesado comparta con sus padres o pareja.'},
+    ],
+    cta:'<strong>Para una academia de idiomas:</strong> idiomas disponibles, niveles, horarios, precio y botón para inscribirse o consultar. Los alumnos llegan listos para empezar.'
+  },
+  empresa: {
+    icon:'🔧', name:'Empresa / Servicios',
+    sub:'Construcción, mantenimiento, instalaciones',
+    benefits:[
+      {icon:'🏗️', title:'Portfolio de trabajos realizados', desc:'Fotos de obras terminadas, instalaciones, reformas. El cliente ve la calidad antes de pedir presupuesto.'},
+      {icon:'💬', title:'Presupuesto online o por WhatsApp', desc:'Formulario donde el cliente describe el trabajo. Llegás a conversaciones calificadas, no consultas vagas.'},
+      {icon:'📍', title:'Zona de cobertura', desc:'Mapa o listado de ciudades donde trabajás. El cliente sabe de antemano si podés atenderlo.'},
+      {icon:'🏆', title:'Certificaciones y credenciales', desc:'Matriculado, habilitado, con seguro. La web es el lugar ideal para mostrar que estás en regla.'},
+      {icon:'🔍', title:'Aparecer en Google cuando buscan tu servicio', desc:'"empresa de plomería en [ciudad]" — aparecés. El que busca ya tiene la necesidad. Solo falta que te encuentre.'},
+    ],
+    cta:'<strong>Para una empresa de mantenimiento:</strong> servicios, fotos de trabajos, zona de cobertura y formulario de presupuesto. Los clientes llegan con la necesidad clara y piden cotización directa.'
+  },
+  hotel: {
+    icon:'🏨', name:'Turismo / Alojamiento',
+    sub:'Hotel, apartamentos, cabaña, hostel',
+    benefits:[
+      {icon:'🛏️', title:'Tipos de habitaciones y precios', desc:'Fotos de cada habitación con capacidad, amenities y precio por noche. El huésped elige sin llamar.'},
+      {icon:'📅', title:'Consulta de disponibilidad', desc:'Formulario de consulta con fechas. El interesado pregunta si hay lugar para cuando quiere viajar.'},
+      {icon:'📸', title:'Galería de instalaciones', desc:'Fotos de habitaciones, áreas comunes, desayuno, piscina. El turista ya "conoce" el lugar antes de reservar.'},
+      {icon:'📍', title:'Cómo llegar y qué hay cerca', desc:'Mapa con la ubicación y puntos de interés cercanos. El viajero ya sabe que está bien ubicado.'},
+      {icon:'⭐', title:'Reseñas de huéspedes', desc:'Testimonios reales generan la confianza necesaria para que alguien pague por adelantado sin conocerte.'},
+    ],
+    cta:'<strong>Para una cabaña:</strong> fotos de cada cabaña, precio por noche, capacidad, servicios incluidos y botón para consultar disponibilidad por WhatsApp. Las reservas llegan solas.'
+  }
+};
+
+let selectedRubro = null;
+
+function selectRubro(key) {
+  const data = RUBROS[key];
+  if(!data) return;
+
+  // Highlight selected
+  document.querySelectorAll('.rubro-btn').forEach(b => b.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+
+  selectedRubro = key;
+  document.getElementById('rph-icon').textContent = data.icon;
+  document.getElementById('rph-name').textContent = data.name;
+  document.getElementById('rph-sub').textContent  = data.sub;
+
+  const container = document.getElementById('rph-benefits');
+  container.innerHTML = data.benefits.map(b =>
+    `<div class="rb-item">
+      <div class="rb-icon">${b.icon}</div>
+      <div class="rb-txt"><strong>${b.title}</strong><span>${b.desc}</span></div>
+    </div>`
+  ).join('');
+
+  document.getElementById('rph-cta').innerHTML = data.cta;
+  const panel = document.getElementById('rubro-panel');
+  panel.classList.add('visible');
+
+  // Scroll panel into view
+  setTimeout(() => panel.scrollIntoView({behavior:'smooth', block:'nearest'}), 100);
+}
+</script>
+</body>
+</html>

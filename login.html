@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LocalWeb · Acceso</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #0f172a;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Splash superior ── */
+  .splash {
+    background: linear-gradient(160deg, #1e3a8a 0%, #0ea5e9 100%);
+    padding: 40px 24px 32px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .logo-mark {
+    width: 72px; height: 72px; border-radius: 20px;
+    background: rgba(255,255,255,.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; margin: 0 auto 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.3);
+  }
+  .brand { font-size: 30px; font-weight: 900; letter-spacing: -0.5px; }
+  .brand span { color: #7dd3fc; }
+  .splash-tag {
+    display: inline-block; margin-top: 10px;
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; opacity: .75;
+  }
+  .splash-aviso {
+    margin-top: 16px; padding: 10px 16px;
+    background: rgba(0,0,0,.2); border-radius: 12px;
+    font-size: 13px; line-height: 1.5; opacity: .9;
+  }
+  .splash-aviso strong { color: #7dd3fc; }
+
+  /* ── Cuerpo del formulario ── */
+  .body-wrap {
+    flex: 1; padding: 24px 20px 32px;
+    max-width: 440px; width: 100%; margin: 0 auto;
+  }
+
+  /* ── Selector de acción ── */
+  .action-tabs {
+    display: flex; gap: 8px; margin-bottom: 24px;
+  }
+  .action-tab {
+    flex: 1; padding: 14px 8px; border-radius: 12px;
+    border: 1.5px solid #334155; background: #1e293b;
+    color: #64748b; font-size: 14px; font-weight: 700;
+    cursor: pointer; text-align: center; transition: all .15s;
+    font-family: inherit;
+  }
+  .action-tab.active {
+    border-color: #3b82f6; background: #1e3a5f; color: #93c5fd;
+  }
+
+  /* ── Formularios ── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .form-group { margin-bottom: 14px; }
+  label {
+    display: block; font-size: 11px; color: #64748b;
+    margin-bottom: 5px; font-weight: 600;
+    letter-spacing: .8px; text-transform: uppercase;
+  }
+  input[type="text"], input[type="email"],
+  input[type="tel"],  input[type="password"] {
+    width: 100%; padding: 13px 14px;
+    background: #0f172a; border: 1px solid #334155;
+    border-radius: 10px; color: #fff; font-size: 15px;
+    outline: none; transition: border-color .15s;
+    font-family: inherit;
+  }
+  input:focus { border-color: #38bdf8; }
+  input::placeholder { color: #475569; }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* ── Términos y condiciones ── */
+  .tyc-toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #1e293b; border: 1px solid #334155;
+    border-radius: 10px; padding: 12px 14px;
+    cursor: pointer; margin-bottom: 10px;
+    font-size: 13px; color: #94a3b8; font-weight: 600;
+  }
+  .tyc-toggle .arrow { transition: transform .2s; font-size: 16px; }
+  .tyc-toggle.open .arrow { transform: rotate(180deg); }
+
+  .tyc-content {
+    display: none; background: #0f172a;
+    border: 1px solid #334155; border-radius: 10px;
+    padding: 14px; margin-bottom: 12px;
+    font-size: 12px; color: #94a3b8; line-height: 1.7;
+    max-height: 220px; overflow-y: auto;
+  }
+  .tyc-content.open { display: block; }
+  .tyc-content h4 { color: #cbd5e1; font-size: 13px; margin: 10px 0 4px; }
+  .tyc-content h4:first-child { margin-top: 0; }
+
+  .tyc-check {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 12px 14px; background: #1e293b;
+    border: 1.5px solid #334155; border-radius: 10px;
+    cursor: pointer; margin-bottom: 14px;
+  }
+  .tyc-check.checked { border-color: #22c55e; background: #052e16; }
+  .tyc-check input[type="checkbox"] {
+    width: 18px; height: 18px; accent-color: #22c55e;
+    flex-shrink: 0; margin-top: 1px; cursor: pointer;
+  }
+  .tyc-check-label {
+    font-size: 13px; color: #94a3b8; line-height: 1.4; cursor: pointer;
+  }
+  .tyc-check.checked .tyc-check-label { color: #4ade80; }
+
+  /* ── Botón principal ── */
+  .btn-primary {
+    width: 100%; padding: 15px; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, #1d4ed8, #7c3aed);
+    color: #fff; font-size: 16px; font-weight: 700;
+    cursor: pointer; font-family: inherit; transition: opacity .15s;
+  }
+  .btn-primary:active { opacity: .85; }
+  .btn-primary:disabled { opacity: .4; cursor: default; }
+
+  /* ── Mensajes ── */
+  .msg {
+    padding: 12px 14px; border-radius: 10px;
+    font-size: 13px; margin-top: 12px;
+    line-height: 1.5; display: none;
+  }
+  .msg.error   { background: #450a0a; color: #fca5a5; border: 1px solid #7f1d1d; display: block; }
+  .msg.success { background: #052e16; color: #4ade80; border: 1px solid #14532d; display: block; }
+  .msg.info    { background: #1e3a5f; color: #93c5fd; border: 1px solid #1d4ed8; display: block; }
+
+  /* ── Footer ── */
+  .foot {
+    text-align: center; padding: 0 20px 20px;
+    font-size: 11px; color: #334155;
+  }
+</style>
+</head>
+<body>
+
+<!-- Encabezado con marca -->
+<div class="splash">
+  <div class="logo-mark">🌐</div>
+  <div class="brand">Local<span>Web</span></div>
+  <div class="splash-tag">Portal de colaboradores</div>
+  <div class="splash-aviso">
+    Esta aplicación es de uso <strong>exclusivo</strong> para personal<br>
+    y directivos de <strong>LocalWeb</strong>.
+  </div>
+</div>
+
+<!-- Formularios -->
+<div class="body-wrap">
+
+  <div class="action-tabs">
+    <button class="action-tab active" id="tab-login" onclick="switchTab('login')">
+      🔐 Ingresar
+    </button>
+    <button class="action-tab" id="tab-reg" onclick="switchTab('registro')">
+      ✍️ Registrarse
+    </button>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="panel-login" class="panel active">
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="l-email" placeholder="tu@email.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label>Contraseña</label>
+      <input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <button class="btn-primary" id="btn-login" onclick="doLogin()">Ingresar</button>
+    <div id="msg-login" class="msg"></div>
+  </div>
+
+  <!-- REGISTRO -->
+  <div id="panel-registro" class="panel">
+    <div class="row2">
+      <div class="form-group" style="margin:0">
+        <label>Nombre</label>
+        <input type="text" id="r-nombre" placeholder="María">
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Apellido</label>
+        <input type="text" id="r-apellido" placeholder="González">
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:14px">
+      <label>Teléfono</label>
+      <input type="tel" id="r-tel" placeholder="2954 123456">
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="r-email" placeholder="tu@email.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label>Contraseña (mínimo 6 caracteres)</label>
+      <input type="password" id="r-pass" placeholder="••••••••" autocomplete="new-password">
+    </div>
+
+    <!-- Términos y condiciones -->
+    <div class="tyc-toggle" id="tyc-toggle" onclick="toggleTyC()">
+      <span>📄 Ver términos y condiciones</span>
+      <span class="arrow">⌄</span>
+    </div>
+
+    <div class="tyc-content" id="tyc-content">
+      <h4>ACUERDO DE COLABORACIÓN COMERCIAL — LOCALWEB</h4>
+
+      <h4>1. Naturaleza del acuerdo</h4>
+      El presente constituye un acuerdo de colaboración comercial entre LocalWeb y el/la colaborador/a. No implica relación de dependencia laboral ni vínculo de empleo de ningún tipo entre las partes.
+
+      <h4>2. Modalidad de trabajo</h4>
+      El/la colaborador/a actuará como vendedor/a independiente, ofreciendo los productos y servicios de LocalWeb (páginas web, publicidad digital y plataformas). La actividad se realiza de forma autónoma, sin horario fijo ni obligación de exclusividad.
+
+      <h4>3. Remuneración por comisión</h4>
+      La retribución consistirá exclusivamente en comisiones calculadas sobre las ventas efectivamente concretadas y cobradas por LocalWeb. No existe sueldo fijo, anticipo ni garantía de ingreso mínimo.
+
+      <h4>4. Ausencia de beneficios laborales</h4>
+      Este acuerdo no genera obligaciones laborales para LocalWeb. No corresponden vacaciones pagas, aguinaldo (SAC), obra social, aportes previsionales, indemnizaciones ni ningún otro beneficio propio de una relación de dependencia regulada por la Ley de Contrato de Trabajo N° 20.744.
+
+      <h4>5. Responsabilidad del colaborador</h4>
+      El/la colaborador/a es responsable de su situación impositiva frente a ARCA (ex-AFIP) y de cualquier obligación fiscal que pudiera corresponderle por los ingresos percibidos.
+
+      <h4>6. Confidencialidad</h4>
+      El/la colaborador/a se compromete a mantener la confidencialidad sobre precios, estrategias comerciales, datos de clientes y cualquier información de LocalWeb a la que acceda a través de esta plataforma.
+
+      <h4>7. Uso de la plataforma</h4>
+      El acceso a esta aplicación es personal e intransferible. Está prohibida su cesión o compartición con terceros no autorizados por LocalWeb.
+
+      <h4>8. Aceptación</h4>
+      Al registrarse, el/la colaborador/a declara haber leído, comprendido y aceptado en su totalidad los presentes términos y condiciones.
+    </div>
+
+    <div class="tyc-check" id="tyc-check" onclick="toggleCheck()">
+      <input type="checkbox" id="chk-tyc" onclick="event.stopPropagation(); toggleCheck()">
+      <label class="tyc-check-label" for="chk-tyc">
+        Leí y acepto los términos y condiciones del acuerdo de colaboración comercial con LocalWeb.
+      </label>
+    </div>
+
+    <button class="btn-primary" id="btn-reg" onclick="doRegistro()">Solicitar acceso</button>
+    <div id="msg-reg" class="msg"></div>
+  </div>
+
+</div>
+
+<div class="foot">LocalWeb © 2026 · Uso interno · Todos los derechos reservados</div>
+
+<script>
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let tycAceptado = false;
+
+function switchTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-reg').classList.toggle('active', tab === 'registro');
+  document.getElementById('panel-login').classList.toggle('active', tab === 'login');
+  document.getElementById('panel-registro').classList.toggle('active', tab === 'registro');
+  document.getElementById('msg-login').className = 'msg';
+  document.getElementById('msg-reg').className = 'msg';
+}
+
+function toggleTyC() {
+  const tog = document.getElementById('tyc-toggle');
+  const con = document.getElementById('tyc-content');
+  tog.classList.toggle('open');
+  con.classList.toggle('open');
+}
+
+function toggleCheck() {
+  tycAceptado = !tycAceptado;
+  document.getElementById('chk-tyc').checked = tycAceptado;
+  document.getElementById('tyc-check').classList.toggle('checked', tycAceptado);
+}
+
+function showMsg(id, type, text) {
+  const el = document.getElementById(id);
+  el.className = `msg ${type}`;
+  el.textContent = text;
+}
+
+function notifyWA(msg) {
+  if (!WA_APIKEY || WA_APIKEY === 'TU_CALLMEBOT_APIKEY') return;
+  const img = new Image();
+  img.src = `https://api.callmebot.com/whatsapp.php?phone=${WA_PHONE}&text=${encodeURIComponent(msg)}&apikey=${WA_APIKEY}`;
+}
+
+async function doLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  if (!email || !pass) return showMsg('msg-login','error','Completá email y contraseña.');
+
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true; btn.textContent = 'Ingresando...';
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) {
+    showMsg('msg-login','error','Email o contraseña incorrectos.');
+    btn.disabled = false; btn.textContent = 'Ingresar';
+    return;
+  }
+
+  const { data: perfil } = await sb.from('perfiles').select('*').eq('id', data.user.id).single();
+  if (!perfil || perfil.rol === 'pendiente') {
+    await sb.auth.signOut();
+    showMsg('msg-login','info','Tu cuenta está pendiente de aprobación. El administrador te habilitará pronto.');
+    btn.disabled = false; btn.textContent = 'Ingresar';
+    return;
+  }
+
+  await sb.from('actividad_login').insert({
+    vendedora_id: data.user.id,
+    nombre: `${perfil.nombre} ${perfil.apellido}`
+  });
+
+  const ahora = new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
+  notifyWA(`🔐 *Login LocalWeb*\n👤 ${perfil.nombre} ${perfil.apellido}\n📅 ${ahora}`);
+
+  window.location.href = perfil.rol === 'superadmin' ? 'admin.html' : 'perfil.html';
+}
+
+async function doRegistro() {
+  const nombre   = document.getElementById('r-nombre').value.trim();
+  const apellido = document.getElementById('r-apellido').value.trim();
+  const tel      = document.getElementById('r-tel').value.trim();
+  const email    = document.getElementById('r-email').value.trim();
+  const pass     = document.getElementById('r-pass').value;
+
+  if (!nombre || !apellido || !email || !pass)
+    return showMsg('msg-reg','error','Completá todos los campos.');
+  if (pass.length < 6)
+    return showMsg('msg-reg','error','La contraseña debe tener al menos 6 caracteres.');
+  if (!tycAceptado)
+    return showMsg('msg-reg','error','Debés aceptar los términos y condiciones para continuar.');
+
+  const btn = document.getElementById('btn-reg');
+  btn.disabled = true; btn.textContent = 'Enviando solicitud...';
+
+  const { data, error } = await sb.auth.signUp({ email, password: pass,
+    options: { emailRedirectTo: null } });
+
+  if (error) {
+    const msg = error.message.toLowerCase().includes('already')
+      ? 'Ese email ya está registrado. Probá con "Ingresar".'
+      : 'Error al registrar. Intentá de nuevo.';
+    showMsg('msg-reg','error', msg);
+    btn.disabled = false; btn.textContent = 'Solicitar acceso';
+    return;
+  }
+
+  await sb.from('perfiles').insert({
+    id: data.user.id, nombre, apellido, telefono: tel, rol: 'pendiente'
+  });
+
+  notifyWA(`🆕 *Nueva solicitud de acceso*\n👤 ${nombre} ${apellido}\n📧 ${email}\n📞 ${tel || '—'}\n⏳ Pendiente de aprobación`);
+
+  showMsg('msg-reg','success',
+    `¡Solicitud enviada, ${nombre}! El administrador revisará tu cuenta y te habilitará el acceso en breve.`);
+  btn.disabled = false; btn.textContent = 'Solicitar acceso';
+}
+
+// Redirigir si ya hay sesión activa
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+  const { data: p } = await sb.from('perfiles').select('rol').eq('id', session.user.id).single();
+  if (p?.rol === 'superadmin')  window.location.href = 'admin.html';
+  else if (p?.rol === 'vendedora') window.location.href = 'perfil.html';
+})();
+</script>
+</body>
+</html>

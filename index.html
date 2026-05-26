@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LocalWeb — Guía de Ventas</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #0f172a;
+    color: #fff;
+    min-height: 100vh;
+  }
+
+  header {
+    background: linear-gradient(135deg, #1e40af, #0ea5e9);
+    padding: 28px 20px 24px;
+    text-align: center;
+  }
+  header .logo { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; opacity: .7; margin-bottom: 8px; }
+  header h1 { font-size: 26px; font-weight: 800; }
+  header p { font-size: 14px; opacity: .85; margin-top: 6px; }
+
+  .intro {
+    background: #1e293b;
+    padding: 18px 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #94a3b8;
+    border-bottom: 1px solid #334155;
+  }
+  .intro strong { color: #38bdf8; }
+
+  .products {
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: #1e293b;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #334155;
+    transition: transform .15s;
+  }
+  .card:active { transform: scale(.98); }
+
+  .card-header {
+    padding: 20px 20px 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .card-icon {
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+  .card-icon.tc { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+  .card-icon.lw { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+  .card-icon.dw { background: linear-gradient(135deg, #10b981, #0ea5e9); }
+
+  .card-title { font-size: 18px; font-weight: 700; }
+  .card-sub { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+
+  .card-desc {
+    padding: 0 20px 16px;
+    font-size: 13px;
+    color: #94a3b8;
+    line-height: 1.5;
+  }
+
+  .card-tags {
+    padding: 0 20px 16px;
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .tag {
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    background: #0f172a;
+    color: #64748b;
+    border: 1px solid #334155;
+  }
+
+  .card-btn {
+    display: block;
+    margin: 0 20px 20px;
+    padding: 14px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+    color: #fff;
+    transition: opacity .15s;
+  }
+  .card-btn:active { opacity: .85; }
+  .card-btn.tc  { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+  .card-btn.tc2 { background: linear-gradient(135deg, #2563eb, #7c3aed); }
+  .card-btn.lw  { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+  .card-btn.dw  { background: linear-gradient(135deg, #10b981, #0ea5e9); }
+  .card-btn.disabled {
+    background: #334155;
+    color: #64748b;
+    cursor: default;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-left: 8px;
+    vertical-align: middle;
+    letter-spacing: .5px;
+  }
+  .badge.ready { background: #166534; color: #4ade80; }
+  .badge.soon { background: #1e3a5f; color: #60a5fa; }
+
+  footer {
+    text-align: center;
+    padding: 28px 16px 90px;
+    font-size: 12px;
+    color: #475569;
+  }
+
+  /* ── Botón panel personal fijo abajo ── */
+  .panel-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    padding: 10px 16px 14px;
+    background: linear-gradient(to top, #0f172a 70%, transparent);
+    z-index: 100;
+  }
+  .panel-bar-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; max-width: 520px; margin: 0 auto;
+    padding: 15px 20px; border-radius: 14px; border: none;
+    background: linear-gradient(135deg, #1d4ed8, #7c3aed);
+    color: #fff; font-size: 15px; font-weight: 700;
+    cursor: pointer; text-decoration: none;
+    box-shadow: 0 4px 20px rgba(124,58,237,.4);
+    font-family: inherit;
+  }
+  .panel-bar-btn:active { opacity: .85; }
+  .panel-bar-sub { font-size: 12px; opacity: .75; font-weight: 400; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">LocalWeb · Herramientas de Venta</div>
+  <h1>Guía para Vendedoras</h1>
+  <p>Mostrá el potencial de nuestras plataformas a tus clientes</p>
+</header>
+
+<div class="intro">
+  Seleccioná una plataforma y seguí la guía paso a paso.<br>
+  <strong>Mostrala en tu celular durante la visita al cliente.</strong>
+</div>
+
+<div class="products">
+
+  <!-- TRABAJOS CERCA -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon tc">🔨</div>
+      <div>
+        <div class="card-title">Trabajos Cerca <span class="badge ready">LISTO</span></div>
+        <div class="card-sub">trabajoscerca.com.ar</div>
+      </div>
+    </div>
+    <div class="card-desc">
+      Plataforma que conecta plomeros, electricistas, albañiles y más de 25 oficios con sus clientes.
+      Los comercios aparecen como <strong style="color:#f59e0b">Destacados del Comercio</strong> justo al lado de los resultados de búsqueda.
+    </div>
+    <div class="card-tags">
+      <span class="tag">Ferreterías</span>
+      <span class="tag">Corralones</span>
+      <span class="tag">Pinturerías</span>
+      <span class="tag">Herramientas</span>
+      <span class="tag">Insumos</span>
+    </div>
+    <a href="trabajoscerca.html" class="card-btn tc" style="margin-bottom:8px">▶ Para profesionales (plomeros, electricistas...)</a>
+    <a href="trabajoscerca-anunciantes.html" class="card-btn tc2">🏪 Para comercios — precios y posiciones</a>
+  </div>
+
+  <!-- LOCAL WEB -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon lw">🌐</div>
+      <div>
+        <div class="card-title">LocalWeb <span class="badge ready">LISTO</span></div>
+        <div class="card-sub">localweb.ar</div>
+      </div>
+    </div>
+    <div class="card-desc">
+      Páginas web profesionales para comercios locales. Diseño, hosting y posicionamiento incluido.
+    </div>
+    <div class="card-tags">
+      <span class="tag">Página web</span>
+      <span class="tag">Comercios</span>
+      <span class="tag">Google</span>
+    </div>
+    <a href="localweb.html" class="card-btn lw">▶ Ver presentación</a>
+  </div>
+
+  <!-- DATAWEB -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon dw">💻</div>
+      <div>
+        <div class="card-title">DataWeb <span class="badge ready">LISTO</span></div>
+        <div class="card-sub">dataweb.com.ar</div>
+      </div>
+    </div>
+    <div class="card-desc">
+      Soluciones digitales completas para empresas: sistemas, apps, e-commerce y más.
+    </div>
+    <div class="card-tags">
+      <span class="tag">Apps</span>
+      <span class="tag">Sistemas</span>
+      <span class="tag">E-commerce</span>
+    </div>
+    <a href="dataweb.html" class="card-btn dw">▶ Ver presentación</a>
+  </div>
+
+</div>
+
+<footer>LocalWeb · Herramientas internas de ventas · 2026</footer>
+
+<!-- Botón panel personal fijo abajo -->
+<div class="panel-bar" id="panel-bar" style="display:none">
+  <a id="panel-bar-btn" href="perfil.html" class="panel-bar-btn">
+    <span>👤</span>
+    <span id="panel-bar-txt">Panel personal</span>
+  </a>
+</div>
+
+<script>
+document.body.style.visibility = 'hidden';
+(async () => {
+  try {
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { data: { session } } = await sb.auth.getSession();
+
+    if (!session) { window.location.replace('login.html'); return; }
+
+    const { data: p } = await sb.from('perfiles').select('*').eq('id', session.user.id).single();
+    if (!p || p.rol === 'pendiente') { window.location.replace('login.html'); return; }
+
+    document.body.style.visibility = '';
+
+    const bar = document.getElementById('panel-bar');
+    const btn = document.getElementById('panel-bar-btn');
+    const txt = document.getElementById('panel-bar-txt');
+    bar.style.display = 'block';
+
+    if (p.rol === 'superadmin') {
+      txt.innerHTML = `Panel admin de <strong>${p.nombre} ${p.apellido}</strong>`;
+      btn.href = 'admin.html';
+    } else {
+      txt.innerHTML = `Panel personal de <strong>${p.nombre} ${p.apellido}</strong>`;
+      btn.href = 'perfil.html';
+    }
+  } catch(e) {
+    document.body.style.visibility = '';
+  }
+})();
+</script>
+</body>
+</html>
