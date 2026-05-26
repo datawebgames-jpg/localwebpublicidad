@@ -69,6 +69,7 @@
   }
   .badge.pendiente { background: #431407; color: #fb923c; }
   .badge.vendedora { background: #052e16; color: #4ade80; }
+  .badge.admin     { background: #1e3a5f; color: #38bdf8; }
   .badge.superadmin{ background: #1e1b4b; color: #a78bfa; }
 
   .btn-aprobar {
@@ -78,6 +79,18 @@
     margin-left: auto;
   }
   .btn-aprobar:disabled { opacity: .45; cursor: default; }
+
+  /* Toggle admin */
+  .admin-toggle {
+    display: flex; align-items: center; gap: 6px;
+    margin-left: auto; cursor: pointer; user-select: none;
+    background: #0f172a; border: 1px solid #334155;
+    padding: 6px 12px; border-radius: 20px; font-size: 12px;
+    font-weight: 700; color: #64748b; transition: all .15s;
+    white-space: nowrap;
+  }
+  .admin-toggle.activo { border-color: #38bdf8; background: #1e3a5f; color: #38bdf8; }
+  .admin-toggle input { display: none; }
 
   /* Cliente cards */
   .cl-card {
@@ -244,7 +257,7 @@ async function init() {
   if (!session) { window.location.href = 'login.html'; return; }
 
   const { data: p } = await sb.from('perfiles').select('*').eq('id', session.user.id).single();
-  if (!p || p.rol !== 'superadmin') { window.location.href = 'login.html'; return; }
+  if (!p || (p.rol !== 'superadmin' && p.rol !== 'admin')) { window.location.href = 'login.html'; return; }
   adminPerfil = p;
   document.getElementById('admin-name').textContent = `${p.nombre} ${p.apellido}`;
 
@@ -263,7 +276,7 @@ async function cargarVendedoras() {
   todasVendedoras = data;
 
   const pendientes = data.filter(v => v.rol === 'pendiente');
-  const activas    = data.filter(v => v.rol === 'vendedora');
+  const activas    = data.filter(v => v.rol === 'vendedora' || v.rol === 'admin');
 
   // Label pendientes
   const lbl = document.getElementById('lbl-pendientes');
@@ -288,9 +301,11 @@ async function cargarVendedoras() {
 
 function cardVendedora(v, pendiente) {
   const ini = (v.nombre[0] + v.apellido[0]).toUpperCase();
-  const avatarHtml = v.avatar_url
-    ? `<img src="${v.avatar_url}">`
-    : ini;
+  const avatarHtml = v.avatar_url ? `<img src="${v.avatar_url}">` : ini;
+  const esSuperadmin = adminPerfil?.rol === 'superadmin';
+  const esAdmin = v.rol === 'admin';
+  const esSelf  = v.id === adminPerfil?.id;
+
   return `<div class="card">
     <div class="card-head">
       <div class="avatar-sm">${avatarHtml}</div>
@@ -300,8 +315,22 @@ function cardVendedora(v, pendiente) {
       </div>
       <span class="badge ${v.rol}">${v.rol}</span>
       ${pendiente ? `<button class="btn-aprobar" id="btn-apr-${v.id}" onclick="aprobar('${v.id}','${v.nombre} ${v.apellido}')">Aprobar</button>` : ''}
+      ${!pendiente && esSuperadmin && !esSelf && v.rol !== 'superadmin' ? `
+        <label class="admin-toggle ${esAdmin ? 'activo' : ''}" id="lbl-adm-${v.id}"
+               onclick="toggleAdmin('${v.id}','${v.nombre} ${v.apellido}','${v.rol}')">
+          ⚙️ Admin
+        </label>` : ''}
     </div>
   </div>`;
+}
+
+async function toggleAdmin(id, nombre, rolActual) {
+  const nuevoRol = rolActual === 'admin' ? 'vendedora' : 'admin';
+  const lbl = document.getElementById('lbl-adm-' + id);
+  if (lbl) { lbl.style.opacity = '.5'; lbl.style.pointerEvents = 'none'; }
+  await sb.from('perfiles').update({ rol: nuevoRol }).eq('id', id);
+  notifyWA(`⚙️ *Cambio de rol*\n👤 ${nombre}\n🔄 ${rolActual} → ${nuevoRol}`);
+  cargarVendedoras();
 }
 
 async function aprobar(id, nombre) {
@@ -383,7 +412,7 @@ async function cargarActividad() {
 function cargarResumen() {
   document.getElementById('st-total').textContent     = todosClientes.length;
   document.getElementById('st-si').textContent        = todosClientes.filter(c => c.interesado === 'si').length;
-  document.getElementById('st-vendedoras').textContent = todasVendedoras.filter(v => v.rol === 'vendedora').length;
+  document.getElementById('st-vendedoras').textContent = todasVendedoras.filter(v => v.rol === 'vendedora' || v.rol === 'admin').length;
   document.getElementById('st-pend').textContent      = todasVendedoras.filter(v => v.rol === 'pendiente').length;
 
   const ultimos = todosClientes.slice(0, 5);

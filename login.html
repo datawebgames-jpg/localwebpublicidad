@@ -338,7 +338,8 @@ async function doLogin() {
   const ahora = new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
   notifyWA(`🔐 *Login LocalWeb*\n👤 ${perfil.nombre} ${perfil.apellido}\n📅 ${ahora}`);
 
-  window.location.href = perfil.rol === 'superadmin' ? 'admin.html' : 'perfil.html';
+  const esAdmin = perfil.rol === 'superadmin' || perfil.rol === 'admin';
+  window.location.href = esAdmin ? 'admin.html' : 'perfil.html';
 }
 
 async function doRegistro() {
@@ -386,7 +387,7 @@ async function doRegistro() {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) return;
   const { data: p } = await sb.from('perfiles').select('rol').eq('id', session.user.id).single();
-  if (p?.rol === 'superadmin')  window.location.href = 'admin.html';
+  if (p?.rol === 'superadmin' || p?.rol === 'admin') window.location.href = 'admin.html';
   else if (p?.rol === 'vendedora') window.location.href = 'perfil.html';
 })();
 </script>
