@@ -463,6 +463,12 @@ async function init() {
   if (!p || p.rol === 'pendiente') { window.location.href = 'login.html'; return; }
   perfil = p;
 
+  // ── Online heartbeat: actualiza last_seen cada 60s ──
+  const actualizarLastSeen = () =>
+    sb.from('perfiles').update({ last_seen: new Date().toISOString() }).eq('id', p.id);
+  actualizarLastSeen();
+  setInterval(actualizarLastSeen, 60000);
+
   // topbar
   const initials = (p.nombre[0] + p.apellido[0]).toUpperCase();
   const avatarEl = document.getElementById('topbar-avatar');

@@ -1,0 +1,5 @@
+[project]
+id = "qzwphmnxirsgqtotnzzq"
+
+[functions.reporte-semanal]
+verify_jwt = false
