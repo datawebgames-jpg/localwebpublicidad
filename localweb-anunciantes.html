@@ -209,14 +209,17 @@ async function init() {
   // Cargar publicidades
   let query = sb.from('publicidades').select('*').eq('activo', true).order('created_at', { ascending: true });
 
-  // Si hay vendedora, filtrar por las que le corresponden
+  // Si hay vendedora, filtrar solo por las que le asignaron
   if (vendedoraId) {
-    const { data: asig } = await sb.from('pub_vendedoras')
+    const { data: asig, error: asigErr } = await sb.from('pub_vendedoras')
       .select('publicidad_id').eq('vendedora_id', vendedoraId);
-    // Si tiene asignaciones, mostrar solo esas; si no, mostrar todas
-    if (asig && asig.length > 0) {
-      const ids = asig.map(a => a.publicidad_id);
-      query = query.in('id', ids);
+    if (!asigErr && asig && asig.length > 0) {
+      query = query.in('id', asig.map(a => a.publicidad_id));
+    } else {
+      // Sin asignaciones o error: no mostrar nada (no fallback a "todas")
+      document.getElementById('lista-pubs').innerHTML =
+        `<div class="empty-state"><span class="icon">📋</span>El administrador todavía no configuró publicidades para tu zona.</div>`;
+      return;
     }
   }
 
