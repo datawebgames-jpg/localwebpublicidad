@@ -1015,67 +1015,121 @@ async function eliminarPublicidad(id, nombre) {
 
 function exportarPDF() {
   if (!todasPublicidades.length) { alert('No hay publicidades cargadas.'); return; }
-  const fmtP = n => new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(n);
-  const ubicLabel = u => ({ banner_inicio:'Banner Inicio', banner_buscador:'Banner Buscador', banner_perfil:'Banner Perfil', banner_popup:'Banner Popup', pack_completo:'⭐ Pack Completo' })[u] || u;
-  const fmtLabel  = f => ({ fijo:'Fijo', rotativo:'Rotativo', gif:'Gif Animado' })[f] || f;
-  const ubicColor = u => ({ banner_inicio:'#7c3aed', banner_buscador:'#0369a1', banner_perfil:'#059669', banner_popup:'#ea580c', pack_completo:'#059669' })[u] || '#64748b';
+
+  const fmtP     = n => new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(n);
+  const ubicLabel = u => ({ banner_inicio:'Banner Inicio', banner_buscador:'Banner Buscador', banner_perfil:'Banner Perfil', banner_popup:'Banner Popup', pack_completo:'Pack Completo' })[u] || u;
+  const fmtLabel  = f => ({ fijo:'Fijo', rotativo:'Rotativo', gif:'Gif Animado' })[f] || '';
+  const ubicColor = u => ({ banner_inicio:'#7c3aed', banner_buscador:'#0369a1', banner_perfil:'#059669', banner_popup:'#ea580c', pack_completo:'#7c3aed' })[u] || '#64748b';
 
   const cards = todasPublicidades.map(pub => {
-    const ub = pub.ubicacion || pub.tipo;
-    const imgHtml = pub.imagen_data
-      ? `<img src="${pub.imagen_data}" style="width:100%;height:140px;object-fit:cover;border-radius:8px;display:block;margin-bottom:12px;">`
-      : '';
-    const feats = [pub.con_link?'Con link al sitio del cliente':'', pub.con_popup?'Con popup de ofertas':''].filter(Boolean);
-    const descuentos = [
-      pub.descuento_3  ? `<td style="text-align:center;padding:7px 10px;font-weight:700;color:#0369a1;">${pub.descuento_3}%<br><span style="font-size:10px;font-weight:400;color:#64748b;">${fmtP(pub.precio*(1-pub.descuento_3/100))}/mes</span></td>` : '<td style="text-align:center;padding:7px 10px;color:#94a3b8;">—</td>',
-      pub.descuento_6  ? `<td style="text-align:center;padding:7px 10px;font-weight:700;color:#0369a1;">${pub.descuento_6}%<br><span style="font-size:10px;font-weight:400;color:#64748b;">${fmtP(pub.precio*(1-pub.descuento_6/100))}/mes</span></td>` : '<td style="text-align:center;padding:7px 10px;color:#94a3b8;">—</td>',
-      pub.descuento_12 ? `<td style="text-align:center;padding:7px 10px;font-weight:700;color:#0369a1;">${pub.descuento_12}%<br><span style="font-size:10px;font-weight:400;color:#64748b;">${fmtP(pub.precio*(1-pub.descuento_12/100))}/mes</span></td>` : '<td style="text-align:center;padding:7px 10px;color:#94a3b8;">—</td>',
-    ];
-    const tieneDescuentos = pub.descuento_3 || pub.descuento_6 || pub.descuento_12;
-    return `<div style="break-inside:avoid;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin-bottom:20px;">
-      ${imgHtml}
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
-        <div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-            <span style="background:${ubicColor(ub)};color:#fff;font-size:10px;font-weight:700;padding:2px 10px;border-radius:20px;">${ubicLabel(ub)}</span>
-            <span style="background:#f1f5f9;color:#475569;font-size:10px;font-weight:700;padding:2px 10px;border-radius:20px;">${fmtLabel(pub.formato)}</span>
-          </div>
-          <div style="font-size:18px;font-weight:800;color:#0f172a;">${pub.nombre}</div>
-        </div>
-        <div style="text-align:right;flex-shrink:0;">
-          <div style="font-size:24px;font-weight:800;color:#059669;">${fmtP(pub.precio)}</div>
-          <div style="font-size:11px;color:#64748b;">por mes</div>
-        </div>
-      </div>
-      ${pub.descripcion ? `<p style="font-size:13px;color:#475569;line-height:1.6;margin-bottom:10px;padding:10px 12px;background:#f8fafc;border-radius:8px;border-left:3px solid ${ubicColor(ub)};">${pub.descripcion}</p>` : ''}
-      ${feats.length ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">${feats.map(f=>`<span style="background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid #bfdbfe;">✓ ${f}</span>`).join('')}</div>` : ''}
-      ${tieneDescuentos ? `
-      <table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:4px;">
-        <thead>
-          <tr style="background:#f8fafc;">
-            <th style="text-align:left;padding:7px 10px;color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;">Contrato</th>
-            <th style="text-align:center;padding:7px 10px;color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;">3 meses</th>
-            <th style="text-align:center;padding:7px 10px;color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;">6 meses</th>
-            <th style="text-align:center;padding:7px 10px;color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;">1 año</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style="border-bottom:1px solid #f1f5f9;">
-            <td style="padding:7px 10px;color:#475569;font-weight:600;">Descuento</td>
-            ${descuentos.join('')}
-          </tr>
-        </tbody>
-      </table>` : ''}
+    const ub    = pub.ubicacion || pub.tipo;
+    const color = ubicColor(ub);
+    const feats = [pub.con_link?'Con link al sitio web':'', pub.con_popup?'Con popup de ofertas':''].filter(Boolean);
+
+    // Columna izquierda: imagen
+    const imgCol = pub.imagen_data
+      ? `<td style="width:38%;padding:0;vertical-align:top;">
+           <img src="${pub.imagen_data}" style="width:100%;display:block;border-radius:6px 0 0 6px;height:100%;object-fit:cover;min-height:160px;">
+         </td>`
+      : `<td style="width:38%;padding:0;vertical-align:top;background:#f8fafc;border-radius:6px 0 0 6px;min-height:160px;">
+           <div style="display:flex;align-items:center;justify-content:center;height:100%;min-height:160px;color:#cbd5e1;font-size:13px;">Sin imagen</div>
+         </td>`;
+
+    // Tabla de descuentos
+    const tieneDesc = pub.descuento_3 || pub.descuento_6 || pub.descuento_12;
+    const descRow = tieneDesc ? `
+      <tr>
+        <td colspan="2" style="padding-top:12px;">
+          <table style="width:100%;border-collapse:collapse;font-size:11px;">
+            <tr style="background:#f1f5f9;">
+              <th style="padding:5px 8px;text-align:left;color:#64748b;font-weight:600;border-radius:4px 0 0 0;">Contrato</th>
+              <th style="padding:5px 8px;text-align:center;color:#64748b;font-weight:600;">3 meses</th>
+              <th style="padding:5px 8px;text-align:center;color:#64748b;font-weight:600;">6 meses</th>
+              <th style="padding:5px 8px;text-align:center;color:#64748b;font-weight:600;border-radius:0 4px 0 0;">1 año</th>
+            </tr>
+            <tr style="background:#fff;border:1px solid #e2e8f0;">
+              <td style="padding:6px 8px;font-weight:700;color:#475569;">Descuento</td>
+              ${pub.descuento_3  ? `<td style="padding:6px 8px;text-align:center;font-weight:800;color:${color};">${pub.descuento_3}%<div style="font-size:10px;font-weight:400;color:#64748b;">${fmtP(pub.precio*(1-pub.descuento_3/100))}/mes</div></td>` : '<td style="text-align:center;color:#cbd5e1;padding:6px 8px;">—</td>'}
+              ${pub.descuento_6  ? `<td style="padding:6px 8px;text-align:center;font-weight:800;color:${color};">${pub.descuento_6}%<div style="font-size:10px;font-weight:400;color:#64748b;">${fmtP(pub.precio*(1-pub.descuento_6/100))}/mes</div></td>` : '<td style="text-align:center;color:#cbd5e1;padding:6px 8px;">—</td>'}
+              ${pub.descuento_12 ? `<td style="padding:6px 8px;text-align:center;font-weight:800;color:${color};">${pub.descuento_12}%<div style="font-size:10px;font-weight:400;color:#64748b;">${fmtP(pub.precio*(1-pub.descuento_12/100))}/mes</div></td>` : '<td style="text-align:center;color:#cbd5e1;padding:6px 8px;">—</td>'}
+            </tr>
+          </table>
+        </td>
+      </tr>` : '';
+
+    return `
+    <div style="break-inside:avoid;margin-bottom:24px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.06);">
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+        <tr>
+          ${imgCol}
+          <td style="vertical-align:top;padding:18px 20px;">
+            <table style="width:100%;border-collapse:collapse;">
+              <tr>
+                <td>
+                  <span style="background:${color};color:#fff;font-size:9px;font-weight:700;padding:2px 9px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;">${ubicLabel(ub)}</span>
+                  ${fmtLabel(pub.formato) ? `<span style="background:#f1f5f9;color:#64748b;font-size:9px;font-weight:700;padding:2px 9px;border-radius:20px;margin-left:4px;">${fmtLabel(pub.formato)}</span>` : ''}
+                </td>
+                <td style="text-align:right;white-space:nowrap;">
+                  <span style="font-size:22px;font-weight:800;color:#059669;">${fmtP(pub.precio)}</span>
+                  <span style="font-size:11px;color:#94a3b8;"> /mes</span>
+                </td>
+              </tr>
+              <tr><td colspan="2" style="padding-top:8px;">
+                <div style="font-size:17px;font-weight:800;color:#0f172a;line-height:1.2;">${pub.nombre}</div>
+              </td></tr>
+              ${pub.descripcion ? `<tr><td colspan="2" style="padding-top:10px;">
+                <div style="font-size:12px;color:#475569;line-height:1.65;padding:9px 11px;background:#f8fafc;border-radius:6px;border-left:3px solid ${color};">${pub.descripcion}</div>
+              </td></tr>` : ''}
+              ${feats.length ? `<tr><td colspan="2" style="padding-top:8px;">
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                  ${feats.map(f=>`<span style="background:#eff6ff;color:#1d4ed8;font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px;border:1px solid #bfdbfe;">✓ ${f}</span>`).join('')}
+                </div>
+              </td></tr>` : ''}
+              ${descRow}
+            </table>
+          </td>
+        </tr>
+      </table>
     </div>`;
   }).join('');
 
-  const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
 <title>Planes de Publicidad — LocalWeb</title>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',system-ui,sans-serif;background:#f8fafc;color:#0f172a;padding:32px 24px}.header{text-align:center;margin-bottom:28px;padding-bottom:16px;border-bottom:2px solid #e2e8f0}.header h1{font-size:24px;font-weight:800;margin-bottom:4px}.header p{font-size:13px;color:#64748b}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}@media print{body{padding:12px;background:#fff}.no-print{display:none}}</style>
-</head><body>
-<div class="header"><h1>💰 Planes de Publicidad LocalWeb</h1><p>Catálogo · ${new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'})}</p></div>
-<div style="text-align:right;margin-bottom:16px" class="no-print"><button onclick="window.print()" style="background:linear-gradient(135deg,#10b981,#0ea5e9);border:none;color:#fff;padding:10px 22px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">🖨️ Imprimir / Guardar PDF</button></div>
-<div class="grid">${cards}</div></body></html>`;
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff; color: #0f172a; }
+  .page { max-width: 800px; margin: 0 auto; padding: 36px 32px; }
+  .encabezado { display: flex; align-items: center; justify-content: space-between; padding-bottom: 18px; margin-bottom: 28px; border-bottom: 3px solid #0f172a; }
+  .enc-titulo { font-size: 22px; font-weight: 800; }
+  .enc-sub { font-size: 12px; color: #64748b; margin-top: 3px; }
+  .enc-logo { font-size: 28px; font-weight: 900; color: #7c3aed; letter-spacing: -1px; }
+  .btn-imprimir { display: block; margin-bottom: 20px; text-align: right; }
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .btn-imprimir { display: none; }
+    .page { padding: 20px 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="encabezado">
+    <div>
+      <div class="enc-titulo">Planes de Publicidad</div>
+      <div class="enc-sub">Catálogo de espacios disponibles · ${new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'})}</div>
+    </div>
+    <div class="enc-logo">LocalWeb</div>
+  </div>
+  <div class="btn-imprimir">
+    <button onclick="window.print()" style="background:#0f172a;border:none;color:#fff;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px;">🖨️ Imprimir / Guardar PDF</button>
+  </div>
+  ${cards}
+</div>
+</body>
+</html>`;
 
   const win = window.open('', '_blank');
   win.document.write(html);
