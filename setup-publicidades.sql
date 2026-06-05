@@ -2,6 +2,17 @@
 -- Publicidades LocalWeb — ejecutar en Supabase SQL Editor
 -- ============================================================
 
+-- ⚡ Si la tabla ya existe, correr solo estas líneas primero:
+alter table publicidades add column if not exists ubicacion     text          default 'banner_inicio';
+alter table publicidades add column if not exists formato       text          default 'fijo';
+alter table publicidades add column if not exists descuento_3   numeric(5,2)  default 0;
+alter table publicidades add column if not exists descuento_6   numeric(5,2)  default 0;
+alter table publicidades add column if not exists descuento_12  numeric(5,2)  default 0;
+alter table publicidades add column if not exists descripcion   text;
+-- Luego continuar con el resto si las tablas pub_vendedoras y precios_sugeridos no existen.
+
+-- ============================================================
+
 -- Tabla principal de planes de publicidad
 create table if not exists publicidades (
   id           uuid default gen_random_uuid() primary key,
