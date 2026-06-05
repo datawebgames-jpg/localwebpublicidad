@@ -232,6 +232,17 @@
   .pub-cat-coms { font-size: 11px; color: #64748b; line-height: 1.6; }
   .pub-cat-coms span { color: #fbbf24; font-weight: 700; }
 
+  /* ── Precios zona ── */
+  .medio-btn { flex:1; padding:10px 6px; border-radius:8px; border:1.5px solid #334155; background:#0f172a; color:#64748b; font-size:12px; font-weight:600; cursor:pointer; text-align:center; transition:all .15s; font-family:inherit; }
+  .medio-btn.sel { border-color:#a78bfa; background:#1e1b4b; color:#c4b5fd; }
+  .pz-item { background:#0f172a; border:1px solid #334155; border-radius:10px; padding:12px 14px; margin-bottom:10px; position:relative; }
+  .pz-item-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .pz-item-num { font-size:12px; color:#475569; font-weight:700; }
+  .btn-remove-item { background:none; border:none; color:#475569; font-size:16px; cursor:pointer; padding:0 4px; }
+  .btn-add-item { width:100%; padding:11px; border-radius:10px; border:2px dashed #334155; background:transparent; color:#475569; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; margin-top:4px; transition:all .15s; }
+  .btn-add-item:hover { border-color:#475569; color:#94a3b8; }
+  .pz-info { background:#1e293b; border-radius:10px; padding:12px 14px; margin-bottom:16px; font-size:13px; color:#94a3b8; line-height:1.7; border:1px solid #334155; }
+
   /* ── Fotos preview ── */
   .fotos-preview { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .fotos-preview img { width: 72px; height: 72px; object-fit: cover; border-radius: 8px; }
@@ -301,6 +312,14 @@
       <div>
         <div class="home-card-title">Mis comisiones</div>
         <div class="home-card-sub">Publicidades vendidas y lo que cobrás</div>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="home-card" onclick="showView('precios-zona')">
+      <div class="home-icon" style="background:linear-gradient(135deg,#7c3aed,#db2777)">💡</div>
+      <div>
+        <div class="home-card-title">Precios de mi zona</div>
+        <div class="home-card-sub">Radio, diarios y web de tu ciudad</div>
       </div>
       <div class="chevron">›</div>
     </div>
@@ -470,6 +489,35 @@
   <div id="msg-nuevo" class="msg"></div>
 </div>
 
+<!-- VIEW: PRECIOS DE MI ZONA -->
+<div id="view-precios-zona" class="view">
+  <div class="sec-header">
+    <button class="btn-back" onclick="showView('home')">← Volver</button>
+    <div class="sec-title">Precios de mi zona</div>
+  </div>
+
+  <div class="pz-info">
+    📍 Completá los precios que manejan los medios de publicidad de <strong>tu ciudad</strong>: radio, diarios, portales web, etc.<br>
+    Esta info le llega al admin para armar el listado de publicidades con precios reales de tu zona.
+  </div>
+
+  <div class="form-group">
+    <label>Tu ciudad / zona</label>
+    <input type="text" id="pz-ciudad" placeholder="Ej: Santa Rosa, La Pampa">
+  </div>
+
+  <div id="pz-items-container"></div>
+  <button class="btn-add-item" onclick="agregarItemPrecio()">+ Agregar medio</button>
+
+  <div class="form-group" style="margin-top:16px">
+    <label>Notas adicionales (opcional)</label>
+    <textarea id="pz-notas" placeholder="Ej: los precios del diario incluyen diseño, la radio cobra aparte la producción..."></textarea>
+  </div>
+
+  <button class="btn-primary" id="btn-enviar-precios" onclick="enviarPreciosZona()" style="margin-top:8px">Enviar al admin</button>
+  <div id="msg-precios" class="msg"></div>
+</div>
+
 <!-- VIEW: MIS COMISIONES -->
 <div id="view-comisiones" class="view">
   <div class="sec-header">
@@ -589,6 +637,7 @@ function showView(name) {
   if (name === 'clientes') cargarClientes();
   if (name === 'nuevo') resetForm();
   if (name === 'comisiones') cargarComisiones();
+  if (name === 'precios-zona') initPreciosZona();
   window.scrollTo(0, 0);
 }
 
@@ -784,6 +833,89 @@ async function registrarCliente() {
     showMsg('msg-nuevo','success','¡Cliente registrado correctamente!');
     btn.disabled = false; btn.textContent = 'Guardar cliente';
     setTimeout(() => showView('clientes'), 1500);
+  }
+}
+
+// ── Precios de mi zona ──
+let pzItems = [];
+
+function initPreciosZona() {
+  pzItems = [];
+  document.getElementById('pz-ciudad').value = perfil.ciudad || '';
+  document.getElementById('pz-notas').value  = '';
+  document.getElementById('msg-precios').className = 'msg';
+  agregarItemPrecio();
+}
+
+const MEDIOS = [
+  { val:'radio',    lbl:'📻 Radio' },
+  { val:'diario',   lbl:'📰 Diario' },
+  { val:'web',      lbl:'🌐 Web/Portal' },
+  { val:'tv',       lbl:'📺 TV' },
+  { val:'revista',  lbl:'📖 Revista' },
+  { val:'otro',     lbl:'📋 Otro' },
+];
+
+function agregarItemPrecio() {
+  const idx = pzItems.length;
+  pzItems.push({ medio: 'radio', descripcion: '', precio: '' });
+  renderItemsPrecios();
+}
+
+function renderItemsPrecios() {
+  const el = document.getElementById('pz-items-container');
+  el.innerHTML = pzItems.map((item, idx) => `
+    <div class="pz-item" id="pz-item-${idx}">
+      <div class="pz-item-head">
+        <span class="pz-item-num">Medio ${idx + 1}</span>
+        ${pzItems.length > 1 ? `<button class="btn-remove-item" onclick="removeItemPrecio(${idx})">✕</button>` : ''}
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+        ${MEDIOS.map(m => `<button class="medio-btn ${item.medio===m.val?'sel':''}" onclick="setItemMedio(${idx},'${m.val}')">${m.lbl}</button>`).join('')}
+      </div>
+      <div class="form-group" style="margin-bottom:8px">
+        <label>Descripción del espacio publicitario</label>
+        <input type="text" value="${item.descripcion}" oninput="setItemDesc(${idx},this.value)"
+          placeholder="Ej: Cuña 30 seg mañana, Banner 300x250 homepage...">
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Precio por mes ($)</label>
+        <input type="number" value="${item.precio}" oninput="setItemPrecio(${idx},this.value)"
+          placeholder="0" min="0" step="500">
+      </div>
+    </div>`).join('');
+}
+
+function setItemMedio(idx, val)  { pzItems[idx].medio = val; renderItemsPrecios(); }
+function setItemDesc(idx, val)   { pzItems[idx].descripcion = val; }
+function setItemPrecio(idx, val) { pzItems[idx].precio = val; }
+function removeItemPrecio(idx)   { pzItems.splice(idx, 1); renderItemsPrecios(); }
+
+async function enviarPreciosZona() {
+  const ciudad = document.getElementById('pz-ciudad').value.trim();
+  if (!ciudad) return showMsg('msg-precios','error','Ingresá tu ciudad.');
+  const itemsValidos = pzItems.filter(i => i.descripcion.trim() && parseFloat(i.precio) > 0);
+  if (!itemsValidos.length) return showMsg('msg-precios','error','Completá al menos un medio con descripción y precio.');
+
+  const btn = document.getElementById('btn-enviar-precios');
+  btn.disabled = true; btn.textContent = 'Enviando...';
+
+  const payload = {
+    vendedora_id: perfil.id,
+    ciudad,
+    items: itemsValidos.map(i => ({ medio: i.medio, descripcion: i.descripcion.trim(), precio: parseFloat(i.precio) })),
+    notas: document.getElementById('pz-notas').value.trim() || null
+  };
+
+  const { error } = await sb.from('precios_sugeridos').insert(payload);
+  btn.disabled = false; btn.textContent = 'Enviar al admin';
+
+  if (error) {
+    showMsg('msg-precios','error','Error al enviar. Intentá de nuevo.');
+  } else {
+    showMsg('msg-precios','success','¡Enviado! El admin ya puede verlo para armar los precios de tu zona. 🎉');
+    pzItems = [];
+    renderItemsPrecios();
   }
 }
 

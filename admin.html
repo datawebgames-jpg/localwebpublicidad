@@ -175,9 +175,13 @@
   .pub-info { flex: 1; min-width: 0; }
   .pub-nombre { font-weight: 800; font-size: 15px; margin-bottom: 4px; }
   .pub-tipo-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 20px; margin-bottom: 6px; }
-  .pub-tipo-banner_inicio { background: #1e1b4b; color: #a78bfa; }
-  .pub-tipo-rotativo { background: #431407; color: #fb923c; }
-  .pub-tipo-fijo { background: #052e16; color: #34d399; }
+  .pub-tipo-banner_inicio   { background: #1e1b4b; color: #a78bfa; }
+  .pub-tipo-banner_buscador { background: #1e3a5f; color: #38bdf8; }
+  .pub-tipo-banner_perfil   { background: #052e16; color: #34d399; }
+  .pub-tipo-banner_popup    { background: #431407; color: #fb923c; }
+  .pub-fmt-fijo    { background: #0f172a; color: #94a3b8; border: 1px solid #334155; }
+  .pub-fmt-rotativo{ background: #1e1b4b; color: #a78bfa; }
+  .pub-fmt-gif     { background: #431407; color: #fbbf24; }
   .pub-features { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 6px; }
   .pub-feat { font-size: 10px; background: #0f172a; border: 1px solid #334155; border-radius: 20px; padding: 2px 8px; color: #64748b; }
   .pub-feat.on { border-color: #38bdf8; color: #38bdf8; background: rgba(56,189,248,.08); }
@@ -217,6 +221,25 @@
   .img-upload-zone-lbl { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font-size: 10px; background: rgba(0,0,0,.6); padding: 3px; }
   .btn-guardar-pub { width: 100%; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #10b981, #0ea5e9); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 8px; }
   .btn-guardar-pub:disabled { opacity: .45; cursor: default; }
+  .m-row4 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .vend-check-row { display: flex; align-items: center; gap: 10px; padding: 9px 13px; background: #0f172a; border: 1px solid #334155; border-radius: 10px; cursor: pointer; transition: border-color .15s; }
+  .vend-check-row:hover { border-color: #475569; }
+  .vend-check-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: #38bdf8; flex-shrink: 0; }
+  .vend-check-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg,#3b82f6,#8b5cf6); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; overflow:hidden; }
+  .vend-check-avatar img { width:100%; height:100%; object-fit:cover; }
+  .vend-check-nombre { font-size: 13px; color: #cbd5e1; font-weight: 600; }
+  .vend-check-ciudad { font-size: 11px; color: #475569; }
+  /* Precios sugeridos */
+  .sec-divider { border: none; border-top: 1px solid #334155; margin: 20px 0; }
+  .psug-card { background: #1e293b; border-radius: 12px; border: 1px solid #334155; margin-bottom: 10px; padding: 12px 14px; }
+  .psug-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .psug-vend { font-weight: 700; font-size: 13px; }
+  .psug-fecha { font-size: 11px; color: #475569; margin-left: auto; }
+  .psug-items { display: flex; flex-direction: column; gap: 5px; }
+  .psug-item { display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8; }
+  .psug-item strong { color: #fbbf24; }
+  .psug-item .psug-medio { color: #cbd5e1; }
+  .psug-nota { font-size: 11px; color: #64748b; margin-top: 6px; font-style: italic; }
 </style>
 </head>
 <body>
@@ -329,6 +352,12 @@
     </div>
   </div>
   <div id="lista-publicidades"><div class="empty">Cargando...</div></div>
+  <hr class="sec-divider">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div class="sec-title" style="margin:0">💡 Precios sugeridos por vendedoras</div>
+    <span style="font-size:11px;color:#475569">Precios de competencia de su zona</span>
+  </div>
+  <div id="lista-precios-sug"><div class="empty">Sin sugerencias recibidas aún.</div></div>
 </div>
 
 <!-- MODAL PUBLICIDAD -->
@@ -341,15 +370,25 @@
 
     <div class="m-group">
       <label class="m-label">Nombre / Categoría</label>
-      <input class="m-input" id="pub-nombre" type="text" placeholder="Ej: Banner de inicio">
+      <input class="m-input" id="pub-nombre" type="text" placeholder="Ej: Banner de inicio premium">
     </div>
 
     <div class="m-group">
-      <label class="m-label">Tipo de publicidad</label>
+      <label class="m-label">Ubicación en la página</label>
+      <div class="m-row4" style="margin-bottom:0">
+        <button class="tipo-btn sel" id="ubic-banner_inicio"   onclick="selUbicacion('banner_inicio')">🏠 Banner Inicio</button>
+        <button class="tipo-btn"     id="ubic-banner_buscador" onclick="selUbicacion('banner_buscador')">🔍 Banner Buscador</button>
+        <button class="tipo-btn"     id="ubic-banner_perfil"   onclick="selUbicacion('banner_perfil')">👤 Banner Perfil</button>
+        <button class="tipo-btn"     id="ubic-banner_popup"    onclick="selUbicacion('banner_popup')">💬 Banner Popup</button>
+      </div>
+    </div>
+
+    <div class="m-group">
+      <label class="m-label">Formato</label>
       <div class="m-row3">
-        <button class="tipo-btn sel" id="tipo-banner_inicio" onclick="selTipo('banner_inicio')">🏠 Banner Inicio</button>
-        <button class="tipo-btn" id="tipo-rotativo" onclick="selTipo('rotativo')">🔄 Rotativo</button>
-        <button class="tipo-btn" id="tipo-fijo" onclick="selTipo('fijo')">📌 Fijo</button>
+        <button class="tipo-btn sel" id="fmt-fijo"     onclick="selFormato('fijo')">📌 Fijo</button>
+        <button class="tipo-btn"     id="fmt-rotativo" onclick="selFormato('rotativo')">🔄 Rotativo</button>
+        <button class="tipo-btn"     id="fmt-gif"      onclick="selFormato('gif')">✨ Gif Animado</button>
       </div>
     </div>
 
@@ -368,7 +407,6 @@
       <div class="img-upload-zone" id="img-upload-zone" onclick="document.getElementById('pub-img-input').click()">
         <span style="font-size:28px">🖼️</span>
         <span>Clic para subir captura / mockup</span>
-        <div class="img-upload-zone-lbl" id="img-zone-lbl" style="display:none">Clic para cambiar</div>
       </div>
       <input type="file" id="pub-img-input" accept="image/*" style="display:none" onchange="previewPubImg(this)">
     </div>
@@ -386,6 +424,14 @@
       <div>
         <label class="m-label">% Comisión desde 2da cuota</label>
         <input class="m-input" id="pub-com2" type="number" min="0" max="100" step="0.5" placeholder="10">
+      </div>
+    </div>
+
+    <div class="m-group">
+      <label class="m-label">Vendedoras que pueden ofrecer esta publicidad</label>
+      <div style="font-size:11px;color:#64748b;margin-bottom:8px;">Solo les aparece a las vendedoras seleccionadas (según ciudad / zona)</div>
+      <div id="vend-checkboxes" style="display:flex;flex-direction:column;gap:6px;">
+        <div style="color:#475569;font-size:13px;padding:8px">Cargando vendedoras...</div>
       </div>
     </div>
 
@@ -695,45 +741,25 @@ function pagNombre(p) { return {trabajoscerca:'TC',localweb:'LocalWeb',dataweb:'
 let todasPublicidades = [];
 let editandoPubId = null;
 let pubImgBase64 = null;
-let pubTipoSel = 'banner_inicio';
+let pubUbicacionSel = 'banner_inicio';
+let pubFormatoSel   = 'fijo';
+let pubVendSelIds   = new Set();
 
-const SQL_PUBLICIDADES = `-- Ejecutar en Supabase SQL Editor:
-create table if not exists publicidades (
-  id uuid default gen_random_uuid() primary key,
-  nombre text not null,
-  tipo text not null default 'banner_inicio',
-  con_link boolean default false,
-  con_popup boolean default false,
-  imagen_data text,
-  precio numeric(12,2) not null default 0,
-  comision_1 numeric(5,2) not null default 0,
-  comision_2 numeric(5,2) not null default 0,
-  activo boolean default true,
-  created_at timestamptz default now()
-);
-alter table publicidades enable row level security;
-create policy "Lectura pública" on publicidades for select using (true);
-create policy "Admins escriben" on publicidades for all
-  using (exists (
-    select 1 from perfiles where id = auth.uid()
-    and rol in ('admin','superadmin')
-  ));
--- Agregar columna a clientes para vincular publicidad:
-alter table clientes add column if not exists publicidad_id uuid references publicidades(id);`;
+const SQL_PUBLICIDADES = `-- Ejecutar en Supabase SQL Editor (setup-publicidades.sql)`;
 
 async function cargarPublicidades() {
-  const { data, error } = await sb.from('publicidades')
-    .select('*').order('created_at', { ascending: true });
+  const [{ data, error }, { data: psug }] = await Promise.all([
+    sb.from('publicidades').select('*').order('created_at', { ascending: true }),
+    sb.from('precios_sugeridos').select('*, perfiles(nombre,apellido,avatar_url)').order('created_at', { ascending: false })
+  ]);
   if (error) {
     document.getElementById('lista-publicidades').innerHTML =
-      `<div class="pub-setup">
-        <div class="pub-setup-title">⚠️ Tabla "publicidades" no encontrada — ejecutá este SQL en Supabase:</div>
-        <pre>${SQL_PUBLICIDADES}</pre>
-      </div>`;
+      `<div class="pub-setup"><div class="pub-setup-title">⚠️ Ejecutá <strong>setup-publicidades.sql</strong> en Supabase para crear las tablas necesarias.</div></div>`;
     return;
   }
   todasPublicidades = data || [];
   renderPublicidades();
+  renderPreciosSugeridos(psug || []);
 }
 
 function renderPublicidades() {
@@ -742,58 +768,86 @@ function renderPublicidades() {
     el.innerHTML = '<div class="empty">No hay publicidades cargadas. Hacé clic en "+ Nueva" para empezar.</div>';
     return;
   }
+  const ubicLabels = { banner_inicio:'🏠 Banner Inicio', banner_buscador:'🔍 Buscador', banner_perfil:'👤 Perfil', banner_popup:'💬 Popup' };
+  const fmtLabels  = { fijo:'📌 Fijo', rotativo:'🔄 Rotativo', gif:'✨ Gif' };
   el.innerHTML = todasPublicidades.map(pub => {
-    const tipoLabel = { banner_inicio:'🏠 Banner Inicio', rotativo:'🔄 Rotativo', fijo:'📌 Fijo' }[pub.tipo] || pub.tipo;
     const precio = new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(pub.precio);
-    const com1 = pub.comision_1 + '%';
-    const com2 = pub.comision_2 + '%';
-    const thumbHtml = pub.imagen_data
-      ? `<img src="${pub.imagen_data}" alt="Vista previa">`
-      : `<span>Sin imagen</span>`;
+    const thumbHtml = pub.imagen_data ? `<img src="${pub.imagen_data}">` : `<span>Sin imagen</span>`;
+    const ubicLabel = ubicLabels[pub.ubicacion || pub.tipo] || pub.ubicacion || pub.tipo;
+    const fmtLabel  = fmtLabels[pub.formato] || '';
+    const nombreSafe = pub.nombre.replace(/'/g,'\\\'');
     return `<div class="pub-card">
       <div class="pub-card-body">
         <div class="pub-thumb">${thumbHtml}</div>
         <div class="pub-info">
           <div class="pub-nombre">${pub.nombre}</div>
-          <span class="pub-tipo-badge pub-tipo-${pub.tipo}">${tipoLabel}</span>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px;">
+            <span class="pub-tipo-badge pub-tipo-${pub.ubicacion||pub.tipo}">${ubicLabel}</span>
+            ${fmtLabel ? `<span class="pub-tipo-badge pub-fmt-${pub.formato}">${fmtLabel}</span>` : ''}
+          </div>
           <div class="pub-features">
             <span class="pub-feat ${pub.con_link?'on':''}">🔗 Con link</span>
             <span class="pub-feat ${pub.con_popup?'on':''}">💬 Popup ofertas</span>
           </div>
           <div class="pub-pricing">
             <div class="pub-price">${precio}<span style="font-size:12px;color:#64748b;font-weight:400">/mes</span></div>
-            <div class="pub-coms">
-              1er pago: <strong>${com1}</strong><br>
-              Desde 2da: <strong>${com2}</strong>
-            </div>
+            <div class="pub-coms">1er pago: <strong>${pub.comision_1}%</strong><br>Desde 2da: <strong>${pub.comision_2}%</strong></div>
           </div>
         </div>
       </div>
       <div class="pub-actions">
         <button class="btn-edit-pub" onclick="abrirFormPub('${pub.id}')">✏️ Editar</button>
-        <button class="btn-del-pub" onclick="eliminarPublicidad('${pub.id}','${pub.nombre.replace(/'/g,"\'")}')">🗑️ Eliminar</button>
+        <button class="btn-del-pub"  onclick="eliminarPublicidad('${pub.id}','${nombreSafe}')">🗑️ Eliminar</button>
       </div>
     </div>`;
   }).join('');
 }
 
-function abrirFormPub(id = null) {
+function renderPreciosSugeridos(lista) {
+  const el = document.getElementById('lista-precios-sug');
+  if (!lista.length) { el.innerHTML = '<div class="empty">Sin sugerencias recibidas aún.</div>'; return; }
+  const medioLabel = { radio:'📻 Radio', diario:'📰 Diario/Periódico', web:'🌐 Web / Portal', tv:'📺 TV', revista:'📖 Revista', otro:'📋 Otro' };
+  el.innerHTML = lista.map(s => {
+    const vNombre = s.perfiles ? `${s.perfiles.nombre} ${s.perfiles.apellido}` : '—';
+    const ini = s.perfiles ? (s.perfiles.nombre[0]+s.perfiles.apellido[0]).toUpperCase() : '?';
+    const avatarHtml = s.perfiles?.avatar_url ? `<img src="${s.perfiles.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` : ini;
+    const items = Array.isArray(s.items) ? s.items : [];
+    return `<div class="psug-card">
+      <div class="psug-head">
+        <div class="avatar-sm" style="width:30px;height:30px;font-size:12px;">${avatarHtml}</div>
+        <div><div class="psug-vend">${vNombre}</div><div style="font-size:10px;color:#475569">${s.ciudad||'—'}</div></div>
+        <div class="psug-fecha">${fmtFecha(s.created_at)}</div>
+      </div>
+      <div class="psug-items">
+        ${items.map(i=>`<div class="psug-item">
+          <span class="psug-medio">${medioLabel[i.medio]||i.medio}</span>
+          <span>${i.descripcion||''}</span>
+          <strong>${new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(i.precio)}/mes</strong>
+        </div>`).join('')}
+      </div>
+      ${s.notas ? `<div class="psug-nota">"${s.notas}"</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+async function abrirFormPub(id = null) {
   editandoPubId = id;
   pubImgBase64 = null;
+  pubVendSelIds = new Set();
   const pub = id ? todasPublicidades.find(p => p.id === id) : null;
 
   document.getElementById('modal-pub-titulo').textContent = pub ? 'Editar publicidad' : 'Nueva publicidad';
-  document.getElementById('pub-nombre').value  = pub?.nombre  || '';
-  document.getElementById('pub-precio').value  = pub?.precio  || '';
-  document.getElementById('pub-com1').value    = pub?.comision_1 || '';
-  document.getElementById('pub-com2').value    = pub?.comision_2 || '';
+  document.getElementById('pub-nombre').value = pub?.nombre  || '';
+  document.getElementById('pub-precio').value = pub?.precio  || '';
+  document.getElementById('pub-com1').value   = pub?.comision_1 || '';
+  document.getElementById('pub-com2').value   = pub?.comision_2 || '';
   document.getElementById('pub-con-link').checked  = pub?.con_link  || false;
   document.getElementById('pub-con-popup').checked = pub?.con_popup || false;
 
-  selTipo(pub?.tipo || 'banner_inicio');
+  selUbicacion(pub?.ubicacion || pub?.tipo || 'banner_inicio');
+  selFormato(pub?.formato || 'fijo');
 
   const zone = document.getElementById('img-upload-zone');
-  const lbl  = document.getElementById('img-zone-lbl');
   if (pub?.imagen_data) {
     zone.innerHTML = `<img src="${pub.imagen_data}"><div class="img-upload-zone-lbl">Clic para cambiar</div>`;
     pubImgBase64 = pub.imagen_data;
@@ -802,8 +856,38 @@ function abrirFormPub(id = null) {
   }
   document.getElementById('pub-img-input').value = '';
 
+  // Cargar vendedoras asignadas
+  const [asignadas] = await Promise.all([
+    id ? sb.from('pub_vendedoras').select('vendedora_id').eq('publicidad_id', id) : { data: [] }
+  ]);
+  if (asignadas.data) asignadas.data.forEach(r => pubVendSelIds.add(r.vendedora_id));
+
+  renderVendCheckboxes();
   document.getElementById('modal-pub').classList.add('open');
   document.body.style.overflow = 'hidden';
+}
+
+function renderVendCheckboxes() {
+  const activas = todasVendedoras.filter(v => v.rol === 'vendedora' || v.rol === 'admin');
+  const el = document.getElementById('vend-checkboxes');
+  if (!activas.length) { el.innerHTML = '<div style="color:#475569;font-size:13px;padding:8px">No hay vendedoras activas.</div>'; return; }
+  el.innerHTML = activas.map(v => {
+    const ini = (v.nombre[0]+v.apellido[0]).toUpperCase();
+    const avatarHtml = v.avatar_url ? `<img src="${v.avatar_url}">` : ini;
+    const checked = pubVendSelIds.has(v.id) ? 'checked' : '';
+    return `<label class="vend-check-row">
+      <input type="checkbox" value="${v.id}" ${checked} onchange="toggleVendSel('${v.id}',this.checked)">
+      <div class="vend-check-avatar">${avatarHtml}</div>
+      <div>
+        <div class="vend-check-nombre">${v.nombre} ${v.apellido}</div>
+        <div class="vend-check-ciudad">${v.telefono||'Sin teléfono'}</div>
+      </div>
+    </label>`;
+  }).join('');
+}
+
+function toggleVendSel(id, checked) {
+  checked ? pubVendSelIds.add(id) : pubVendSelIds.delete(id);
 }
 
 function cerrarModalPub() {
@@ -815,11 +899,18 @@ function cerrarSiAfuera(e) {
   if (e.target === document.getElementById('modal-pub')) cerrarModalPub();
 }
 
-function selTipo(tipo) {
-  pubTipoSel = tipo;
-  ['banner_inicio','rotativo','fijo'].forEach(t => {
-    document.getElementById('tipo-' + t)?.classList.toggle('sel', t === tipo);
-  });
+function selUbicacion(val) {
+  pubUbicacionSel = val;
+  ['banner_inicio','banner_buscador','banner_perfil','banner_popup'].forEach(u =>
+    document.getElementById('ubic-'+u)?.classList.toggle('sel', u === val)
+  );
+}
+
+function selFormato(val) {
+  pubFormatoSel = val;
+  ['fijo','rotativo','gif'].forEach(f =>
+    document.getElementById('fmt-'+f)?.classList.toggle('sel', f === val)
+  );
 }
 
 function previewPubImg(input) {
@@ -848,21 +939,32 @@ async function guardarPublicidad() {
   btn.disabled = true; btn.textContent = 'Guardando...';
 
   const payload = {
-    nombre, tipo: pubTipoSel, precio, comision_1: com1, comision_2: com2,
+    nombre, ubicacion: pubUbicacionSel, formato: pubFormatoSel,
+    precio, comision_1: com1, comision_2: com2,
     con_link:  document.getElementById('pub-con-link').checked,
     con_popup: document.getElementById('pub-con-popup').checked,
     imagen_data: pubImgBase64 || null
   };
 
+  let pubId = editandoPubId;
   let error;
   if (editandoPubId) {
     ({ error } = await sb.from('publicidades').update(payload).eq('id', editandoPubId));
   } else {
-    ({ error } = await sb.from('publicidades').insert(payload));
+    const { data: ins, error: e } = await sb.from('publicidades').insert(payload).select().single();
+    error = e; pubId = ins?.id;
+  }
+
+  if (!error && pubId) {
+    // Actualizar vendedoras asignadas
+    await sb.from('pub_vendedoras').delete().eq('publicidad_id', pubId);
+    if (pubVendSelIds.size > 0) {
+      const rows = [...pubVendSelIds].map(vid => ({ publicidad_id: pubId, vendedora_id: vid }));
+      await sb.from('pub_vendedoras').insert(rows);
+    }
   }
 
   btn.disabled = false; btn.textContent = 'Guardar publicidad';
-
   if (error) { alert('Error al guardar: ' + error.message); return; }
   cerrarModalPub();
   cargarPublicidades();
@@ -870,6 +972,7 @@ async function guardarPublicidad() {
 
 async function eliminarPublicidad(id, nombre) {
   if (!confirm(`¿Eliminar "${nombre}"? Esta acción no se puede deshacer.`)) return;
+  await sb.from('pub_vendedoras').delete().eq('publicidad_id', id);
   const { error } = await sb.from('publicidades').delete().eq('id', id);
   if (error) { alert('Error al eliminar.'); return; }
   cargarPublicidades();
@@ -877,65 +980,48 @@ async function eliminarPublicidad(id, nombre) {
 
 function exportarPDF() {
   if (!todasPublicidades.length) { alert('No hay publicidades cargadas.'); return; }
-
-  const fmtPrecio = n => new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(n);
-  const tipoLabel = t => ({ banner_inicio:'Banner Inicio', rotativo:'Rotativo', fijo:'Fijo' })[t] || t;
-  const tipoColor = t => ({ banner_inicio:'#7c3aed', rotativo:'#ea580c', fijo:'#059669' })[t] || '#64748b';
+  const fmtP = n => new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(n);
+  const ubicLabel = u => ({ banner_inicio:'Banner Inicio', banner_buscador:'Banner Buscador', banner_perfil:'Banner Perfil', banner_popup:'Banner Popup' })[u] || u;
+  const fmtLabel  = f => ({ fijo:'Fijo', rotativo:'Rotativo', gif:'Gif Animado' })[f] || f;
+  const ubicColor = u => ({ banner_inicio:'#7c3aed', banner_buscador:'#0369a1', banner_perfil:'#059669', banner_popup:'#ea580c' })[u] || '#64748b';
 
   const cards = todasPublicidades.map(pub => {
-    const com1Monto = fmtPrecio(pub.precio * pub.comision_1 / 100);
-    const com2Monto = fmtPrecio(pub.precio * pub.comision_2 / 100);
     const imgHtml = pub.imagen_data
-      ? `<img src="${pub.imagen_data}" style="width:100%;height:140px;object-fit:cover;border-radius:8px;display:block;margin-bottom:10px;">`
-      : `<div style="width:100%;height:80px;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#94a3b8;margin-bottom:10px;">Sin imagen</div>`;
+      ? `<img src="${pub.imagen_data}" style="width:100%;height:130px;object-fit:cover;border-radius:8px;display:block;margin-bottom:10px;">`
+      : `<div style="width:100%;height:60px;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#94a3b8;margin-bottom:10px;font-size:12px;">Sin imagen</div>`;
     const feats = [pub.con_link?'🔗 Con link':'',pub.con_popup?'💬 Popup ofertas':''].filter(Boolean).join('  ·  ');
+    const ub = pub.ubicacion || pub.tipo;
     return `<div style="break-inside:avoid;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:16px;">
       ${imgHtml}
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <div style="font-size:17px;font-weight:800;color:#0f172a">${pub.nombre}</div>
-        <span style="background:${tipoColor(pub.tipo)};color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;">${tipoLabel(pub.tipo)}</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+        <span style="background:${ubicColor(ub)};color:#fff;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;">${ubicLabel(ub)}</span>
+        <span style="background:#f1f5f9;color:#475569;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;">${fmtLabel(pub.formato)}</span>
       </div>
-      ${feats ? `<div style="font-size:12px;color:#64748b;margin-bottom:8px;">${feats}</div>` : ''}
-      <div style="font-size:24px;font-weight:800;color:#059669;margin-bottom:8px;">${fmtPrecio(pub.precio)}<span style="font-size:13px;color:#64748b;font-weight:400"> / mes</span></div>
+      <div style="font-size:16px;font-weight:800;color:#0f172a;margin-bottom:4px;">${pub.nombre}</div>
+      ${feats?`<div style="font-size:11px;color:#64748b;margin-bottom:8px;">${feats}</div>`:''}
+      <div style="font-size:22px;font-weight:800;color:#059669;margin-bottom:10px;">${fmtP(pub.precio)}<span style="font-size:12px;color:#64748b;font-weight:400"> / mes</span></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
         <div style="background:#fefce8;border:1px solid #fde047;border-radius:8px;padding:10px;text-align:center;">
-          <div style="font-size:11px;color:#92400e;font-weight:600;margin-bottom:2px;">COMISIÓN 1er PAGO</div>
+          <div style="font-size:10px;color:#92400e;font-weight:700;margin-bottom:2px;">COMISIÓN 1er PAGO</div>
           <div style="font-size:18px;font-weight:800;color:#d97706;">${pub.comision_1}%</div>
-          <div style="font-size:12px;color:#92400e;">${com1Monto}</div>
+          <div style="font-size:11px;color:#92400e;">${fmtP(pub.precio*pub.comision_1/100)}</div>
         </div>
         <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px;text-align:center;">
-          <div style="font-size:11px;color:#14532d;font-weight:600;margin-bottom:2px;">DESDE 2DA CUOTA</div>
+          <div style="font-size:10px;color:#14532d;font-weight:700;margin-bottom:2px;">DESDE 2DA CUOTA</div>
           <div style="font-size:18px;font-weight:800;color:#16a34a;">${pub.comision_2}%</div>
-          <div style="font-size:12px;color:#14532d;">${com2Monto}</div>
+          <div style="font-size:11px;color:#14532d;">${fmtP(pub.precio*pub.comision_2/100)}</div>
         </div>
       </div>
     </div>`;
   }).join('');
 
-  const html = `<!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8">
+  const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
 <title>Planes de Publicidad — LocalWeb</title>
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Segoe UI',system-ui,sans-serif; background:#f8fafc; color:#0f172a; padding:32px 24px; }
-  .header { text-align:center; margin-bottom:32px; padding-bottom:20px; border-bottom:2px solid #e2e8f0; }
-  .header h1 { font-size:26px; font-weight:800; color:#0f172a; margin-bottom:4px; }
-  .header p { font-size:14px; color:#64748b; }
-  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
-  @media print {
-    body { padding:16px; background:#fff; }
-    .no-print { display:none; }
-  }
-</style></head><body>
-<div class="header">
-  <h1>💰 Planes de Publicidad LocalWeb</h1>
-  <p>Catálogo de precios y comisiones · ${new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'})}</p>
-</div>
-<div style="text-align:right;margin-bottom:20px;" class="no-print">
-  <button onclick="window.print()" style="background:linear-gradient(135deg,#10b981,#0ea5e9);border:none;color:#fff;padding:10px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">🖨️ Imprimir / Guardar PDF</button>
-</div>
-<div class="grid">${cards}</div>
-</body></html>`;
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',system-ui,sans-serif;background:#f8fafc;color:#0f172a;padding:32px 24px}.header{text-align:center;margin-bottom:28px;padding-bottom:16px;border-bottom:2px solid #e2e8f0}.header h1{font-size:24px;font-weight:800;margin-bottom:4px}.header p{font-size:13px;color:#64748b}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}@media print{body{padding:12px;background:#fff}.no-print{display:none}}</style>
+</head><body>
+<div class="header"><h1>💰 Planes de Publicidad LocalWeb</h1><p>Catálogo · ${new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'})}</p></div>
+<div style="text-align:right;margin-bottom:16px" class="no-print"><button onclick="window.print()" style="background:linear-gradient(135deg,#10b981,#0ea5e9);border:none;color:#fff;padding:10px 22px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">🖨️ Imprimir / Guardar PDF</button></div>
+<div class="grid">${cards}</div></body></html>`;
 
   const win = window.open('', '_blank');
   win.document.write(html);
