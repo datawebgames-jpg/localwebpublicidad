@@ -165,6 +165,58 @@
   .lightbox.open { display: flex; }
   .lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 12px; }
   .lightbox-close { position: absolute; top: 20px; right: 24px; font-size: 28px; cursor: pointer; }
+
+  /* ── Publicidades ── */
+  .pub-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .pub-card { background: #1e293b; border-radius: 14px; border: 1px solid #334155; margin-bottom: 12px; overflow: hidden; }
+  .pub-card-body { padding: 14px 16px; display: flex; gap: 14px; }
+  .pub-thumb { width: 90px; height: 68px; border-radius: 8px; background: #0f172a; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 11px; text-align: center; overflow: hidden; }
+  .pub-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .pub-info { flex: 1; min-width: 0; }
+  .pub-nombre { font-weight: 800; font-size: 15px; margin-bottom: 4px; }
+  .pub-tipo-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 20px; margin-bottom: 6px; }
+  .pub-tipo-banner_inicio { background: #1e1b4b; color: #a78bfa; }
+  .pub-tipo-rotativo { background: #431407; color: #fb923c; }
+  .pub-tipo-fijo { background: #052e16; color: #34d399; }
+  .pub-features { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 6px; }
+  .pub-feat { font-size: 10px; background: #0f172a; border: 1px solid #334155; border-radius: 20px; padding: 2px 8px; color: #64748b; }
+  .pub-feat.on { border-color: #38bdf8; color: #38bdf8; background: rgba(56,189,248,.08); }
+  .pub-pricing { display: flex; gap: 10px; align-items: flex-end; margin-top: 4px; }
+  .pub-price { font-size: 20px; font-weight: 800; color: #34d399; }
+  .pub-coms { font-size: 11px; color: #64748b; line-height: 1.5; }
+  .pub-coms strong { color: #fbbf24; }
+  .pub-actions { display: flex; gap: 6px; padding: 0 16px 12px; }
+  .btn-edit-pub { background: #334155; border: none; color: #94a3b8; padding: 6px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: inherit; }
+  .btn-del-pub  { background: #450a0a; border: none; color: #fca5a5; padding: 6px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: inherit; }
+  .btn-nueva-pub { background: linear-gradient(135deg, #10b981, #0ea5e9); border: none; color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .btn-pdf { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 10px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .btn-pdf:hover { border-color: #475569; color: #fff; }
+  .pub-setup { background: #1e293b; border: 1px solid #f59e0b; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .pub-setup-title { font-size: 13px; font-weight: 700; color: #fbbf24; margin-bottom: 8px; }
+  .pub-setup pre { background: #0f172a; border-radius: 8px; padding: 12px; font-size: 11px; color: #94a3b8; overflow-x: auto; margin-top: 8px; white-space: pre-wrap; }
+
+  /* ── Modal publicidad ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.8); z-index: 500; align-items: flex-end; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal-sheet { background: #1e293b; border-radius: 20px 20px 0 0; width: 100%; max-width: 640px; max-height: 94vh; overflow-y: auto; padding: 24px 20px 48px; }
+  .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+  .modal-close { background: #334155; border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .m-group { margin-bottom: 14px; }
+  .m-label { display: block; font-size: 11px; color: #64748b; margin-bottom: 5px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; }
+  .m-input { width: 100%; padding: 11px 13px; background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: #fff; font-size: 14px; outline: none; font-family: inherit; transition: border-color .15s; }
+  .m-input:focus { border-color: #38bdf8; }
+  .m-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .m-row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .tipo-btn { padding: 10px 8px; border-radius: 8px; border: 1.5px solid #334155; background: #0f172a; color: #64748b; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; transition: all .15s; font-family: inherit; }
+  .tipo-btn.sel { border-color: #38bdf8; background: #1e3a5f; color: #93c5fd; }
+  .check-row { display: flex; align-items: center; gap: 10px; padding: 10px 13px; background: #0f172a; border: 1px solid #334155; border-radius: 10px; cursor: pointer; margin-bottom: 8px; }
+  .check-row input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #38bdf8; flex-shrink: 0; }
+  .check-row-lbl { font-size: 14px; color: #94a3b8; }
+  .img-upload-zone { width: 100%; height: 130px; border-radius: 10px; border: 2px dashed #334155; background: #0f172a; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: #475569; cursor: pointer; font-size: 13px; overflow: hidden; position: relative; }
+  .img-upload-zone img { width: 100%; height: 100%; object-fit: cover; }
+  .img-upload-zone-lbl { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font-size: 10px; background: rgba(0,0,0,.6); padding: 3px; }
+  .btn-guardar-pub { width: 100%; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #10b981, #0ea5e9); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 8px; }
+  .btn-guardar-pub:disabled { opacity: .45; cursor: default; }
 </style>
 </head>
 <body>
@@ -185,6 +237,7 @@
   <button class="tab" onclick="switchTab('stats',this)">📈 Stats</button>
   <button class="tab" onclick="switchTab('actividad',this)">🔔 Actividad</button>
   <button class="tab" onclick="switchTab('config',this)">⚙️ Config</button>
+  <button class="tab" onclick="switchTab('publicidades',this)">💰 Publicidades</button>
 </div>
 
 <!-- RESUMEN -->
@@ -265,6 +318,83 @@
     </div>
   </div>
 </div>
+
+<!-- PUBLICIDADES -->
+<div id="panel-publicidades" class="panel">
+  <div class="pub-header">
+    <div class="sec-title" style="margin:0">Planes de publicidad</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-pdf" onclick="exportarPDF()">📄 PDF</button>
+      <button class="btn-nueva-pub" onclick="abrirFormPub()">+ Nueva</button>
+    </div>
+  </div>
+  <div id="lista-publicidades"><div class="empty">Cargando...</div></div>
+</div>
+
+<!-- MODAL PUBLICIDAD -->
+<div class="modal-overlay" id="modal-pub" onclick="cerrarSiAfuera(event)">
+  <div class="modal-sheet">
+    <div class="modal-title">
+      <span id="modal-pub-titulo">Nueva publicidad</span>
+      <button class="modal-close" onclick="cerrarModalPub()">✕</button>
+    </div>
+
+    <div class="m-group">
+      <label class="m-label">Nombre / Categoría</label>
+      <input class="m-input" id="pub-nombre" type="text" placeholder="Ej: Banner de inicio">
+    </div>
+
+    <div class="m-group">
+      <label class="m-label">Tipo de publicidad</label>
+      <div class="m-row3">
+        <button class="tipo-btn sel" id="tipo-banner_inicio" onclick="selTipo('banner_inicio')">🏠 Banner Inicio</button>
+        <button class="tipo-btn" id="tipo-rotativo" onclick="selTipo('rotativo')">🔄 Rotativo</button>
+        <button class="tipo-btn" id="tipo-fijo" onclick="selTipo('fijo')">📌 Fijo</button>
+      </div>
+    </div>
+
+    <div class="m-group">
+      <label class="m-label">Opciones incluidas</label>
+      <label class="check-row">
+        <input type="checkbox" id="pub-con-link"> <span class="check-row-lbl">🔗 Con link al sitio del cliente</span>
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="pub-con-popup"> <span class="check-row-lbl">💬 Con popup de ofertas</span>
+      </label>
+    </div>
+
+    <div class="m-group">
+      <label class="m-label">Imagen de ubicación en la página</label>
+      <div class="img-upload-zone" id="img-upload-zone" onclick="document.getElementById('pub-img-input').click()">
+        <span style="font-size:28px">🖼️</span>
+        <span>Clic para subir captura / mockup</span>
+        <div class="img-upload-zone-lbl" id="img-zone-lbl" style="display:none">Clic para cambiar</div>
+      </div>
+      <input type="file" id="pub-img-input" accept="image/*" style="display:none" onchange="previewPubImg(this)">
+    </div>
+
+    <div class="m-group">
+      <label class="m-label">Precio mensual ($)</label>
+      <input class="m-input" id="pub-precio" type="number" min="0" step="1000" placeholder="50000">
+    </div>
+
+    <div class="m-row2" style="margin-bottom:14px">
+      <div>
+        <label class="m-label">% Comisión 1er pago</label>
+        <input class="m-input" id="pub-com1" type="number" min="0" max="100" step="0.5" placeholder="20">
+      </div>
+      <div>
+        <label class="m-label">% Comisión desde 2da cuota</label>
+        <input class="m-input" id="pub-com2" type="number" min="0" max="100" step="0.5" placeholder="10">
+      </div>
+    </div>
+
+    <button class="btn-guardar-pub" id="btn-guardar-pub" onclick="guardarPublicidad()">Guardar publicidad</button>
+  </div>
+</div>
+
+<!-- Área de impresión -->
+<div id="print-area" style="display:none"></div>
 
 <!-- Lightbox fotos -->
 <div class="lightbox" id="lightbox" onclick="this.classList.remove('open')">
@@ -538,6 +668,7 @@ function switchTab(name, el) {
   el.classList.add('active');
   document.getElementById('panel-' + name).classList.add('active');
   if (name === 'stats') cargarStats();
+  if (name === 'publicidades') cargarPublicidades();
 }
 
 function toggleDet(id) { document.getElementById(id)?.classList.toggle('open'); }
@@ -559,6 +690,257 @@ function fmtFecha(iso) { return new Date(iso).toLocaleDateString('es-AR',{day:'2
 function fmtFechaHora(iso) { return new Date(iso).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }
 function badgeCls(p) { return {trabajoscerca:'pag-tc',localweb:'pag-lw',dataweb:'pag-dw'}[p]||'pag-none'; }
 function pagNombre(p) { return {trabajoscerca:'TC',localweb:'LocalWeb',dataweb:'DataWeb',ninguna:'Ninguna'}[p]||'—'; }
+
+// ── Publicidades ──
+let todasPublicidades = [];
+let editandoPubId = null;
+let pubImgBase64 = null;
+let pubTipoSel = 'banner_inicio';
+
+const SQL_PUBLICIDADES = `-- Ejecutar en Supabase SQL Editor:
+create table if not exists publicidades (
+  id uuid default gen_random_uuid() primary key,
+  nombre text not null,
+  tipo text not null default 'banner_inicio',
+  con_link boolean default false,
+  con_popup boolean default false,
+  imagen_data text,
+  precio numeric(12,2) not null default 0,
+  comision_1 numeric(5,2) not null default 0,
+  comision_2 numeric(5,2) not null default 0,
+  activo boolean default true,
+  created_at timestamptz default now()
+);
+alter table publicidades enable row level security;
+create policy "Lectura pública" on publicidades for select using (true);
+create policy "Admins escriben" on publicidades for all
+  using (exists (
+    select 1 from perfiles where id = auth.uid()
+    and rol in ('admin','superadmin')
+  ));
+-- Agregar columna a clientes para vincular publicidad:
+alter table clientes add column if not exists publicidad_id uuid references publicidades(id);`;
+
+async function cargarPublicidades() {
+  const { data, error } = await sb.from('publicidades')
+    .select('*').order('created_at', { ascending: true });
+  if (error) {
+    document.getElementById('lista-publicidades').innerHTML =
+      `<div class="pub-setup">
+        <div class="pub-setup-title">⚠️ Tabla "publicidades" no encontrada — ejecutá este SQL en Supabase:</div>
+        <pre>${SQL_PUBLICIDADES}</pre>
+      </div>`;
+    return;
+  }
+  todasPublicidades = data || [];
+  renderPublicidades();
+}
+
+function renderPublicidades() {
+  const el = document.getElementById('lista-publicidades');
+  if (!todasPublicidades.length) {
+    el.innerHTML = '<div class="empty">No hay publicidades cargadas. Hacé clic en "+ Nueva" para empezar.</div>';
+    return;
+  }
+  el.innerHTML = todasPublicidades.map(pub => {
+    const tipoLabel = { banner_inicio:'🏠 Banner Inicio', rotativo:'🔄 Rotativo', fijo:'📌 Fijo' }[pub.tipo] || pub.tipo;
+    const precio = new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(pub.precio);
+    const com1 = pub.comision_1 + '%';
+    const com2 = pub.comision_2 + '%';
+    const thumbHtml = pub.imagen_data
+      ? `<img src="${pub.imagen_data}" alt="Vista previa">`
+      : `<span>Sin imagen</span>`;
+    return `<div class="pub-card">
+      <div class="pub-card-body">
+        <div class="pub-thumb">${thumbHtml}</div>
+        <div class="pub-info">
+          <div class="pub-nombre">${pub.nombre}</div>
+          <span class="pub-tipo-badge pub-tipo-${pub.tipo}">${tipoLabel}</span>
+          <div class="pub-features">
+            <span class="pub-feat ${pub.con_link?'on':''}">🔗 Con link</span>
+            <span class="pub-feat ${pub.con_popup?'on':''}">💬 Popup ofertas</span>
+          </div>
+          <div class="pub-pricing">
+            <div class="pub-price">${precio}<span style="font-size:12px;color:#64748b;font-weight:400">/mes</span></div>
+            <div class="pub-coms">
+              1er pago: <strong>${com1}</strong><br>
+              Desde 2da: <strong>${com2}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pub-actions">
+        <button class="btn-edit-pub" onclick="abrirFormPub('${pub.id}')">✏️ Editar</button>
+        <button class="btn-del-pub" onclick="eliminarPublicidad('${pub.id}','${pub.nombre.replace(/'/g,"\'")}')">🗑️ Eliminar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function abrirFormPub(id = null) {
+  editandoPubId = id;
+  pubImgBase64 = null;
+  const pub = id ? todasPublicidades.find(p => p.id === id) : null;
+
+  document.getElementById('modal-pub-titulo').textContent = pub ? 'Editar publicidad' : 'Nueva publicidad';
+  document.getElementById('pub-nombre').value  = pub?.nombre  || '';
+  document.getElementById('pub-precio').value  = pub?.precio  || '';
+  document.getElementById('pub-com1').value    = pub?.comision_1 || '';
+  document.getElementById('pub-com2').value    = pub?.comision_2 || '';
+  document.getElementById('pub-con-link').checked  = pub?.con_link  || false;
+  document.getElementById('pub-con-popup').checked = pub?.con_popup || false;
+
+  selTipo(pub?.tipo || 'banner_inicio');
+
+  const zone = document.getElementById('img-upload-zone');
+  const lbl  = document.getElementById('img-zone-lbl');
+  if (pub?.imagen_data) {
+    zone.innerHTML = `<img src="${pub.imagen_data}"><div class="img-upload-zone-lbl">Clic para cambiar</div>`;
+    pubImgBase64 = pub.imagen_data;
+  } else {
+    zone.innerHTML = `<span style="font-size:28px">🖼️</span><span>Clic para subir captura / mockup</span>`;
+  }
+  document.getElementById('pub-img-input').value = '';
+
+  document.getElementById('modal-pub').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function cerrarModalPub() {
+  document.getElementById('modal-pub').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function cerrarSiAfuera(e) {
+  if (e.target === document.getElementById('modal-pub')) cerrarModalPub();
+}
+
+function selTipo(tipo) {
+  pubTipoSel = tipo;
+  ['banner_inicio','rotativo','fijo'].forEach(t => {
+    document.getElementById('tipo-' + t)?.classList.toggle('sel', t === tipo);
+  });
+}
+
+function previewPubImg(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    pubImgBase64 = e.target.result;
+    const zone = document.getElementById('img-upload-zone');
+    zone.innerHTML = `<img src="${pubImgBase64}"><div class="img-upload-zone-lbl">Clic para cambiar</div>`;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function guardarPublicidad() {
+  const nombre = document.getElementById('pub-nombre').value.trim();
+  const precio = parseFloat(document.getElementById('pub-precio').value);
+  const com1   = parseFloat(document.getElementById('pub-com1').value);
+  const com2   = parseFloat(document.getElementById('pub-com2').value);
+
+  if (!nombre) return alert('Ingresá un nombre para la publicidad.');
+  if (isNaN(precio) || precio < 0) return alert('Ingresá un precio válido.');
+  if (isNaN(com1) || isNaN(com2)) return alert('Ingresá los porcentajes de comisión.');
+
+  const btn = document.getElementById('btn-guardar-pub');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+
+  const payload = {
+    nombre, tipo: pubTipoSel, precio, comision_1: com1, comision_2: com2,
+    con_link:  document.getElementById('pub-con-link').checked,
+    con_popup: document.getElementById('pub-con-popup').checked,
+    imagen_data: pubImgBase64 || null
+  };
+
+  let error;
+  if (editandoPubId) {
+    ({ error } = await sb.from('publicidades').update(payload).eq('id', editandoPubId));
+  } else {
+    ({ error } = await sb.from('publicidades').insert(payload));
+  }
+
+  btn.disabled = false; btn.textContent = 'Guardar publicidad';
+
+  if (error) { alert('Error al guardar: ' + error.message); return; }
+  cerrarModalPub();
+  cargarPublicidades();
+}
+
+async function eliminarPublicidad(id, nombre) {
+  if (!confirm(`¿Eliminar "${nombre}"? Esta acción no se puede deshacer.`)) return;
+  const { error } = await sb.from('publicidades').delete().eq('id', id);
+  if (error) { alert('Error al eliminar.'); return; }
+  cargarPublicidades();
+}
+
+function exportarPDF() {
+  if (!todasPublicidades.length) { alert('No hay publicidades cargadas.'); return; }
+
+  const fmtPrecio = n => new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(n);
+  const tipoLabel = t => ({ banner_inicio:'Banner Inicio', rotativo:'Rotativo', fijo:'Fijo' })[t] || t;
+  const tipoColor = t => ({ banner_inicio:'#7c3aed', rotativo:'#ea580c', fijo:'#059669' })[t] || '#64748b';
+
+  const cards = todasPublicidades.map(pub => {
+    const com1Monto = fmtPrecio(pub.precio * pub.comision_1 / 100);
+    const com2Monto = fmtPrecio(pub.precio * pub.comision_2 / 100);
+    const imgHtml = pub.imagen_data
+      ? `<img src="${pub.imagen_data}" style="width:100%;height:140px;object-fit:cover;border-radius:8px;display:block;margin-bottom:10px;">`
+      : `<div style="width:100%;height:80px;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#94a3b8;margin-bottom:10px;">Sin imagen</div>`;
+    const feats = [pub.con_link?'🔗 Con link':'',pub.con_popup?'💬 Popup ofertas':''].filter(Boolean).join('  ·  ');
+    return `<div style="break-inside:avoid;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:16px;">
+      ${imgHtml}
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div style="font-size:17px;font-weight:800;color:#0f172a">${pub.nombre}</div>
+        <span style="background:${tipoColor(pub.tipo)};color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;">${tipoLabel(pub.tipo)}</span>
+      </div>
+      ${feats ? `<div style="font-size:12px;color:#64748b;margin-bottom:8px;">${feats}</div>` : ''}
+      <div style="font-size:24px;font-weight:800;color:#059669;margin-bottom:8px;">${fmtPrecio(pub.precio)}<span style="font-size:13px;color:#64748b;font-weight:400"> / mes</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="background:#fefce8;border:1px solid #fde047;border-radius:8px;padding:10px;text-align:center;">
+          <div style="font-size:11px;color:#92400e;font-weight:600;margin-bottom:2px;">COMISIÓN 1er PAGO</div>
+          <div style="font-size:18px;font-weight:800;color:#d97706;">${pub.comision_1}%</div>
+          <div style="font-size:12px;color:#92400e;">${com1Monto}</div>
+        </div>
+        <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px;text-align:center;">
+          <div style="font-size:11px;color:#14532d;font-weight:600;margin-bottom:2px;">DESDE 2DA CUOTA</div>
+          <div style="font-size:18px;font-weight:800;color:#16a34a;">${pub.comision_2}%</div>
+          <div style="font-size:12px;color:#14532d;">${com2Monto}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8">
+<title>Planes de Publicidad — LocalWeb</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:#f8fafc; color:#0f172a; padding:32px 24px; }
+  .header { text-align:center; margin-bottom:32px; padding-bottom:20px; border-bottom:2px solid #e2e8f0; }
+  .header h1 { font-size:26px; font-weight:800; color:#0f172a; margin-bottom:4px; }
+  .header p { font-size:14px; color:#64748b; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
+  @media print {
+    body { padding:16px; background:#fff; }
+    .no-print { display:none; }
+  }
+</style></head><body>
+<div class="header">
+  <h1>💰 Planes de Publicidad LocalWeb</h1>
+  <p>Catálogo de precios y comisiones · ${new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'})}</p>
+</div>
+<div style="text-align:right;margin-bottom:20px;" class="no-print">
+  <button onclick="window.print()" style="background:linear-gradient(135deg,#10b981,#0ea5e9);border:none;color:#fff;padding:10px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">🖨️ Imprimir / Guardar PDF</button>
+</div>
+<div class="grid">${cards}</div>
+</body></html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+}
 
 init();
 </script>

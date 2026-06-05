@@ -206,6 +206,32 @@
   }
   input[type="file"] { display: none; }
 
+  /* ── Comisiones ── */
+  .com-resumen { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .com-stat { background: #1e293b; border-radius: 12px; border: 1px solid #334155; padding: 14px; }
+  .com-stat-val { font-size: 22px; font-weight: 800; color: #34d399; }
+  .com-stat-lbl { font-size: 11px; color: #64748b; margin-top: 2px; }
+  .com-card { background: #1e293b; border-radius: 12px; border: 1px solid #334155; margin-bottom: 10px; overflow: hidden; }
+  .com-card-head { padding: 12px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .com-negocio { font-weight: 700; font-size: 14px; }
+  .com-sub { font-size: 11px; color: #64748b; margin-top: 2px; }
+  .com-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-left: auto; flex-shrink: 0; }
+  .com-badge-1 { background: #431407; color: #fb923c; }
+  .com-badge-r { background: #052e16; color: #34d399; }
+  .com-detail { display: none; padding: 12px 14px; border-top: 1px solid #334155; }
+  .com-detail.open { display: block; }
+  .com-row { display: flex; justify-content: space-between; font-size: 13px; color: #94a3b8; margin-bottom: 6px; }
+  .com-row strong { color: #fbbf24; }
+  .com-pub-catalog { margin-top: 8px; }
+  .pub-cat-card { background: #1e293b; border-radius: 12px; border: 1px solid #334155; margin-bottom: 10px; overflow: hidden; }
+  .pub-cat-head { padding: 12px 14px; display: flex; gap: 12px; align-items: center; }
+  .pub-cat-thumb { width: 72px; height: 54px; border-radius: 6px; background: #0f172a; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 10px; }
+  .pub-cat-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .pub-cat-nombre { font-weight: 700; font-size: 14px; }
+  .pub-cat-precio { font-size: 16px; font-weight: 800; color: #34d399; margin: 3px 0; }
+  .pub-cat-coms { font-size: 11px; color: #64748b; line-height: 1.6; }
+  .pub-cat-coms span { color: #fbbf24; font-weight: 700; }
+
   /* ── Fotos preview ── */
   .fotos-preview { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .fotos-preview img { width: 72px; height: 72px; object-fit: cover; border-radius: 8px; }
@@ -267,6 +293,14 @@
       <div>
         <div class="home-card-title">Registrar cliente</div>
         <div class="home-card-sub">Cargá un nuevo comercio visitado</div>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="home-card" onclick="showView('comisiones')">
+      <div class="home-icon" style="background:linear-gradient(135deg,#d97706,#059669)">💰</div>
+      <div>
+        <div class="home-card-title">Mis comisiones</div>
+        <div class="home-card-sub">Publicidades vendidas y lo que cobrás</div>
       </div>
       <div class="chevron">›</div>
     </div>
@@ -436,6 +470,46 @@
   <div id="msg-nuevo" class="msg"></div>
 </div>
 
+<!-- VIEW: MIS COMISIONES -->
+<div id="view-comisiones" class="view">
+  <div class="sec-header">
+    <button class="btn-back" onclick="showView('home')">← Volver</button>
+    <div class="sec-title">Mis comisiones</div>
+  </div>
+
+  <!-- Resumen numérico -->
+  <div class="com-resumen">
+    <div class="com-stat">
+      <div class="com-stat-val" id="com-total-ventas">—</div>
+      <div class="com-stat-lbl">Publicidades vendidas</div>
+    </div>
+    <div class="com-stat">
+      <div class="com-stat-val" id="com-total-monto">—</div>
+      <div class="com-stat-lbl">Comisión total estimada</div>
+    </div>
+  </div>
+
+  <!-- Tabs internas -->
+  <div style="display:flex;gap:8px;margin-bottom:16px;">
+    <button id="ctab-ventas" onclick="switchComTab('ventas')"
+      style="flex:1;padding:10px;border-radius:10px;border:none;background:#1e293b;color:#34d399;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;border:1px solid #34d399;">
+      📋 Mis ventas
+    </button>
+    <button id="ctab-catalogo" onclick="switchComTab('catalogo')"
+      style="flex:1;padding:10px;border-radius:10px;border:none;background:#1e293b;color:#64748b;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;border:1px solid #334155;">
+      💰 Catálogo
+    </button>
+  </div>
+
+  <div id="com-ventas-panel">
+    <div id="lista-com-ventas"><div class="empty-state"><div class="icon">⏳</div>Cargando...</div></div>
+  </div>
+
+  <div id="com-catalogo-panel" style="display:none">
+    <div id="lista-pub-catalogo"><div class="empty-state"><div class="icon">⏳</div>Cargando...</div></div>
+  </div>
+</div>
+
 <script>
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -514,6 +588,7 @@ function showView(name) {
   document.getElementById('view-' + name).classList.add('active');
   if (name === 'clientes') cargarClientes();
   if (name === 'nuevo') resetForm();
+  if (name === 'comisiones') cargarComisiones();
   window.scrollTo(0, 0);
 }
 
@@ -710,6 +785,123 @@ async function registrarCliente() {
     btn.disabled = false; btn.textContent = 'Guardar cliente';
     setTimeout(() => showView('clientes'), 1500);
   }
+}
+
+// ── Comisiones ──
+let todasPublicidades = [];
+let misClientesComisiones = [];
+let comTabActual = 'ventas';
+
+async function cargarComisiones() {
+  const [{ data: pubs }, { data: clientes }] = await Promise.all([
+    sb.from('publicidades').select('*').order('created_at', { ascending: true }),
+    sb.from('clientes').select('*').eq('vendedora_id', perfil.id).order('created_at', { ascending: false })
+  ]);
+  todasPublicidades = pubs || [];
+  misClientesComisiones = clientes || [];
+  switchComTab(comTabActual);
+}
+
+function switchComTab(tab) {
+  comTabActual = tab;
+  const btnV = document.getElementById('ctab-ventas');
+  const btnC = document.getElementById('ctab-catalogo');
+  const panV = document.getElementById('com-ventas-panel');
+  const panC = document.getElementById('com-catalogo-panel');
+
+  if (tab === 'ventas') {
+    btnV.style.cssText += ';color:#34d399;border-color:#34d399;';
+    btnC.style.cssText += ';color:#64748b;border-color:#334155;';
+    panV.style.display = ''; panC.style.display = 'none';
+    renderVentas();
+  } else {
+    btnC.style.cssText += ';color:#34d399;border-color:#34d399;';
+    btnV.style.cssText += ';color:#64748b;border-color:#334155;';
+    panC.style.display = ''; panV.style.display = 'none';
+    renderCatalogo();
+  }
+}
+
+function renderVentas() {
+  const fmtP = n => new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(n);
+
+  // Clientes con publicidad vinculada (por publicidad_id o por coincidencia de nombre en plan)
+  const ventas = misClientesComisiones.filter(c => {
+    if (c.publicidad_id) return todasPublicidades.some(p => p.id === c.publicidad_id);
+    if (c.plan) return todasPublicidades.some(p => c.plan.toLowerCase().includes(p.nombre.toLowerCase()));
+    return false;
+  });
+
+  let totalMonto = 0;
+  const cards = ventas.map((c, idx) => {
+    const pub = c.publicidad_id
+      ? todasPublicidades.find(p => p.id === c.publicidad_id)
+      : todasPublicidades.find(p => c.plan?.toLowerCase().includes(p.nombre.toLowerCase()));
+    if (!pub) return '';
+
+    const esPrimero = idx === 0; // simplificación: todos como 1er pago hasta tener cuotas
+    const pct = pub.comision_1;
+    const monto = pub.precio * pct / 100;
+    totalMonto += monto;
+
+    return `<div class="com-card">
+      <div class="com-card-head" onclick="toggleDetalle('cdet-${c.id}')">
+        <div>
+          <div class="com-negocio">${c.nombre_negocio}</div>
+          <div class="com-sub">📦 ${pub.nombre} · ${fmtFecha(c.created_at)}</div>
+        </div>
+        <span class="com-badge com-badge-1">${fmtP(monto)}</span>
+      </div>
+      <div class="com-detail" id="cdet-${c.id}">
+        <div class="com-row"><span>Precio publicidad</span><strong>${fmtP(pub.precio)}/mes</strong></div>
+        <div class="com-row"><span>Comisión 1er pago (${pub.comision_1}%)</span><strong>${fmtP(pub.precio * pub.comision_1 / 100)}</strong></div>
+        <div class="com-row"><span>Comisión desde 2da cuota (${pub.comision_2}%)</span><strong>${fmtP(pub.precio * pub.comision_2 / 100)}</strong></div>
+        ${c.direccion ? `<div class="com-row"><span>Dirección</span><span>${c.direccion}</span></div>` : ''}
+        ${c.telefono  ? `<div class="com-row"><span>Teléfono</span><span>${c.telefono}</span></div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('com-total-ventas').textContent = ventas.length;
+  document.getElementById('com-total-monto').textContent =
+    new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(totalMonto);
+
+  document.getElementById('lista-com-ventas').innerHTML = ventas.length
+    ? cards
+    : `<div class="empty-state"><div class="icon">💰</div>Todavía no tenés ventas de publicidad registradas.<br><br>
+       <small style="color:#475569">Las ventas aparecen cuando registrás un cliente con un plan de publicidad.</small></div>`;
+}
+
+function renderCatalogo() {
+  const fmtP = n => new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(n);
+  const tipoLabel = t => ({ banner_inicio:'🏠 Banner Inicio', rotativo:'🔄 Rotativo', fijo:'📌 Fijo' })[t] || t;
+
+  if (!todasPublicidades.length) {
+    document.getElementById('lista-pub-catalogo').innerHTML =
+      '<div class="empty-state"><div class="icon">📋</div>No hay publicidades cargadas aún.</div>';
+    return;
+  }
+
+  document.getElementById('lista-pub-catalogo').innerHTML = todasPublicidades.map(pub => {
+    const thumbHtml = pub.imagen_data
+      ? `<img src="${pub.imagen_data}">`
+      : `<span>Sin imagen</span>`;
+    const feats = [pub.con_link?'🔗 Link':'', pub.con_popup?'💬 Popup':''].filter(Boolean).join(' · ');
+    return `<div class="pub-cat-card">
+      <div class="pub-cat-head">
+        <div class="pub-cat-thumb">${thumbHtml}</div>
+        <div style="flex:1;min-width:0">
+          <div class="pub-cat-nombre">${pub.nombre}</div>
+          <div style="font-size:10px;color:#64748b;margin-bottom:2px;">${tipoLabel(pub.tipo)}${feats?' · '+feats:''}</div>
+          <div class="pub-cat-precio">${fmtP(pub.precio)}<span style="font-size:11px;color:#64748b;font-weight:400">/mes</span></div>
+          <div class="pub-cat-coms">
+            1er pago: <span>${pub.comision_1}% = ${fmtP(pub.precio*pub.comision_1/100)}</span>
+            &nbsp;·&nbsp; Desde 2da: <span>${pub.comision_2}% = ${fmtP(pub.precio*pub.comision_2/100)}</span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 // ── Helpers ──
