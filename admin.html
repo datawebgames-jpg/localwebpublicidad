@@ -179,6 +179,7 @@
   .pub-tipo-banner_buscador { background: #1e3a5f; color: #38bdf8; }
   .pub-tipo-banner_perfil   { background: #052e16; color: #34d399; }
   .pub-tipo-banner_popup    { background: #431407; color: #fb923c; }
+  .pub-tipo-pack_completo { background: linear-gradient(135deg,#7c3aed,#059669); color: #fff; }
   .pub-fmt-fijo    { background: #0f172a; color: #94a3b8; border: 1px solid #334155; }
   .pub-fmt-rotativo{ background: #1e1b4b; color: #a78bfa; }
   .pub-fmt-gif     { background: #431407; color: #fbbf24; }
@@ -380,6 +381,7 @@
         <button class="tipo-btn"     id="ubic-banner_buscador" onclick="selUbicacion('banner_buscador')">🔍 Banner Buscador</button>
         <button class="tipo-btn"     id="ubic-banner_perfil"   onclick="selUbicacion('banner_perfil')">👤 Banner Perfil</button>
         <button class="tipo-btn"     id="ubic-banner_popup"    onclick="selUbicacion('banner_popup')">💬 Banner Popup</button>
+        <button class="tipo-btn"     id="ubic-pack_completo"   onclick="selUbicacion('pack_completo')" style="grid-column:span 2;background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(5,150,105,.15));border-color:#7c3aed;">⭐ Pack Completo — todos los espacios</button>
       </div>
     </div>
 
@@ -768,7 +770,7 @@ function renderPublicidades() {
     el.innerHTML = '<div class="empty">No hay publicidades cargadas. Hacé clic en "+ Nueva" para empezar.</div>';
     return;
   }
-  const ubicLabels = { banner_inicio:'🏠 Banner Inicio', banner_buscador:'🔍 Buscador', banner_perfil:'👤 Perfil', banner_popup:'💬 Popup' };
+  const ubicLabels = { banner_inicio:'🏠 Banner Inicio', banner_buscador:'🔍 Buscador', banner_perfil:'👤 Perfil', banner_popup:'💬 Popup', pack_completo:'⭐ Pack Completo' };
   const fmtLabels  = { fijo:'📌 Fijo', rotativo:'🔄 Rotativo', gif:'✨ Gif' };
   el.innerHTML = todasPublicidades.map(pub => {
     const precio = new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(pub.precio);
@@ -901,7 +903,7 @@ function cerrarSiAfuera(e) {
 
 function selUbicacion(val) {
   pubUbicacionSel = val;
-  ['banner_inicio','banner_buscador','banner_perfil','banner_popup'].forEach(u =>
+  ['banner_inicio','banner_buscador','banner_perfil','banner_popup','pack_completo'].forEach(u =>
     document.getElementById('ubic-'+u)?.classList.toggle('sel', u === val)
   );
 }
@@ -981,9 +983,9 @@ async function eliminarPublicidad(id, nombre) {
 function exportarPDF() {
   if (!todasPublicidades.length) { alert('No hay publicidades cargadas.'); return; }
   const fmtP = n => new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(n);
-  const ubicLabel = u => ({ banner_inicio:'Banner Inicio', banner_buscador:'Banner Buscador', banner_perfil:'Banner Perfil', banner_popup:'Banner Popup' })[u] || u;
+  const ubicLabel = u => ({ banner_inicio:'Banner Inicio', banner_buscador:'Banner Buscador', banner_perfil:'Banner Perfil', banner_popup:'Banner Popup', pack_completo:'⭐ Pack Completo' })[u] || u;
   const fmtLabel  = f => ({ fijo:'Fijo', rotativo:'Rotativo', gif:'Gif Animado' })[f] || f;
-  const ubicColor = u => ({ banner_inicio:'#7c3aed', banner_buscador:'#0369a1', banner_perfil:'#059669', banner_popup:'#ea580c' })[u] || '#64748b';
+  const ubicColor = u => ({ banner_inicio:'#7c3aed', banner_buscador:'#0369a1', banner_perfil:'#059669', banner_popup:'#ea580c', pack_completo:'#059669' })[u] || '#64748b';
 
   const cards = todasPublicidades.map(pub => {
     const imgHtml = pub.imagen_data
