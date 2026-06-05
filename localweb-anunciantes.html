@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LocalWeb · Espacios Publicitarios</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #fff; min-height: 100vh; }
+
+  /* Header */
+  .hero {
+    background: linear-gradient(135deg, #1e3a8a, #7c3aed, #059669);
+    padding: 32px 20px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero-logo { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; opacity: .6; margin-bottom: 10px; }
+  .hero h1 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+  .hero p { font-size: 13px; opacity: .8; line-height: 1.5; max-width: 360px; margin: 0 auto; }
+  .btn-back-top {
+    position: absolute; top: 16px; left: 16px;
+    background: rgba(255,255,255,.15); border: none; color: #fff;
+    padding: 7px 14px; border-radius: 20px; font-size: 12px;
+    cursor: pointer; text-decoration: none; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+
+  /* Filtros de tipo */
+  .filtros-bar {
+    background: #1e293b; border-bottom: 1px solid #334155;
+    padding: 12px 16px; overflow-x: auto;
+    display: flex; gap: 8px; align-items: center;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .filtros-bar::-webkit-scrollbar { display: none; }
+  .filtro-chip {
+    flex-shrink: 0; padding: 7px 14px; border-radius: 20px;
+    border: 1.5px solid #334155; background: #0f172a;
+    color: #64748b; font-size: 12px; font-weight: 600;
+    cursor: pointer; font-family: inherit; white-space: nowrap;
+    transition: all .15s;
+  }
+  .filtro-chip.activo { border-color: #38bdf8; background: rgba(56,189,248,.1); color: #38bdf8; }
+
+  /* Contenido */
+  .content { padding: 20px 16px; max-width: 600px; margin: 0 auto; }
+
+  /* Tarjetas de publicidad */
+  .pub-card {
+    background: #1e293b; border-radius: 16px;
+    border: 1px solid #334155; margin-bottom: 20px;
+    overflow: hidden; transition: transform .15s, border-color .15s;
+  }
+  .pub-card:active { transform: scale(.99); }
+
+  .pub-img-wrap {
+    position: relative; width: 100%;
+    background: #0f172a; min-height: 160px;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .pub-img-wrap img { width: 100%; display: block; }
+  .pub-img-empty {
+    padding: 32px 20px; text-align: center;
+    color: #334155; font-size: 13px;
+  }
+  .pub-img-empty .icon { font-size: 40px; margin-bottom: 8px; opacity: .4; }
+  .pub-ubicacion-pill {
+    position: absolute; top: 10px; left: 10px;
+    font-size: 11px; font-weight: 700; padding: 4px 11px;
+    border-radius: 20px; backdrop-filter: blur(4px);
+  }
+  .pill-banner_inicio   { background: rgba(124,58,237,.85); color: #fff; }
+  .pill-banner_buscador { background: rgba(3,105,161,.85);  color: #fff; }
+  .pill-banner_perfil   { background: rgba(5,150,105,.85);  color: #fff; }
+  .pill-banner_popup    { background: rgba(234,88,12,.85);   color: #fff; }
+  .pill-pack_completo   { background: rgba(124,58,237,.9);   color: #fff; }
+  .pub-formato-pill {
+    position: absolute; top: 10px; right: 10px;
+    font-size: 10px; font-weight: 700; padding: 3px 10px;
+    border-radius: 20px; background: rgba(15,23,42,.85); color: #94a3b8;
+    border: 1px solid rgba(255,255,255,.1);
+  }
+
+  .pub-body { padding: 18px 18px 14px; }
+  .pub-nombre { font-size: 19px; font-weight: 800; margin-bottom: 6px; }
+  .pub-descripcion {
+    font-size: 13px; color: #94a3b8; line-height: 1.65;
+    margin-bottom: 14px; padding: 10px 13px;
+    background: #0f172a; border-radius: 8px;
+    border-left: 3px solid #334155;
+  }
+  .pub-feats { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 14px; }
+  .pub-feat {
+    font-size: 11px; font-weight: 600; padding: 4px 11px;
+    border-radius: 20px; background: rgba(56,189,248,.08);
+    border: 1px solid rgba(56,189,248,.25); color: #38bdf8;
+  }
+
+  /* Precio */
+  .precio-row {
+    display: flex; align-items: flex-end; gap: 10px;
+    margin-bottom: 14px;
+  }
+  .precio-num { font-size: 30px; font-weight: 800; color: #34d399; line-height: 1; }
+  .precio-sub { font-size: 13px; color: #64748b; margin-bottom: 2px; }
+
+  /* Tabla descuentos */
+  .descuentos-title { font-size: 11px; color: #64748b; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; margin-bottom: 8px; }
+  .descuentos-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .desc-box {
+    background: #0f172a; border: 1px solid #334155;
+    border-radius: 10px; padding: 10px 8px; text-align: center;
+    transition: border-color .15s;
+  }
+  .desc-box.mayor { border-color: #0369a1; background: rgba(3,105,161,.08); }
+  .desc-plazo { font-size: 10px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 3px; }
+  .desc-pct { font-size: 15px; font-weight: 800; color: #38bdf8; }
+  .desc-precio { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+  /* Separador */
+  .sep { border: none; border-top: 1px solid #334155; margin: 12px 0; }
+
+  /* Loading / empty */
+  .loading { text-align: center; padding: 60px 20px; color: #475569; }
+  .loading .spin { font-size: 32px; animation: spin 1s linear infinite; display: block; margin-bottom: 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .empty-state { text-align: center; padding: 60px 20px; color: #475569; }
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; display: block; }
+
+  /* CTA Whatsapp */
+  .cta-wa {
+    background: #052e16; border: 1px solid #14532d;
+    border-radius: 14px; padding: 18px; margin: 8px 0 24px;
+    display: flex; align-items: center; gap: 14px;
+    text-decoration: none; color: #fff;
+    transition: opacity .15s;
+  }
+  .cta-wa:active { opacity: .85; }
+  .cta-wa-icon {
+    width: 48px; height: 48px; background: #25D366;
+    border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: 24px; flex-shrink: 0;
+  }
+  .cta-wa-title { font-size: 15px; font-weight: 700; color: #4ade80; }
+  .cta-wa-sub   { font-size: 12px; color: #6ee7b7; margin-top: 2px; }
+
+  footer { text-align: center; padding: 20px 16px 40px; font-size: 12px; color: #334155; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <a href="index.html" class="btn-back-top">← Volver</a>
+  <div class="hero-logo">LocalWeb · Publicidad Digital</div>
+  <h1>Espacios publicitarios</h1>
+  <p>Hacé que tu negocio aparezca donde tus clientes te buscan — en la web local de tu ciudad</p>
+</div>
+
+<div class="filtros-bar" id="filtros-bar">
+  <button class="filtro-chip activo" data-filtro="todos" onclick="filtrar('todos',this)">✦ Todos</button>
+  <button class="filtro-chip" data-filtro="banner_inicio"   onclick="filtrar('banner_inicio',this)">🏠 Inicio</button>
+  <button class="filtro-chip" data-filtro="banner_buscador" onclick="filtrar('banner_buscador',this)">🔍 Buscador</button>
+  <button class="filtro-chip" data-filtro="banner_perfil"   onclick="filtrar('banner_perfil',this)">👤 Perfil</button>
+  <button class="filtro-chip" data-filtro="banner_popup"    onclick="filtrar('banner_popup',this)">💬 Popup</button>
+  <button class="filtro-chip" data-filtro="pack_completo"   onclick="filtrar('pack_completo',this)">⭐ Pack</button>
+</div>
+
+<div class="content">
+  <div id="lista-pubs"><div class="loading"><span class="spin">⏳</span>Cargando publicidades...</div></div>
+</div>
+
+<footer>LocalWeb · Publicidad digital local · 2026</footer>
+
+<script>
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let todasPubs = [];
+let filtroActivo = 'todos';
+let vendedoraId = null;
+
+const UBIC_LABEL = {
+  banner_inicio:   '🏠 Banner Inicio',
+  banner_buscador: '🔍 Banner Buscador',
+  banner_perfil:   '👤 Banner Perfil',
+  banner_popup:    '💬 Banner Popup',
+  pack_completo:   '⭐ Pack Completo',
+};
+const FMT_LABEL = { fijo:'📌 Fijo', rotativo:'🔄 Rotativo', gif:'✨ Gif Animado' };
+
+async function init() {
+  // Obtener sesión para saber si hay vendedora asignada
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) vendedoraId = session.user.id;
+  } catch(e) {}
+
+  // Cargar publicidades
+  let query = sb.from('publicidades').select('*').eq('activo', true).order('created_at', { ascending: true });
+
+  // Si hay vendedora, filtrar por las que le corresponden
+  if (vendedoraId) {
+    const { data: asig } = await sb.from('pub_vendedoras')
+      .select('publicidad_id').eq('vendedora_id', vendedoraId);
+    // Si tiene asignaciones, mostrar solo esas; si no, mostrar todas
+    if (asig && asig.length > 0) {
+      const ids = asig.map(a => a.publicidad_id);
+      query = query.in('id', ids);
+    }
+  }
+
+  const { data, error } = await query;
+  if (error || !data?.length) {
+    document.getElementById('lista-pubs').innerHTML =
+      `<div class="empty-state"><span class="icon">📋</span>No hay publicidades disponibles aún.</div>`;
+    return;
+  }
+  todasPubs = data;
+  render();
+}
+
+function filtrar(val, el) {
+  filtroActivo = val;
+  document.querySelectorAll('.filtro-chip').forEach(c => c.classList.remove('activo'));
+  el.classList.add('activo');
+  render();
+}
+
+function fmtPrecio(n) {
+  return new Intl.NumberFormat('es-AR', { style:'currency', currency:'ARS', maximumFractionDigits:0 }).format(n);
+}
+
+function render() {
+  const lista = filtroActivo === 'todos'
+    ? todasPubs
+    : todasPubs.filter(p => (p.ubicacion || p.tipo) === filtroActivo);
+
+  if (!lista.length) {
+    document.getElementById('lista-pubs').innerHTML =
+      `<div class="empty-state"><span class="icon">🔍</span>Sin publicidades en esta categoría.</div>`;
+    return;
+  }
+
+  document.getElementById('lista-pubs').innerHTML = lista.map(pub => {
+    const ub = pub.ubicacion || pub.tipo || 'banner_inicio';
+    const ubicLabel = UBIC_LABEL[ub] || ub;
+    const fmtLabel  = FMT_LABEL[pub.formato] || '';
+
+    const imgHtml = pub.imagen_data
+      ? `<img src="${pub.imagen_data}" alt="Vista previa de posición">`
+      : `<div class="pub-img-empty"><div class="icon">🖼️</div>Imagen de posición próximamente</div>`;
+
+    const feats = [
+      pub.con_link  ? '🔗 Link al sitio web' : '',
+      pub.con_popup ? '💬 Popup de ofertas' : '',
+    ].filter(Boolean);
+
+    const tieneDescuentos = pub.descuento_3 || pub.descuento_6 || pub.descuento_12;
+
+    const maxDesc = Math.max(pub.descuento_3||0, pub.descuento_6||0, pub.descuento_12||0);
+
+    const descHtml = tieneDescuentos ? `
+      <hr class="sep">
+      <div class="descuentos-title">Descuentos por contrato</div>
+      <div class="descuentos-grid">
+        ${pub.descuento_3 ? `<div class="desc-box ${pub.descuento_3===maxDesc&&maxDesc>0?'mayor':''}">
+          <div class="desc-plazo">3 meses</div>
+          <div class="desc-pct">${pub.descuento_3}% off</div>
+          <div class="desc-precio">${fmtPrecio(pub.precio*(1-pub.descuento_3/100))}/mes</div>
+        </div>` : '<div class="desc-box"><div class="desc-plazo">3 meses</div><div style="color:#334155;font-size:18px;margin-top:4px;">—</div></div>'}
+        ${pub.descuento_6 ? `<div class="desc-box ${pub.descuento_6===maxDesc&&maxDesc>0?'mayor':''}">
+          <div class="desc-plazo">6 meses</div>
+          <div class="desc-pct">${pub.descuento_6}% off</div>
+          <div class="desc-precio">${fmtPrecio(pub.precio*(1-pub.descuento_6/100))}/mes</div>
+        </div>` : '<div class="desc-box"><div class="desc-plazo">6 meses</div><div style="color:#334155;font-size:18px;margin-top:4px;">—</div></div>'}
+        ${pub.descuento_12 ? `<div class="desc-box ${pub.descuento_12===maxDesc&&maxDesc>0?'mayor':''}">
+          <div class="desc-plazo">1 año</div>
+          <div class="desc-pct">${pub.descuento_12}% off</div>
+          <div class="desc-precio">${fmtPrecio(pub.precio*(1-pub.descuento_12/100))}/mes</div>
+        </div>` : '<div class="desc-box"><div class="desc-plazo">1 año</div><div style="color:#334155;font-size:18px;margin-top:4px;">—</div></div>'}
+      </div>` : '';
+
+    return `<div class="pub-card">
+      <div class="pub-img-wrap">
+        ${imgHtml}
+        <span class="pub-ubicacion-pill pill-${ub}">${ubicLabel}</span>
+        ${fmtLabel ? `<span class="pub-formato-pill">${fmtLabel}</span>` : ''}
+      </div>
+      <div class="pub-body">
+        <div class="pub-nombre">${pub.nombre}</div>
+        ${pub.descripcion ? `<div class="pub-descripcion">${pub.descripcion}</div>` : ''}
+        ${feats.length ? `<div class="pub-feats">${feats.map(f=>`<span class="pub-feat">${f}</span>`).join('')}</div>` : ''}
+        <div class="precio-row">
+          <div>
+            <div class="precio-sub">Precio mensual</div>
+            <div class="precio-num">${fmtPrecio(pub.precio)}</div>
+          </div>
+          <div class="precio-sub" style="margin-bottom:4px">/mes</div>
+        </div>
+        ${descHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+init();
+</script>
+</body>
+</html>
