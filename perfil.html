@@ -3,7 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LocalWeb · Mi Perfil</title>
+<title>Trabajos Cerca · Mi Panel</title>
+<link rel="manifest" href="/manifest-tc.json">
+<meta name="theme-color" content="#0ea5e9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TrabajosCerca">
+<link rel="apple-touch-icon" href="/icon-tc.svg">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <style>
@@ -252,6 +258,38 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 24px; color: #475569; cursor: pointer;
   }
+
+  /* ── Acuerdos ── */
+  .ac-section-title { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .8px; margin: 20px 0 10px; }
+  .ac-pub-check { background: #0f172a; border: 1.5px solid #334155; border-radius: 12px; margin-bottom: 8px; cursor: pointer; overflow: hidden; transition: border-color .15s; }
+  .ac-pub-check.selected { border-color: #38bdf8; background: #0c1a2e; }
+  .ac-pub-check-head { display: flex; align-items: center; gap: 10px; padding: 12px 13px; }
+  .ac-pub-check-head input[type="checkbox"] { width: 18px; height: 18px; accent-color: #38bdf8; flex-shrink: 0; cursor: pointer; }
+  .ac-pub-thumb { width: 52px; height: 40px; border-radius: 6px; background: #1e293b; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #475569; }
+  .ac-pub-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .ac-pub-info { flex: 1; min-width: 0; }
+  .ac-pub-nombre { font-weight: 700; font-size: 13px; color: #cbd5e1; }
+  .ac-pub-precio { font-size: 15px; font-weight: 800; color: #34d399; margin-top: 1px; }
+  .ac-pub-options { display: none; padding: 10px 13px 13px; border-top: 1px solid #1e293b; background: #0a1628; }
+  .ac-pub-options.open { display: block; }
+  .dur-btn { padding: 8px 10px; border-radius: 8px; border: 1.5px solid #334155; background: #0f172a; color: #64748b; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .15s; text-align: center; }
+  .dur-btn.sel { border-color: #38bdf8; background: #0c1a2e; color: #93c5fd; }
+
+  .ac-total-box { background: linear-gradient(135deg, #052e16, #0c1a2e); border: 1px solid #164e63; border-radius: 14px; padding: 16px; margin: 16px 0; text-align: center; }
+  .ac-total-lbl { font-size: 12px; color: #64748b; margin-bottom: 4px; }
+  .ac-total-val { font-size: 28px; font-weight: 900; color: #34d399; }
+  .ac-total-sub { font-size: 12px; color: #475569; margin-top: 2px; }
+
+  .acuerdo-card { background: #1e293b; border-radius: 14px; border: 1px solid #334155; margin-bottom: 12px; overflow: hidden; cursor: pointer; }
+  .acuerdo-card-head { padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+  .acuerdo-card-body { display: none; padding: 12px 16px 14px; border-top: 1px solid #334155; }
+  .acuerdo-card-body.open { display: block; }
+  .ac-estado { font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 20px; margin-left: auto; flex-shrink: 0; }
+  .ac-estado-vigente  { background: #052e16; color: #4ade80; }
+  .ac-estado-vencido  { background: #431407; color: #fca5a5; }
+  .ac-estado-cancelado{ background: #1e293b; color: #64748b; border: 1px solid #334155; }
+  .ac-row { display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8; margin-bottom: 5px; }
+  .ac-row strong { color: #cbd5e1; }
 </style>
 </head>
 <body>
@@ -262,7 +300,7 @@
     <div class="avatar" id="topbar-avatar">?</div>
     <div>
       <div class="topbar-name" id="topbar-name">Cargando...</div>
-      <div class="topbar-sub">Vendedora</div>
+      <div class="topbar-sub" id="topbar-sub">ComercialWeb</div>
     </div>
   </div>
   <div style="display:flex; gap:8px; align-items:center">
@@ -299,6 +337,14 @@
       </div>
       <div class="chevron">›</div>
     </div>
+    <div class="home-card" onclick="showView('a-visitar')" style="border-color:#3b82f6;background:linear-gradient(135deg,#0f172a,#1e1b4b)">
+      <div class="home-icon" style="background:linear-gradient(135deg,#1d4ed8,#0ea5e9)">🗺️</div>
+      <div>
+        <div class="home-card-title" style="color:#60a5fa">A visitar</div>
+        <div class="home-card-sub" id="home-sub-visitar">Locales asignados para visitar</div>
+      </div>
+      <div class="chevron" style="color:#3b82f6">›</div>
+    </div>
     <div class="home-card" onclick="showView('nuevo')">
       <div class="home-icon ic-naranja">➕</div>
       <div>
@@ -322,6 +368,40 @@
         <div class="home-card-sub">Radio, diarios y web de tu ciudad</div>
       </div>
       <div class="chevron">›</div>
+    </div>
+    <div class="home-card" onclick="showView('acuerdo-nuevo')" style="border-color:#1d4ed8;background:linear-gradient(135deg,#0f172a,#1e1b4b)">
+      <div class="home-icon" style="background:linear-gradient(135deg,#1d4ed8,#7c3aed)">📝</div>
+      <div>
+        <div class="home-card-title">Crear acuerdo de publicidad</div>
+        <div class="home-card-sub">Generá un contrato para tu cliente</div>
+      </div>
+      <div class="chevron" style="color:#7c3aed">›</div>
+    </div>
+    <div class="home-card" onclick="showView('mis-acuerdos')">
+      <div class="home-icon" style="background:linear-gradient(135deg,#0369a1,#0891b2)">📋</div>
+      <div>
+        <div class="home-card-title">Mis acuerdos</div>
+        <div class="home-card-sub">Contratos firmados con comercios</div>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="home-card" onclick="showView('mis-comisiones')">
+      <div class="home-icon" style="background:linear-gradient(135deg,#065f46,#047857)">💰</div>
+      <div>
+        <div class="home-card-title">Mis comisiones</div>
+        <div class="home-card-sub" id="home-com-sub">Pendientes y pagadas</div>
+      </div>
+      <div class="chevron" style="color:#34d399">›</div>
+    </div>
+
+    <!-- Solo visible para jefe_ventas -->
+    <div class="home-card" id="card-equipo-tc" style="display:none;border-color:#7c3aed;background:linear-gradient(135deg,#0f172a,#1e1b4b)" onclick="showView('equipo-zona')">
+      <div class="home-icon" style="background:linear-gradient(135deg,#4c1d95,#7c3aed)">👥</div>
+      <div>
+        <div class="home-card-title" style="color:#c4b5fd">Mi equipo</div>
+        <div class="home-card-sub" id="home-sub-equipo-tc">Vendedores a cargo</div>
+      </div>
+      <div class="chevron" style="color:#7c3aed">›</div>
     </div>
   </div>
 
@@ -373,6 +453,32 @@
     <label>Teléfono</label>
     <input type="tel" id="d-tel" placeholder="2954 123456">
   </div>
+  <div class="form-group" style="margin-top:14px">
+    <label>Provincia</label>
+    <select id="d-provincia" onchange="actualizarCiudadesPerfil()">
+      <option value="">— Seleccioná provincia —</option>
+      <option>Buenos Aires</option><option>CABA</option><option>Catamarca</option>
+      <option>Chaco</option><option>Chubut</option><option>Córdoba</option>
+      <option>Corrientes</option><option>Entre Ríos</option><option>Formosa</option>
+      <option>Jujuy</option><option>La Pampa</option><option>La Rioja</option>
+      <option>Mendoza</option><option>Misiones</option><option>Neuquén</option>
+      <option>Río Negro</option><option>Salta</option><option>San Juan</option>
+      <option>San Luis</option><option>Santa Cruz</option><option>Santa Fe</option>
+      <option>Santiago del Estero</option><option>Tierra del Fuego</option><option>Tucumán</option>
+    </select>
+  </div>
+  <div class="form-group" id="d-ciudad-wrap" style="margin-top:14px;display:none">
+    <label>Ciudad / Localidad</label>
+    <select id="d-ciudad">
+      <option value="">— Seleccioná ciudad —</option>
+    </select>
+  </div>
+
+  <div class="form-group" style="margin-top:14px">
+    <label>Alias o CBU para cobrar comisiones</label>
+    <input type="text" id="d-alias-cbu" placeholder="Ej: mi.alias.mp o 0000003100...">
+    <div style="font-size:11px;color:#64748b;margin-top:4px">Necesario para que el admin pueda depositarte las comisiones.</div>
+  </div>
 
   <button class="btn-primary" id="btn-guardar" onclick="guardarDatos()">Guardar cambios</button>
   <div id="msg-datos" class="msg"></div>
@@ -386,6 +492,53 @@
   </div>
   <div id="lista-clientes">
     <div class="empty-state"><div class="icon">📋</div>Cargando...</div>
+  </div>
+</div>
+
+<!-- VIEW: A VISITAR -->
+<div id="view-a-visitar" class="view">
+  <div class="sec-header">
+    <button class="btn-back" onclick="showView('home')">← Volver</button>
+    <div class="sec-title">A visitar</div>
+  </div>
+  <div style="font-size:12px;color:#64748b;margin-bottom:14px">Locales asignados por el admin. Visitá cada uno y marcá el resultado.</div>
+  <!-- Tabs internos -->
+  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+    <button id="vtab-pendientes" onclick="filtrarAVisitar('pendientes')"
+      style="flex:1;padding:9px;border-radius:10px;border:1px solid #3b82f6;background:#1e3a5f;color:#60a5fa;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">
+      📌 Pendientes
+    </button>
+    <button id="vtab-visitados" onclick="filtrarAVisitar('visitados')"
+      style="flex:1;padding:9px;border-radius:10px;border:1px solid #334155;background:#1e293b;color:#64748b;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">
+      ✅ Ya visitados
+    </button>
+  </div>
+  <div id="lista-a-visitar">
+    <div class="empty-state"><div class="icon">⏳</div>Cargando...</div>
+  </div>
+</div>
+
+<!-- MODAL MARCAR VISITA -->
+<div id="modal-visita" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:999;display:none;align-items:flex-end;justify-content:center">
+  <div style="background:#1e293b;border-radius:20px 20px 0 0;padding:24px 20px;width:100%;max-width:540px;border-top:1px solid #334155">
+    <div style="font-size:17px;font-weight:800;margin-bottom:4px" id="mv-nombre">—</div>
+    <div style="font-size:12px;color:#64748b;margin-bottom:18px" id="mv-rubro">—</div>
+    <label style="font-size:11px;color:#64748b;font-weight:700;letter-spacing:.8px;text-transform:uppercase;display:block;margin-bottom:6px">¿Qué pasó en la visita?</label>
+    <select id="mv-resultado" style="width:100%;padding:13px 14px;background:#0f172a;border:1px solid #334155;border-radius:10px;color:#fff;font-size:15px;outline:none;margin-bottom:14px;font-family:inherit">
+      <option value="">— Seleccioná el resultado —</option>
+      <option value="Interesado, pendiente de decisión">Interesado, pendiente de decisión</option>
+      <option value="Cerró - pasó a cliente">Cerró - pasó a cliente ✅</option>
+      <option value="No estaba / no lo pude ver">No estaba / no lo pude ver</option>
+      <option value="No le interesó">No le interesó ❌</option>
+      <option value="Lo llamo después">Lo llamo después 📞</option>
+      <option value="Pidió propuesta por WhatsApp">Pidió propuesta por WhatsApp</option>
+    </select>
+    <label style="font-size:11px;color:#64748b;font-weight:700;letter-spacing:.8px;text-transform:uppercase;display:block;margin-bottom:6px">Observaciones (opcional)</label>
+    <textarea id="mv-obs" rows="3" placeholder="Ej: le interesó la web, me llama el viernes..." style="width:100%;padding:12px 14px;background:#0f172a;border:1px solid #334155;border-radius:10px;color:#fff;font-size:14px;outline:none;margin-bottom:16px;resize:vertical;font-family:inherit"></textarea>
+    <div style="display:flex;gap:10px">
+      <button onclick="cerrarModalVisita()" style="flex:1;padding:13px;background:#0f172a;border:1px solid #334155;border-radius:10px;color:#94a3b8;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">Cancelar</button>
+      <button onclick="guardarVisita()" style="flex:2;padding:13px;background:linear-gradient(135deg,#1d4ed8,#0ea5e9);border:none;border-radius:10px;color:#fff;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">✅ Guardar visita</button>
+    </div>
   </div>
 </div>
 
@@ -487,6 +640,126 @@
 
   <button class="btn-primary" id="btn-registrar" onclick="registrarCliente()">Guardar cliente</button>
   <div id="msg-nuevo" class="msg"></div>
+</div>
+
+<!-- VIEW: NUEVO ACUERDO -->
+<div id="view-acuerdo-nuevo" class="view">
+  <div class="sec-header">
+    <button class="btn-back" onclick="showView('home')">← Volver</button>
+    <div class="sec-title">Acuerdo de publicidad</div>
+  </div>
+
+  <div class="ac-section-title">📅 Fecha del acuerdo</div>
+  <div class="row2">
+    <div class="form-group" style="margin:0">
+      <label>Fecha del acuerdo</label>
+      <input type="date" id="ac-fecha" class="m-input" style="width:100%;padding:11px 13px;background:#0f172a;border:1px solid #334155;border-radius:10px;color:#fff;font-size:14px;outline:none;font-family:inherit;">
+    </div>
+    <div class="form-group" style="margin:0">
+      <label>Fecha de inicio del servicio</label>
+      <input type="date" id="ac-inicio" class="m-input" style="width:100%;padding:11px 13px;background:#0f172a;border:1px solid #334155;border-radius:10px;color:#fff;font-size:14px;outline:none;font-family:inherit;">
+    </div>
+  </div>
+
+  <div class="ac-section-title" style="margin-top:18px">🏪 Datos del anunciante</div>
+  <div class="form-group">
+    <label>Nombre del comercio / empresa *</label>
+    <input type="text" id="ac-comercio" placeholder="Ej: Ferretería El Clavo">
+  </div>
+  <div class="row2">
+    <div class="form-group" style="margin:0">
+      <label>Responsable / Propietario</label>
+      <input type="text" id="ac-responsable" placeholder="Nombre y apellido">
+    </div>
+    <div class="form-group" style="margin:0">
+      <label>DNI / CUIT</label>
+      <input type="text" id="ac-cuit" placeholder="20-12345678-5">
+    </div>
+  </div>
+  <div class="row2" style="margin-top:14px">
+    <div class="form-group" style="margin:0">
+      <label>Teléfono</label>
+      <input type="tel" id="ac-tel" placeholder="2954 xxxxxxx">
+    </div>
+    <div class="form-group" style="margin:0">
+      <label>Email</label>
+      <input type="email" id="ac-email" placeholder="(opcional)">
+    </div>
+  </div>
+  <div class="form-group" style="margin-top:14px">
+    <label>Dirección</label>
+    <input type="text" id="ac-dir" placeholder="Calle, número, localidad">
+  </div>
+
+  <div class="ac-section-title" style="margin-top:18px">📦 Publicidades contratadas</div>
+  <div id="ac-pub-lista"><div class="empty-state" style="padding:20px 0"><div class="icon" style="font-size:24px">⏳</div>Cargando publicidades...</div></div>
+
+  <div class="ac-section-title" style="margin-top:10px">⏱ Duración del acuerdo</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">
+    <button class="dur-btn" id="durbtn-1"  onclick="selDuracion(1)">1 mes</button>
+    <button class="dur-btn" id="durbtn-3"  onclick="selDuracion(3)">3 meses</button>
+    <button class="dur-btn" id="durbtn-6"  onclick="selDuracion(6)">6 meses</button>
+    <button class="dur-btn" id="durbtn-12" onclick="selDuracion(12)">1 año</button>
+  </div>
+  <div class="form-group" style="margin-bottom:0">
+    <label>O escribí otra duración</label>
+    <input type="text" id="ac-duracion-texto" placeholder="Ej: 2 meses, indefinido, hasta dic 2026" oninput="acDuracionManual()">
+  </div>
+
+  <div class="ac-total-box" id="ac-total-box" style="display:none">
+    <div class="ac-total-lbl">Monto mensual acordado</div>
+    <div class="ac-total-val" id="ac-total-mensual">$0</div>
+    <div class="ac-total-sub" id="ac-total-duracion"></div>
+    <div class="ac-total-val" id="ac-total-global" style="font-size:20px;margin-top:6px;color:#38bdf8"></div>
+  </div>
+
+  <div class="form-group">
+    <label>Observaciones / Condiciones especiales</label>
+    <textarea id="ac-notas" placeholder="Ej: el cliente solicita comenzar en la segunda semana del mes, se incluye diseño del banner..."></textarea>
+  </div>
+
+  <button class="btn-primary" id="btn-guardar-acuerdo" onclick="guardarAcuerdo()">💾 Guardar acuerdo</button>
+  <div id="msg-acuerdo" class="msg"></div>
+</div>
+
+<!-- VIEW: MIS ACUERDOS -->
+<div id="view-mis-acuerdos" class="view">
+  <div class="sec-header">
+    <button class="btn-back" onclick="showView('home')">← Volver</button>
+    <div class="sec-title">Mis acuerdos</div>
+  </div>
+  <div id="lista-acuerdos"><div class="empty-state"><div class="icon">⏳</div>Cargando...</div></div>
+</div>
+
+<!-- VIEW: MIS COMISIONES -->
+<div id="view-mis-comisiones" class="view">
+  <div class="sec-header">
+    <button class="btn-back" onclick="showView('home')">← Volver</button>
+    <div class="sec-title">Mis comisiones</div>
+  </div>
+  <div id="com-resumen-vend" style="margin-bottom:16px"></div>
+  <div id="lista-mis-comisiones"><div class="empty-state"><div class="icon">⏳</div>Cargando...</div></div>
+</div>
+
+<!-- VIEW: EQUIPO DE ZONA (jefe_ventas) -->
+<div id="view-equipo-zona" class="view">
+  <div class="sec-header">
+    <button class="btn-back" onclick="showView('home')">← Volver</button>
+    <div class="sec-title">👥 Mi equipo</div>
+  </div>
+  <div id="tc-zona-badge" style="background:#1e293b;border-radius:10px;padding:8px 14px;margin-bottom:14px;font-size:13px;color:#a78bfa;font-weight:600"></div>
+  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+    <button id="tc-tab-vend" onclick="tcTabEquipo('vendedores')"
+      style="padding:8px 16px;border-radius:20px;border:none;background:#4c1d95;color:#c4b5fd;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
+      👤 Vendedores
+    </button>
+    <button id="tc-tab-vent" onclick="tcTabEquipo('ventas')"
+      style="padding:8px 16px;border-radius:20px;border:1px solid #334155;background:transparent;color:#64748b;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">
+      📊 Ventas en zona
+    </button>
+  </div>
+  <div id="tc-panel-vend"><div class="empty-state"><div class="icon">⏳</div>Cargando...</div></div>
+  <div id="tc-panel-vent" style="display:none"><div class="empty-state"><div class="icon">⏳</div>Cargando...</div></div>
 </div>
 
 <!-- VIEW: PRECIOS DE MI ZONA -->
@@ -600,6 +873,18 @@ async function init() {
     avatarEl.textContent = initials;
   }
   document.getElementById('topbar-name').textContent = `${p.nombre} ${p.apellido}`;
+  const ROL_LABEL = { vendedora:'Vendedora', vendedor:'Vendedor', vendedor_web:'Vendedor Web',
+    jefe_ventas:'Jefe de Ventas', admin:'Admin', superadmin:'Superadmin' };
+  document.getElementById('topbar-sub').textContent = ROL_LABEL[p.rol] || 'Trabajos Cerca';
+
+  // Mostrar card de equipo solo para jefe_ventas
+  if (p.rol === 'jefe_ventas') {
+    const cardEq = document.getElementById('card-equipo-tc');
+    if (cardEq) cardEq.style.display = '';
+    const zona = [p.ciudad, p.provincia].filter(Boolean).join(', ') || 'Sin zona';
+    const subEq = document.getElementById('home-sub-equipo-tc');
+    if (subEq) subEq.textContent = `Mi zona · ${zona}`;
+  }
 
   // Bienvenida personalizada
   const hora = new Date().getHours();
@@ -621,23 +906,42 @@ async function init() {
   document.getElementById('wa-nicolas').href = `https://wa.me/542954298700?text=${msg}`;
 
   // pre-llenar datos
-  document.getElementById('d-nombre').value   = p.nombre;
-  document.getElementById('d-apellido').value = p.apellido;
-  document.getElementById('d-tel').value      = p.telefono || '';
+  document.getElementById('d-nombre').value    = p.nombre;
+  document.getElementById('d-apellido').value  = p.apellido;
+  document.getElementById('d-tel').value       = p.telefono || '';
+  document.getElementById('d-ciudad').value    = p.ciudad || '';
+  if (p.provincia) {
+    document.getElementById('d-provincia').value = p.provincia;
+    actualizarCiudadesPerfil();
+    if (p.ciudad) document.getElementById('d-ciudad').value = p.ciudad;
+  }
+  document.getElementById('d-alias-cbu').value  = p.alias_cbu || '';
   document.getElementById('avatar-initials').textContent = initials;
   if (p.avatar_url) {
     document.getElementById('avatar-edit-btn').innerHTML =
       `<img src="${p.avatar_url}"><div class="avatar-edit-overlay">Cambiar</div>`;
   }
+
+  // Contador badge "A visitar"
+  const { count } = await sb.from('clientes')
+    .select('id', { count: 'exact', head: true })
+    .eq('asignado_a', p.id).eq('fuente', 'webzonal').eq('estado', 'a_visitar');
+  const sub = document.getElementById('home-sub-visitar');
+  if (sub && count > 0) sub.textContent = `${count} pendiente${count > 1 ? 's' : ''} de visita`;
 }
 
 function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
   if (name === 'clientes') cargarClientes();
+  if (name === 'a-visitar') cargarAVisitar();
   if (name === 'nuevo') resetForm();
   if (name === 'comisiones') cargarComisiones();
   if (name === 'precios-zona') initPreciosZona();
+  if (name === 'acuerdo-nuevo') initAcuerdo();
+  if (name === 'mis-acuerdos') cargarMisAcuerdos();
+  if (name === 'mis-comisiones') cargarMisComisiones();
+  if (name === 'equipo-zona') tcCargarEquipo();
   window.scrollTo(0, 0);
 }
 
@@ -662,6 +966,9 @@ async function guardarDatos() {
   const nombre   = document.getElementById('d-nombre').value.trim();
   const apellido = document.getElementById('d-apellido').value.trim();
   const tel      = document.getElementById('d-tel').value.trim();
+  const provincia  = document.getElementById('d-provincia').value;
+  const ciudad     = document.getElementById('d-ciudad').value.trim();
+  const alias_cbu  = document.getElementById('d-alias-cbu').value.trim();
   if (!nombre || !apellido) return showMsg('msg-datos','error','Completá nombre y apellido.');
 
   const btn = document.getElementById('btn-guardar');
@@ -679,7 +986,7 @@ async function guardarDatos() {
     }
   }
 
-  const { error } = await sb.from('perfiles').update({ nombre, apellido, telefono: tel, avatar_url })
+  const { error } = await sb.from('perfiles').update({ nombre, apellido, telefono: tel, avatar_url, provincia: provincia || null, ciudad: ciudad || null, alias_cbu: alias_cbu || null })
     .eq('id', perfil.id);
 
   if (error) {
@@ -687,6 +994,7 @@ async function guardarDatos() {
   } else {
     perfil.nombre = nombre; perfil.apellido = apellido;
     perfil.telefono = tel; perfil.avatar_url = avatar_url;
+    perfil.provincia = provincia || null; perfil.ciudad = ciudad || null; perfil.alias_cbu = alias_cbu || null;
     document.getElementById('topbar-name').textContent = `${nombre} ${apellido}`;
     showMsg('msg-datos','success','¡Datos actualizados correctamente!');
   }
@@ -733,6 +1041,137 @@ async function cargarClientes() {
 
 function toggleDetalle(id) {
   document.getElementById(id)?.classList.toggle('open');
+}
+
+// ── A visitar (prospectos WebZonal asignados) ──
+let prospectosMios = [];
+let filtroVisitar = 'pendientes';
+let visitaActualId = null;
+
+async function cargarAVisitar() {
+  const el = document.getElementById('lista-a-visitar');
+  el.innerHTML = '<div class="empty-state"><div class="icon">⏳</div>Cargando...</div>';
+
+  const { data } = await sb.from('clientes')
+    .select('*')
+    .eq('asignado_a', perfil.id)
+    .eq('fuente', 'webzonal')
+    .order('created_at', { ascending: false });
+
+  prospectosMios = data || [];
+  const sub = document.getElementById('home-sub-visitar');
+  const pend = prospectosMios.filter(p => p.estado === 'a_visitar').length;
+  if (sub) sub.textContent = pend > 0 ? `${pend} pendiente${pend > 1 ? 's' : ''} de visita` : 'Sin pendientes por ahora';
+  filtrarAVisitar(filtroVisitar);
+}
+
+function filtrarAVisitar(filtro) {
+  filtroVisitar = filtro;
+  const btnPend = document.getElementById('vtab-pendientes');
+  const btnVist = document.getElementById('vtab-visitados');
+  if (filtro === 'pendientes') {
+    btnPend.style.borderColor = '#3b82f6'; btnPend.style.background = '#1e3a5f'; btnPend.style.color = '#60a5fa';
+    btnVist.style.borderColor = '#334155'; btnVist.style.background = '#1e293b'; btnVist.style.color = '#64748b';
+  } else {
+    btnVist.style.borderColor = '#22c55e'; btnVist.style.background = '#052e16'; btnVist.style.color = '#4ade80';
+    btnPend.style.borderColor = '#334155'; btnPend.style.background = '#1e293b'; btnPend.style.color = '#64748b';
+  }
+  const lista = filtro === 'pendientes'
+    ? prospectosMios.filter(p => p.estado === 'a_visitar')
+    : prospectosMios.filter(p => p.estado === 'visitado' || p.estado === 'cliente' || p.estado === 'no_interesado');
+  const el = document.getElementById('lista-a-visitar');
+  if (!lista.length) {
+    el.innerHTML = `<div class="empty-state"><div class="icon">${filtro === 'pendientes' ? '📌' : '✅'}</div>${filtro === 'pendientes' ? 'No tenés locales pendientes de visita.' : 'Todavía no visitaste ninguno.'}</div>`;
+    return;
+  }
+  el.innerHTML = lista.map(cardAVisitar).join('');
+}
+
+function cardAVisitar(p) {
+  const presColor = { sinNada:'#ef4444', soloInstagram:'#f97316', webVieja:'#f59e0b', completo:'#22c55e' };
+  const presLabel = { sinNada:'Sin presencia', soloInstagram:'Solo Instagram', webVieja:'Web vieja', completo:'Completo' };
+  const estadoBadge = {
+    a_visitar:     '<span style="background:#1e3a5f;color:#60a5fa;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700">📌 A visitar</span>',
+    visitado:      '<span style="background:#052e16;color:#4ade80;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700">✅ Visitado</span>',
+    cliente:       '<span style="background:#14532d;color:#86efac;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700">💚 ¡Cerró!</span>',
+    no_interesado: '<span style="background:#450a0a;color:#f87171;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700">❌ No interesado</span>',
+  };
+  const waUrl = p.telefono ? `https://wa.me/54${p.telefono.replace(/\D/g,'')}` : null;
+  return `<div class="cliente-card" style="border-color:${p.estado==='cliente'?'#22c55e':p.estado==='a_visitar'?'#3b82f6':'#334155'}">
+    <div class="cliente-card-head">
+      <div style="flex:1;min-width:0">
+        <div class="cliente-name">${p.nombre_negocio}</div>
+        <div class="cliente-sub">🏪 ${p.rubro||'—'} · ${p.ciudad||'—'}</div>
+        ${p.presencia_nivel ? `<div style="font-size:11px;color:${presColor[p.presencia_nivel]||'#64748b'};margin-top:2px;font-weight:600">📊 ${presLabel[p.presencia_nivel]||''} · ${p.presencia_score||0}/100</div>` : ''}
+      </div>
+      ${estadoBadge[p.estado] || ''}
+    </div>
+    <!-- Presencia icons -->
+    <div style="display:flex;gap:6px;padding:0 16px 10px;flex-wrap:wrap">
+      <span style="padding:3px 9px;border-radius:20px;border:1px solid ${p.tiene_web?'#22c55e':'#475569'};color:${p.tiene_web?'#4ade80':'#64748b'};font-size:11px;font-weight:700">🌐 Web ${p.tiene_web?'✓':'✗'}</span>
+      <span style="padding:3px 9px;border-radius:20px;border:1px solid ${p.tiene_instagram?'#e879f9':'#475569'};color:${p.tiene_instagram?'#e879f9':'#64748b'};font-size:11px;font-weight:700">📸 IG ${p.tiene_instagram?'✓':'✗'}</span>
+      <span style="padding:3px 9px;border-radius:20px;border:1px solid ${p.tiene_facebook?'#60a5fa':'#475569'};color:${p.tiene_facebook?'#60a5fa':'#64748b'};font-size:11px;font-weight:700">📘 FB ${p.tiene_facebook?'✓':'✗'}</span>
+      <span style="padding:3px 9px;border-radius:20px;border:1px solid ${p.tiene_whatsapp?'#4ade80':'#475569'};color:${p.tiene_whatsapp?'#4ade80':'#64748b'};font-size:11px;font-weight:700">💬 WA ${p.tiene_whatsapp?'✓':'✗'}</span>
+    </div>
+    ${p.pitch_venta ? `<div style="padding:0 16px 10px;font-size:12px;color:#a78bfa;font-style:italic">"${p.pitch_venta}"</div>` : ''}
+    ${p.resultado_visita ? `<div style="padding:0 16px 10px;font-size:12px;color:#94a3b8">📋 ${p.resultado_visita}</div>` : ''}
+    <!-- Acciones -->
+    <div style="display:flex;gap:8px;padding:0 16px 14px;flex-wrap:wrap">
+      ${p.telefono ? `<a href="tel:${p.telefono}" style="padding:8px 12px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#38bdf8;font-size:12px;font-weight:700;text-decoration:none">📞 Llamar</a>` : ''}
+      ${waUrl ? `<a href="${waUrl}" target="_blank" style="padding:8px 12px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#4ade80;font-size:12px;font-weight:700;text-decoration:none">💬 WhatsApp</a>` : ''}
+      ${p.estado === 'a_visitar' ? `<button onclick="abrirModalVisita('${p.id}','${p.nombre_negocio.replace(/'/g,"\\'")}','${p.rubro||''}')" style="flex:1;padding:8px 12px;border-radius:8px;border:none;background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✅ Marcar visita</button>` : ''}
+      ${p.estado === 'visitado' ? `<button onclick="convertirACliente('${p.id}')" style="flex:1;padding:8px 12px;border-radius:8px;border:none;background:linear-gradient(135deg,#15803d,#059669);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">💚 ¡Cerró! → Cliente</button>` : ''}
+    </div>
+  </div>`;
+}
+
+function abrirModalVisita(id, nombre, rubro) {
+  visitaActualId = id;
+  document.getElementById('mv-nombre').textContent = nombre;
+  document.getElementById('mv-rubro').textContent = rubro || '—';
+  document.getElementById('mv-resultado').value = '';
+  document.getElementById('mv-obs').value = '';
+  const modal = document.getElementById('modal-visita');
+  modal.style.display = 'flex';
+}
+
+function cerrarModalVisita() {
+  document.getElementById('modal-visita').style.display = 'none';
+  visitaActualId = null;
+}
+
+async function guardarVisita() {
+  if (!visitaActualId) return;
+  const resultado = document.getElementById('mv-resultado').value;
+  const obs = document.getElementById('mv-obs').value.trim();
+  if (!resultado) { alert('Seleccioná el resultado de la visita.'); return; }
+
+  const esCliente = resultado.includes('Cerró');
+  const nuevoEstado = esCliente ? 'cliente' : resultado.includes('No le interesó') ? 'no_interesado' : 'visitado';
+  const updates = {
+    estado: nuevoEstado,
+    visitado: true,
+    fecha_visita: new Date().toISOString(),
+    resultado_visita: obs ? `${resultado} — ${obs}` : resultado,
+  };
+
+  const { error } = await sb.from('clientes').update(updates).eq('id', visitaActualId);
+  if (!error) {
+    const idx = prospectosMios.findIndex(p => p.id === visitaActualId);
+    if (idx !== -1) Object.assign(prospectosMios[idx], updates);
+    cerrarModalVisita();
+    filtrarAVisitar(filtroVisitar);
+  }
+}
+
+async function convertirACliente(id) {
+  if (!confirm('¿Confirmar que cerró y pasa a ser tu cliente?')) return;
+  const { error } = await sb.from('clientes').update({ estado: 'cliente', visitado: true }).eq('id', id);
+  if (!error) {
+    const idx = prospectosMios.findIndex(p => p.id === id);
+    if (idx !== -1) { prospectosMios[idx].estado = 'cliente'; prospectosMios[idx].visitado = true; }
+    filtrarAVisitar(filtroVisitar);
+  }
 }
 
 // ── Nuevo cliente ──
@@ -1121,6 +1560,422 @@ ${cards}</div></body></html>`;
   win.document.close();
 }
 
+/* ══════════════════════════════════
+   ACUERDOS COMERCIALES
+══════════════════════════════════ */
+let acPubs = [];          // publicidades disponibles para esta vendedora
+let acSelIds = new Set(); // ids seleccionados
+let acDurMeses = null;    // duración numérica
+let acDescPorId = {};     // { pubId: 'ninguno'|'3'|'6'|'12' }
+
+const acFmt = n => new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(n||0);
+
+async function initAcuerdo() {
+  // Setear fecha hoy por defecto
+  const hoy = new Date().toISOString().slice(0,10);
+  document.getElementById('ac-fecha').value  = hoy;
+  document.getElementById('ac-inicio').value = hoy;
+  document.getElementById('ac-notas').value  = '';
+  document.getElementById('msg-acuerdo').className = 'msg';
+
+  // Reset selección
+  acSelIds.clear();
+  acDurMeses = null;
+  acDescPorId = {};
+  document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('sel'));
+  document.getElementById('ac-duracion-texto').value = '';
+  document.getElementById('ac-total-box').style.display = 'none';
+
+  // Cargar publicidades asignadas
+  const listaEl = document.getElementById('ac-pub-lista');
+  listaEl.innerHTML = '<div class="empty-state" style="padding:20px 0"><div class="icon" style="font-size:24px">⏳</div>Cargando...</div>';
+
+  const { data: asig } = await sb.from('pub_vendedoras').select('publicidad_id').eq('vendedora_id', perfil.id);
+  if (!asig?.length) {
+    listaEl.innerHTML = '<div class="empty-state" style="padding:20px 0;font-size:13px;color:#475569">El admin todavía no te asignó publicidades. Pedile que las configure.</div>';
+    acPubs = [];
+    return;
+  }
+  const ids = asig.map(a => a.publicidad_id);
+  const { data: pubs } = await sb.from('publicidades').select('*').in('id', ids).eq('activo', true).order('precio');
+  acPubs = pubs || [];
+  renderAcPubs();
+}
+
+function renderAcPubs() {
+  const el = document.getElementById('ac-pub-lista');
+  if (!acPubs.length) { el.innerHTML = '<div class="empty-state" style="padding:16px 0;color:#475569;font-size:13px">Sin publicidades disponibles.</div>'; return; }
+
+  el.innerHTML = acPubs.map(pub => {
+    const ub = pub.ubicacion || pub.tipo;
+    const thumb = pub.imagen_data
+      ? `<img src="${pub.imagen_data}">`
+      : `<span>${ub?.replace('banner_','').replace('_',' ') || '—'}</span>`;
+    return `
+    <div class="ac-pub-check" id="acpub-wrap-${pub.id}">
+      <div class="ac-pub-check-head" onclick="toggleAcPub('${pub.id}')">
+        <input type="checkbox" id="acpub-${pub.id}" onclick="event.stopPropagation();toggleAcPub('${pub.id}')">
+        <div class="ac-pub-thumb">${thumb}</div>
+        <div class="ac-pub-info">
+          <div class="ac-pub-nombre">${pub.nombre}</div>
+          <div class="ac-pub-precio">${acFmt(pub.precio)}<span style="font-size:10px;color:#64748b;font-weight:400">/mes</span></div>
+        </div>
+      </div>
+      <div class="ac-pub-options" id="acpub-opts-${pub.id}">
+        <div style="font-size:11px;color:#64748b;margin-bottom:6px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;">Descuento por plazo</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+          <button class="dur-btn sel" id="acdisc-${pub.id}-0" onclick="selDescPub('${pub.id}','0')">Sin desc.</button>
+          ${pub.descuento_3  ? `<button class="dur-btn" id="acdisc-${pub.id}-3"  onclick="selDescPub('${pub.id}','3')">3m · ${pub.descuento_3}%<br><span style="font-size:10px;color:#94a3b8">${acFmt(pub.precio*(1-pub.descuento_3/100))}/mes</span></button>` : ''}
+          ${pub.descuento_6  ? `<button class="dur-btn" id="acdisc-${pub.id}-6"  onclick="selDescPub('${pub.id}','6')">6m · ${pub.descuento_6}%<br><span style="font-size:10px;color:#94a3b8">${acFmt(pub.precio*(1-pub.descuento_6/100))}/mes</span></button>` : ''}
+          ${pub.descuento_12 ? `<button class="dur-btn" id="acdisc-${pub.id}-12" onclick="selDescPub('${pub.id}','12')">1 año · ${pub.descuento_12}%<br><span style="font-size:10px;color:#94a3b8">${acFmt(pub.precio*(1-pub.descuento_12/100))}/mes</span></button>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleAcPub(id) {
+  const cb   = document.getElementById('acpub-' + id);
+  const wrap = document.getElementById('acpub-wrap-' + id);
+  const opts = document.getElementById('acpub-opts-' + id);
+  if (acSelIds.has(id)) {
+    acSelIds.delete(id);
+    cb.checked = false;
+    wrap.classList.remove('selected');
+    opts.classList.remove('open');
+    delete acDescPorId[id];
+  } else {
+    acSelIds.add(id);
+    cb.checked = true;
+    wrap.classList.add('selected');
+    opts.classList.add('open');
+    if (!acDescPorId[id]) acDescPorId[id] = '0';
+  }
+  actualizarTotalAcuerdo();
+}
+
+function selDescPub(pubId, disc) {
+  acDescPorId[pubId] = disc;
+  // visual: deselect all, select this one
+  ['0','3','6','12'].forEach(d => {
+    const b = document.getElementById(`acdisc-${pubId}-${d}`);
+    if (b) b.classList.toggle('sel', d === disc);
+  });
+  actualizarTotalAcuerdo();
+}
+
+function selDuracion(meses) {
+  acDurMeses = meses;
+  document.getElementById('ac-duracion-texto').value = '';
+  document.querySelectorAll('.dur-btn[id^="durbtn-"]').forEach(b => b.classList.remove('sel'));
+  const btn = document.getElementById('durbtn-' + meses);
+  if (btn) btn.classList.add('sel');
+  actualizarTotalAcuerdo();
+}
+
+function acDuracionManual() {
+  acDurMeses = null;
+  document.querySelectorAll('.dur-btn[id^="durbtn-"]').forEach(b => b.classList.remove('sel'));
+  actualizarTotalAcuerdo();
+}
+
+function precioConDesc(pub) {
+  const disc = acDescPorId[pub.id] || '0';
+  if (disc === '3'  && pub.descuento_3)  return pub.precio * (1 - pub.descuento_3/100);
+  if (disc === '6'  && pub.descuento_6)  return pub.precio * (1 - pub.descuento_6/100);
+  if (disc === '12' && pub.descuento_12) return pub.precio * (1 - pub.descuento_12/100);
+  return pub.precio;
+}
+
+function actualizarTotalAcuerdo() {
+  const selPubs = acPubs.filter(p => acSelIds.has(p.id));
+  const box     = document.getElementById('ac-total-box');
+  if (!selPubs.length) { box.style.display = 'none'; return; }
+
+  const mensual = selPubs.reduce((s, p) => s + precioConDesc(p), 0);
+  const durTxt  = document.getElementById('ac-duracion-texto').value.trim();
+  const meses   = acDurMeses;
+
+  box.style.display = '';
+  document.getElementById('ac-total-mensual').textContent = acFmt(mensual) + '/mes';
+  if (meses) {
+    const total = mensual * meses;
+    document.getElementById('ac-total-duracion').textContent = `Por ${meses} mes${meses > 1 ? 'es' : ''}`;
+    document.getElementById('ac-total-global').textContent = 'Total: ' + acFmt(total);
+  } else if (durTxt) {
+    document.getElementById('ac-total-duracion').textContent = 'Duración: ' + durTxt;
+    document.getElementById('ac-total-global').textContent = '';
+  } else {
+    document.getElementById('ac-total-duracion').textContent = 'Seleccioná la duración para ver el total';
+    document.getElementById('ac-total-global').textContent = '';
+  }
+}
+
+async function guardarAcuerdo() {
+  const comercio    = document.getElementById('ac-comercio').value.trim();
+  const responsable = document.getElementById('ac-responsable').value.trim();
+  const cuit        = document.getElementById('ac-cuit').value.trim();
+  const tel         = document.getElementById('ac-tel').value.trim();
+  const email       = document.getElementById('ac-email').value.trim();
+  const dir         = document.getElementById('ac-dir').value.trim();
+  const fechaAc     = document.getElementById('ac-fecha').value;
+  const fechaInicio = document.getElementById('ac-inicio').value;
+  const durTexto    = document.getElementById('ac-duracion-texto').value.trim();
+  const notas       = document.getElementById('ac-notas').value.trim();
+
+  if (!comercio)    return showMsg('msg-acuerdo','error','Ingresá el nombre del comercio.');
+  if (!fechaAc)     return showMsg('msg-acuerdo','error','Ingresá la fecha del acuerdo.');
+  if (!acSelIds.size) return showMsg('msg-acuerdo','error','Seleccioná al menos una publicidad.');
+  if (!acDurMeses && !durTexto) return showMsg('msg-acuerdo','error','Indicá la duración del acuerdo.');
+
+  const selPubs = acPubs.filter(p => acSelIds.has(p.id));
+  const mensual = selPubs.reduce((s, p) => s + precioConDesc(p), 0);
+  const total   = acDurMeses ? mensual * acDurMeses : null;
+
+  const snap = selPubs.map(p => ({
+    id: p.id, nombre: p.nombre,
+    precio_base: p.precio,
+    precio_acordado: precioConDesc(p),
+    descuento_pct: acDescPorId[p.id] || '0',
+    ubicacion: p.ubicacion || p.tipo,
+    formato: p.formato
+  }));
+
+  const btn = document.getElementById('btn-guardar-acuerdo');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+
+  const payload = {
+    vendedora_id: perfil.id,
+    comercio_nombre: comercio,
+    comercio_responsable: responsable || null,
+    comercio_cuit: cuit || null,
+    comercio_telefono: tel || null,
+    comercio_email: email || null,
+    comercio_direccion: dir || null,
+    fecha_acuerdo: fechaAc,
+    fecha_inicio: fechaInicio || fechaAc,
+    duracion_meses: acDurMeses,
+    duracion_texto: acDurMeses ? `${acDurMeses} mes${acDurMeses>1?'es':''}` : durTexto,
+    publicidades_snap: snap,
+    monto_mensual: mensual,
+    monto_total: total,
+    notas: notas || null,
+    estado: 'vigente'
+  };
+
+  const { data: nuevo, error } = await sb.from('acuerdos_comerciales').insert(payload).select().single();
+  btn.disabled = false; btn.textContent = '💾 Guardar acuerdo';
+
+  if (error) { showMsg('msg-acuerdo','error','Error al guardar: ' + error.message); return; }
+
+  // Notificar admin por WhatsApp
+  const pubsTexto = snap.map(p => `• ${p.nombre}: ${acFmt(p.precio_acordado)}/mes`).join('\n');
+  const msgWA = `📝 *Nuevo acuerdo de publicidad*\n👤 Vendedora: ${perfil.nombre} ${perfil.apellido}\n🏪 Comercio: ${comercio}${responsable ? '\n👥 Responsable: '+responsable : ''}${tel ? '\n📞 '+tel : ''}\n📅 Fecha: ${fechaAc}\n⏱ Duración: ${payload.duracion_texto}\n\n📦 *Publicidades:*\n${pubsTexto}\n\n💰 Mensual: ${acFmt(mensual)}${total ? '\n💰 Total: '+acFmt(total) : ''}`;
+  window.open(`https://wa.me/542954320639?text=${encodeURIComponent(msgWA)}`, '_blank');
+
+  showMsg('msg-acuerdo','success','¡Acuerdo guardado! Se abrió WhatsApp para notificar al admin.');
+  setTimeout(() => imprimirAcuerdo(nuevo), 600);
+}
+
+async function cargarMisAcuerdos() {
+  const el = document.getElementById('lista-acuerdos');
+  el.innerHTML = '<div class="empty-state"><div class="icon">⏳</div>Cargando...</div>';
+  const { data, error } = await sb.from('acuerdos_comerciales')
+    .select('*').eq('vendedora_id', perfil.id)
+    .order('created_at', { ascending: false });
+  if (error || !data?.length) {
+    el.innerHTML = '<div class="empty-state"><div class="icon">📋</div>Todavía no creaste ningún acuerdo.<br><br><button onclick="showView(\'acuerdo-nuevo\')" style="background:linear-gradient(135deg,#1d4ed8,#7c3aed);border:none;color:#fff;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">📝 Crear primer acuerdo</button></div>';
+    return;
+  }
+  el.innerHTML = data.map(ac => {
+    const snaps = ac.publicidades_snap || [];
+    const pubsTexto = snaps.map(p => p.nombre).join(', ');
+    return `
+    <div class="acuerdo-card">
+      <div class="acuerdo-card-head" onclick="toggleAcDet('acdet-${ac.id}')">
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:800;font-size:15px">${ac.comercio_nombre}</div>
+          <div style="font-size:11px;color:#64748b;margin-top:2px">${fmtFecha(ac.fecha_acuerdo)} · ${ac.duracion_texto || '—'} · ${acFmt(ac.monto_mensual)}/mes</div>
+        </div>
+        <span class="ac-estado ac-estado-${ac.estado||'vigente'}">${ac.estado||'vigente'}</span>
+      </div>
+      <div class="acuerdo-card-body" id="acdet-${ac.id}">
+        ${ac.comercio_responsable ? `<div class="ac-row"><span>Responsable</span><strong>${ac.comercio_responsable}</strong></div>` : ''}
+        ${ac.comercio_cuit        ? `<div class="ac-row"><span>CUIT/DNI</span><strong>${ac.comercio_cuit}</strong></div>` : ''}
+        ${ac.comercio_telefono    ? `<div class="ac-row"><span>Teléfono</span><strong>${ac.comercio_telefono}</strong></div>` : ''}
+        ${ac.comercio_direccion   ? `<div class="ac-row"><span>Dirección</span><strong>${ac.comercio_direccion}</strong></div>` : ''}
+        <div class="ac-row"><span>Inicio del servicio</span><strong>${fmtFecha(ac.fecha_inicio)}</strong></div>
+        ${ac.monto_total ? `<div class="ac-row"><span>Monto total</span><strong style="color:#34d399">${acFmt(ac.monto_total)}</strong></div>` : ''}
+        <div style="font-size:11px;color:#64748b;margin:8px 0 4px">Publicidades: <span style="color:#94a3b8">${pubsTexto}</span></div>
+        ${ac.notas ? `<div style="font-size:12px;color:#64748b;margin:6px 0;padding:8px 10px;background:#0f172a;border-radius:8px;line-height:1.5">${ac.notas}</div>` : ''}
+        <button onclick="imprimirAcuerdo(${JSON.stringify(ac).replace(/"/g,'&quot;')})" style="width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🖨️ Imprimir / PDF para firmar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleAcDet(id) {
+  document.getElementById(id)?.classList.toggle('open');
+}
+
+function imprimirAcuerdo(ac) {
+  const snaps = ac.publicidades_snap || [];
+  const fmtDate = d => d ? new Date(d+'T12:00:00').toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'}) : '—';
+
+  // Calcular fecha fin si hay duración en meses
+  let fechaFinTexto = '—';
+  if (ac.duracion_meses && ac.fecha_inicio) {
+    const fi = new Date(ac.fecha_inicio+'T12:00:00');
+    fi.setMonth(fi.getMonth() + ac.duracion_meses);
+    fi.setDate(fi.getDate() - 1);
+    fechaFinTexto = fi.toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'});
+  }
+
+  const filas = snaps.map((p,i) => `
+    <tr style="${i%2===0?'background:#f8fafc':'background:#fff'}">
+      <td style="padding:10px 12px;font-weight:600;color:#0f172a;">${p.nombre}</td>
+      <td style="padding:10px 12px;text-align:center;color:#475569;">${{ banner_inicio:'Banner Inicio', banner_buscador:'Banner Buscador', banner_perfil:'Banner Perfil', banner_popup:'Banner Popup', pack_completo:'Pack Completo' }[p.ubicacion]||p.ubicacion||'—'}</td>
+      <td style="padding:10px 12px;text-align:right;color:#64748b;">${acFmt(p.precio_base)}</td>
+      <td style="padding:10px 12px;text-align:center;color:${p.descuento_pct!=='0'?'#059669':'#94a3b8'};">${p.descuento_pct!=='0'?p.descuento_pct+'% OFF':'—'}</td>
+      <td style="padding:10px 12px;text-align:right;font-weight:800;color:#059669;">${acFmt(p.precio_acordado)}</td>
+    </tr>`).join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8">
+<title>Acuerdo Comercial — ${ac.comercio_nombre}</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#0f172a;font-size:14px}
+  .page{max-width:820px;margin:0 auto;padding:40px 40px 60px}
+  .header{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:20px;margin-bottom:24px;border-bottom:3px solid #0f172a}
+  .logo{font-size:28px;font-weight:900;color:#7c3aed;letter-spacing:-1px}
+  .logo span{color:#0f172a}
+  .doc-title{font-size:22px;font-weight:800;text-align:right;color:#0f172a}
+  .doc-num{font-size:12px;color:#64748b;text-align:right;margin-top:3px}
+  .partes{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+  .parte{border:1px solid #e2e8f0;border-radius:10px;padding:16px;background:#f8fafc}
+  .parte-title{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #e2e8f0}
+  .parte-dato{font-size:13px;margin-bottom:5px;color:#0f172a;line-height:1.5}
+  .parte-dato strong{color:#334155;font-size:12px;font-weight:600;display:block}
+  .sec{margin-bottom:22px}
+  .sec-title{font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:#0f172a;color:#fff;padding:10px 12px;text-align:left;font-weight:600;font-size:12px}
+  th:last-child,th:nth-child(3),th:nth-child(5){text-align:right}
+  th:nth-child(4){text-align:center}
+  .total-row td{padding:12px;font-weight:800;font-size:15px;border-top:2px solid #0f172a}
+  .clausulas{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px;margin-bottom:24px}
+  .clausulas p{font-size:12px;color:#475569;line-height:1.7;margin-bottom:6px}
+  .clausulas p strong{color:#334155}
+  .firmas{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px}
+  .firma-box{text-align:center}
+  .firma-linea{border-top:2px solid #334155;margin-bottom:8px;padding-top:8px}
+  .firma-nombre{font-weight:700;font-size:14px;color:#0f172a}
+  .firma-cargo{font-size:12px;color:#64748b;margin-top:2px}
+  .firma-espacio{height:60px}
+  @media print{.no-print{display:none}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.page{padding:24px 28px}}
+</style></head><body><div class="page">
+
+<div class="header">
+  <div>
+    <div class="logo">Local<span>Web</span></div>
+    <div style="font-size:12px;color:#64748b;margin-top:4px">Publicidad Digital · trabajoscerca.com.ar</div>
+    <div style="font-size:12px;color:#64748b">Contacto: +54 2954 320639 · localweb.ar</div>
+  </div>
+  <div>
+    <div class="doc-title">ACUERDO COMERCIAL<br>DE PUBLICIDAD</div>
+    <div class="doc-num">Fecha: ${fmtDate(ac.fecha_acuerdo)}</div>
+  </div>
+</div>
+
+<div class="partes">
+  <div class="parte">
+    <div class="parte-title">🏢 Prestador del servicio</div>
+    <div class="parte-dato"><strong>Empresa</strong>LocalWeb / DataWeb</div>
+    <div class="parte-dato"><strong>Representante</strong>${perfil.nombre} ${perfil.apellido}</div>
+    <div class="parte-dato"><strong>Teléfono</strong>${perfil.telefono || '+54 2954 320639'}</div>
+    <div class="parte-dato"><strong>Plataforma</strong>trabajoscerca.com.ar · localweb.ar</div>
+  </div>
+  <div class="parte">
+    <div class="parte-title">🏪 Anunciante</div>
+    <div class="parte-dato"><strong>Comercio / Empresa</strong>${ac.comercio_nombre}</div>
+    ${ac.comercio_responsable?`<div class="parte-dato"><strong>Responsable</strong>${ac.comercio_responsable}</div>`:''}
+    ${ac.comercio_cuit?`<div class="parte-dato"><strong>DNI / CUIT</strong>${ac.comercio_cuit}</div>`:''}
+    ${ac.comercio_telefono?`<div class="parte-dato"><strong>Teléfono</strong>${ac.comercio_telefono}</div>`:''}
+    ${ac.comercio_email?`<div class="parte-dato"><strong>Email</strong>${ac.comercio_email}</div>`:''}
+    ${ac.comercio_direccion?`<div class="parte-dato"><strong>Dirección</strong>${ac.comercio_direccion}</div>`:''}
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-title">📅 Vigencia del acuerdo</div>
+  <div style="display:flex;gap:24px;font-size:13px;">
+    <div><strong style="color:#64748b;font-size:11px;display:block;margin-bottom:2px">Inicio</strong>${fmtDate(ac.fecha_inicio)}</div>
+    <div><strong style="color:#64748b;font-size:11px;display:block;margin-bottom:2px">Duración</strong>${ac.duracion_texto || '—'}</div>
+    <div><strong style="color:#64748b;font-size:11px;display:block;margin-bottom:2px">Fin estimado</strong>${fechaFinTexto}</div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-title">📦 Servicios contratados</div>
+  <table>
+    <thead><tr>
+      <th>Publicidad / Posición</th>
+      <th>Ubicación</th>
+      <th style="text-align:right">Precio lista</th>
+      <th style="text-align:center">Descuento</th>
+      <th style="text-align:right">Precio acordado</th>
+    </tr></thead>
+    <tbody>
+      ${filas}
+      <tr class="total-row">
+        <td colspan="4">Total mensual acordado</td>
+        <td style="text-align:right;color:#059669;">${acFmt(ac.monto_mensual)}/mes</td>
+      </tr>
+      ${ac.monto_total?`<tr><td colspan="4" style="padding:6px 12px;font-size:12px;color:#64748b;">Total por ${ac.duracion_texto}</td><td style="padding:6px 12px;text-align:right;font-size:14px;font-weight:800;color:#1d4ed8;">${acFmt(ac.monto_total)}</td></tr>`:''}
+    </tbody>
+  </table>
+</div>
+
+${ac.notas?`<div class="sec"><div class="sec-title">📝 Condiciones especiales</div><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;font-size:13px;color:#475569;line-height:1.7;">${ac.notas}</div></div>`:''}
+
+<div class="clausulas">
+  <div style="font-size:12px;font-weight:700;color:#334155;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Condiciones generales</div>
+  <p><strong>1. Objeto:</strong> El prestador se compromete a publicar los avisos publicitarios detallados en la plataforma acordada durante el período de vigencia establecido.</p>
+  <p><strong>2. Pago:</strong> El monto acordado deberá abonarse por adelantado al inicio de cada período. El incumplimiento dará lugar a la suspensión del servicio.</p>
+  <p><strong>3. Material:</strong> El anunciante es responsable de proveer el material gráfico/multimedia en tiempo y forma. El prestador puede producirlo a cotizar por separado.</p>
+  <p><strong>4. Renovación:</strong> Al vencimiento del plazo, el acuerdo podrá renovarse bajo las condiciones vigentes en ese momento, previa notificación de ambas partes.</p>
+  <p><strong>5. Rescisión anticipada:</strong> Cualquier rescisión antes del plazo convenido deberá notificarse con 15 días de anticipación y podrá estar sujeta a penalidades según lo pactado.</p>
+</div>
+
+<div class="firmas">
+  <div class="firma-box">
+    <div class="firma-espacio"></div>
+    <div class="firma-linea"></div>
+    <div class="firma-nombre">LocalWeb / DataWeb</div>
+    <div class="firma-cargo">${perfil.nombre} ${perfil.apellido} — Representante</div>
+    ${perfil.telefono?`<div class="firma-cargo">${perfil.telefono}</div>`:''}
+  </div>
+  <div class="firma-box">
+    <div class="firma-espacio"></div>
+    <div class="firma-linea"></div>
+    <div class="firma-nombre">${ac.comercio_nombre}</div>
+    <div class="firma-cargo">${ac.comercio_responsable||'Responsable del anunciante'}</div>
+    ${ac.comercio_cuit?`<div class="firma-cargo">DNI/CUIT: ${ac.comercio_cuit}</div>`:''}
+  </div>
+</div>
+
+<div class="no-print" style="text-align:center;margin-top:36px">
+  <button onclick="window.print()" style="background:#0f172a;border:none;color:#fff;padding:12px 32px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">🖨️ Imprimir / Guardar PDF</button>
+</div>
+
+</div></body></html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+}
+
 // ── Helpers ──
 function fmtFecha(iso) {
   return new Date(iso).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'2-digit' });
@@ -1137,7 +1992,310 @@ function showMsg(id, type, text) {
   el.textContent = text;
 }
 
+const CIUDADES_AR = {
+  'Buenos Aires': ['La Plata','Mar del Plata','Bahía Blanca','Quilmes','Lanús','Lomas de Zamora','General San Martín','Morón','Tres de Febrero','Tigre','Moreno','La Matanza','Berazategui','Florencio Varela','Almirante Brown','Ezeiza','Merlo','José C. Paz','San Miguel','Malvinas Argentinas','Hurlingham','Ituzaingó','San Isidro','Vicente López','San Fernando','Zárate','Campana','Luján','Olavarría','Tandil','Junín','Pergamino','Azul','Necochea','Pinamar','Villa Gesell','Chivilcoy','Mercedes','San Nicolás','Ramallo','Rojas','Bolívar','Pehuajó','9 de Julio','Lincoln','Bragado','Trenque Lauquen','Coronel Suárez','Benito Juárez','Tres Arroyos','Miramar','Balcarce','Chacabuco','Salto','Arrecifes','San Pedro','Baradero'],
+  'CABA': ['Palermo','Belgrano','Caballito','Villa Urquiza','Flores','Almagro','Barracas','San Telmo','La Boca','Recoleta','Retiro','Monserrat','Puerto Madero','Constitución','Once','Villa del Parque','Devoto','Villa Pueyrredón','Liniers','Mataderos','Lugano','Villa Soldati','Parque Patricios','Boedo','Villa Crespo','Chacarita','Colegiales','Núñez','Saavedra'],
+  'Catamarca': ['San Fernando del Valle de Catamarca','Andalgalá','Belén','Santa María','Tinogasta','Fiambalá','Hualfín','Pomán','Recreo'],
+  'Chaco': ['Resistencia','Barranqueras','Fontana','Presidencia Roque Sáenz Peña','Villa Ángela','Charata','General San Martín','Quitilipi','Las Breñas','Machagai','Presidencia de la Plaza','Campo Largo','Juan José Castelli','Pampa del Infierno','Tres Isletas'],
+  'Chubut': ['Rawson','Comodoro Rivadavia','Trelew','Puerto Madryn','Esquel','Rada Tilly','Sarmiento','Gaiman','Dolavon','28 de Julio','Paso de Indios','Gobernador Costa'],
+  'Córdoba': ['Córdoba','Villa Carlos Paz','Villa María','Río Cuarto','San Francisco','Alta Gracia','La Falda','Cosquín','Jesús María','Bell Ville','Río Tercero','Deán Funes','Cruz del Eje','Villa Dolores','Laboulaye','Marcos Juárez','Villa General Belgrano','Mina Clavero','Río Segundo','Oncativo','Villa del Rosario','General Cabrera','Vicuña Mackenna'],
+  'Corrientes': ['Corrientes','Goya','Paso de los Libres','Curuzú Cuatiá','Mercedes','Santo Tomé','Esquina','Saladas','San Luis del Palmar','Ituzaingó','Bella Vista','Monte Caseros','Mburucuyá'],
+  'Entre Ríos': ['Paraná','Concordia','Gualeguaychú','Concepción del Uruguay','Villaguay','La Paz','Federación','Colón','San José','Gualeguay','Victoria','Crespo','Chajarí','Federal','Diamante','Nogoyá'],
+  'Formosa': ['Formosa','Clorinda','Pirané','El Colorado','General Mosconi','Ingeniero Juárez','Las Lomitas','Ibarreta','Gran Guardia'],
+  'Jujuy': ['San Salvador de Jujuy','San Pedro de Jujuy','Libertador General San Martín','Palpalá','Perico','Humahuaca','Tilcara','La Quiaca','Abra Pampa','Fraile Pintado','Calilegua','El Carmen','Monterrico','Pampa Blanca','San Antonio','Yala','Volcán'],
+  'La Pampa': ['Santa Rosa','General Pico','Toay','Eduardo Castex','Victorica','Realicó','Guatraché','General Acha','Intendente Alvear','Catriló','Macachín','Winifreda','Rancul','Quemú Quemú'],
+  'La Rioja': ['La Rioja','Chilecito','Aimogasta','Chamical','Chepes','Patquía','Villa Unión','Nonogasta','Vinchina','Villa Castelli'],
+  'Mendoza': ['Mendoza','San Rafael','Godoy Cruz','Maipú','Luján de Cuyo','Guaymallén','Las Heras','Rivadavia','General Alvear','Tunuyán','San Martín','Junín','La Paz','Lavalle','Malargüe','Tupungato'],
+  'Misiones': ['Posadas','Oberá','Eldorado','Puerto Iguazú','Apóstoles','Leandro N. Alem','San Vicente','Bernardo de Irigoyen','Aristóbulo del Valle','Jardín América','San Ignacio','Montecarlo','Puerto Rico','Wanda','Cerro Azul'],
+  'Neuquén': ['Neuquén','San Martín de los Andes','Zapala','Cutral Có','Plaza Huincul','Centenario','Villa La Angostura','Junín de los Andes','Chos Malal','Rincón de los Sauces','Las Lajas','Loncopué','Aluminé','Piedra del Águila'],
+  'Río Negro': ['Viedma','Bariloche','General Roca','Cipolletti','El Bolsón','Allen','Catriel','Villa Regina','Cinco Saltos','Choele Choel','Jacobacci','San Antonio Oeste','Las Grutas'],
+  'Salta': ['Salta','Orán','Tartagal','General Güemes','Cafayate','Metán','Joaquín V. González','Rosario de la Frontera','Embarcación','Salvador Mazza','Rivadavia','Cachi','Cerrillos','Rosario de Lerma'],
+  'San Juan': ['San Juan','Caucete','Rivadavia','Santa Lucía','Chimbas','Rawson','9 de Julio','Pocito','Zonda','Albardón','Angaco','Iglesia','Jáchal','Valle Fértil','25 de Mayo'],
+  'San Luis': ['San Luis','Villa Mercedes','Merlo','Justo Daract','La Toma','Concarán','Quines','Tilisarao','Santa Rosa del Conlara','Luján'],
+  'Santa Cruz': ['Río Gallegos','Caleta Olivia','El Calafate','Puerto Deseado','Pico Truncado','Las Heras','Gobernador Gregores','Perito Moreno','San Julián','Puerto Santa Cruz','El Chaltén'],
+  'Santa Fe': ['Santa Fe','Rosario','Rafaela','Venado Tuerto','Villa Constitución','Santo Tomé','Reconquista','San Lorenzo','Esperanza','Cañada de Gómez','Firmat','Las Rosas','Rufino','San Justo','Vera','Tostado','Gálvez','San Cristóbal','Sunchales','Avellaneda','Villa Ocampo','Casilda','Ceres'],
+  'Santiago del Estero': ['Santiago del Estero','La Banda','Termas de Río Hondo','Añatuya','Frías','Fernández','Loreto','Monte Quemado','Suncho Corral','Quimilí','Nueva Esperanza','Beltrán','Sumampa'],
+  'Tierra del Fuego': ['Ushuaia','Río Grande','Tolhuin'],
+  'Tucumán': ['San Miguel de Tucumán','Yerba Buena','Tafí Viejo','Banda del Río Salí','Aguilares','Concepción','Monteros','Famailla','Simoca','Bella Vista','Alderetes','Las Talitas','El Manantial','Lules']
+};
+
+function actualizarCiudadesPerfil() {
+  const prov = document.getElementById('d-provincia').value;
+  const wrap = document.getElementById('d-ciudad-wrap');
+  const sel  = document.getElementById('d-ciudad');
+  if (!prov || !CIUDADES_AR[prov]) { wrap.style.display = 'none'; sel.value = ''; return; }
+  sel.innerHTML = '<option value="">— Seleccioná ciudad —</option>' +
+    CIUDADES_AR[prov].map(c => `<option value="${c}">${c}</option>`).join('');
+  wrap.style.display = '';
+}
+
 init();
+
+/* ══════════════════════════════════════════════════════════
+   MIS COMISIONES
+══════════════════════════════════════════════════════════ */
+async function cargarMisComisiones() {
+  const elLista   = document.getElementById('lista-mis-comisiones');
+  const elResumen = document.getElementById('com-resumen-vend');
+  elLista.innerHTML = '<div class="empty-state"><div class="icon">⏳</div>Cargando...</div>';
+
+  const { data, error } = await sb
+    .from('comisiones')
+    .select('*, acuerdo:acuerdos_comerciales(comercio_nombre, fecha_acuerdo, monto_mensual)')
+    .eq('perfil_id', perfil.id)
+    .order('created_at', { ascending: false });
+
+  if (error) { elLista.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div>' + error.message + '</div>'; return; }
+
+  const lista = data || [];
+  const fmt   = n => new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(n||0);
+
+  // Resumen totales
+  const pendiente  = lista.filter(c => c.estado === 'pendiente').reduce((s,c) => s + parseFloat(c.monto), 0);
+  const pagada     = lista.filter(c => c.estado === 'pagada').reduce((s,c) => s + parseFloat(c.monto), 0);
+  const confirmada = lista.filter(c => c.estado === 'confirmada').reduce((s,c) => s + parseFloat(c.monto), 0);
+
+  // Actualizar subtítulo en home card
+  const homeSub = document.getElementById('home-com-sub');
+  if (homeSub) homeSub.textContent = pendiente > 0 ? `${fmt(pendiente)} pendiente` : 'Todo saldado ✔';
+
+  elResumen.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:4px">
+      <div style="background:#1e293b;border-radius:12px;padding:12px;text-align:center">
+        <div style="font-size:10px;color:#64748b;margin-bottom:4px">Pendiente</div>
+        <div style="font-size:16px;font-weight:800;color:#f59e0b">${fmt(pendiente)}</div>
+      </div>
+      <div style="background:#1e293b;border-radius:12px;padding:12px;text-align:center">
+        <div style="font-size:10px;color:#64748b;margin-bottom:4px">Depositado</div>
+        <div style="font-size:16px;font-weight:800;color:#34d399">${fmt(pagada)}</div>
+      </div>
+      <div style="background:#1e293b;border-radius:12px;padding:12px;text-align:center">
+        <div style="font-size:10px;color:#64748b;margin-bottom:4px">Confirmado</div>
+        <div style="font-size:16px;font-weight:800;color:#818cf8">${fmt(confirmada)}</div>
+      </div>
+    </div>
+    ${!perfil.alias_cbu ? `<div style="background:#1c1917;border:1px solid #78350f;border-radius:10px;padding:10px 14px;font-size:12px;color:#fbbf24;margin-top:8px">⚠ Cargá tu alias o CBU en <strong>Datos personales</strong> para que puedan depositarte.</div>` : ''}`;
+
+  if (!lista.length) { elLista.innerHTML = '<div class="empty-state"><div class="icon">💰</div>Todavía no tenés comisiones registradas.</div>'; return; }
+
+  const estadoColor = { pendiente:'#f59e0b', pagada:'#34d399', confirmada:'#818cf8' };
+  const estadoLabel = { pendiente:'Pendiente de pago', pagada:'Depositada ✔', confirmada:'Confirmada ✔' };
+
+  elLista.innerHTML = lista.map(c => {
+    const ac  = c.acuerdo || {};
+    const col = estadoColor[c.estado] || '#64748b';
+    const lbl = estadoLabel[c.estado] || c.estado;
+    const fecha = ac.fecha_acuerdo ? new Date(ac.fecha_acuerdo+'T12:00').toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'}) : '';
+    return `
+    <div style="background:#1e293b;border-radius:12px;padding:14px 16px;margin-bottom:8px;border-left:3px solid ${col}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:700;color:#e2e8f0">${ac.comercio_nombre||'—'}</div>
+          <div style="font-size:11px;color:#64748b;margin-top:2px">${fecha} · ${c.tipo === 'jefe_ventas' ? 'Comisión jefe de ventas (5%)' : 'Comisión por venta'}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:18px;font-weight:800;color:${col}">${fmt(c.monto)}</div>
+          <div style="font-size:10px;color:${col};font-weight:700;margin-top:2px">${lbl}</div>
+          ${c.estado === 'pagada' ? `<button onclick="confirmarRecepcion('${c.id}', this)" style="margin-top:6px;padding:4px 10px;border-radius:20px;border:none;background:#312e81;color:#a5b4fc;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">✔ Confirmar recepción</button>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function confirmarRecepcion(comisionId, btn) {
+  btn.disabled = true; btn.textContent = '...';
+  const { error } = await sb.from('comisiones').update({ estado: 'confirmada' }).eq('id', comisionId);
+  if (error) { btn.disabled = false; btn.textContent = '✔ Confirmar recepción'; alert('Error: ' + error.message); return; }
+  cargarMisComisiones();
+}
+
+/* ═══════════════════════════════════════
+   EQUIPO DE ZONA — Jefe de Ventas (TC)
+═══════════════════════════════════════ */
+let _tcVendedoresZona = [];
+let _tcAcuerdosZona   = [];
+let _tcEquipoCargado  = false;
+let _tcTabActual      = 'vendedores';
+
+function tcTabEquipo(tab) {
+  _tcTabActual = tab;
+  document.getElementById('tc-panel-vend').style.display = tab === 'vendedores' ? '' : 'none';
+  document.getElementById('tc-panel-vent').style.display = tab === 'ventas'     ? '' : 'none';
+  const activo   = 'padding:8px 16px;border-radius:20px;border:none;background:#4c1d95;color:#c4b5fd;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit';
+  const inactivo = 'padding:8px 16px;border-radius:20px;border:1px solid #334155;background:transparent;color:#64748b;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit';
+  document.getElementById('tc-tab-vend').style.cssText = tab === 'vendedores' ? activo : inactivo;
+  document.getElementById('tc-tab-vent').style.cssText = tab === 'ventas'     ? activo : inactivo;
+  if (tab === 'ventas' && !_tcAcuerdosZona.length) tcCargarVentas();
+}
+
+async function tcCargarEquipo() {
+  if (_tcEquipoCargado) return;
+  const panelV = document.getElementById('tc-panel-vend');
+
+  const zona = [perfil.ciudad, perfil.provincia].filter(Boolean).join(', ') || 'Sin zona';
+  document.getElementById('tc-zona-badge').textContent = `📍 Zona a cargo: ${zona}`;
+
+  try {
+    let q = sb.from('perfiles')
+      .select('id, nombre, apellido, telefono, avatar_url, rol, provincia, ciudad, comision_cw_pct, comision_cw_recurrente_pct, last_seen')
+      .in('rol', ['vendedora','vendedor','vendedor_web']);
+
+    if (perfil.ciudad) q = q.eq('ciudad', perfil.ciudad);
+    else if (perfil.provincia) q = q.eq('provincia', perfil.provincia);
+
+    const { data } = await q.order('nombre');
+    _tcVendedoresZona = data || [];
+    _tcEquipoCargado  = true;
+
+    const sub = document.getElementById('home-sub-equipo-tc');
+    if (sub) sub.textContent = `${_tcVendedoresZona.length} vendedor${_tcVendedoresZona.length!==1?'es':''} · ${zona}`;
+
+    tcRenderVendedores();
+  } catch(e) {
+    panelV.innerHTML = '<div class="empty-state"><div class="icon">❌</div>Error al cargar el equipo</div>';
+  }
+}
+
+function tcRenderVendedores() {
+  const panel = document.getElementById('tc-panel-vend');
+  if (!_tcVendedoresZona.length) {
+    panel.innerHTML = '<div class="empty-state"><div class="icon">👥</div>No hay vendedores en tu zona.</div>';
+    return;
+  }
+  const ONLINE_MIN = 5;
+  const isOnline = ls => ls && (Date.now() - new Date(ls).getTime()) < ONLINE_MIN * 60000;
+  const rolLabel = { vendedora:'Vendedora', vendedor:'Vendedor', vendedor_web:'Vend. Web' };
+
+  panel.innerHTML = _tcVendedoresZona.map(v => {
+    const ini    = ((v.nombre||'?')[0]+(v.apellido||'?')[0]).toUpperCase();
+    const online = isOnline(v.last_seen);
+    const tel    = (v.telefono||'').replace(/\D/g,'');
+    const waMsg  = encodeURIComponent(`Hola ${v.nombre}! 👋 Te escribo desde el equipo de Trabajos Cerca.`);
+    return `<div style="background:#1e293b;border:1px solid #334155;border-radius:14px;padding:14px 16px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="position:relative;flex-shrink:0">
+          <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#1e3a5f,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff">
+            ${v.avatar_url?`<img src="${v.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:ini}
+          </div>
+          <div style="position:absolute;bottom:1px;right:1px;width:10px;height:10px;border-radius:50%;border:2px solid #1e293b;background:${online?'#4ade80':'#475569'}"></div>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:700;color:#e2e8f0">${v.nombre} ${v.apellido}</div>
+          <div style="font-size:11px;color:#64748b;margin-top:2px">
+            <span style="background:#1e3a5f;color:#60a5fa;padding:1px 7px;border-radius:20px;font-size:10px;font-weight:700">${rolLabel[v.rol]||v.rol}</span>
+            ${online?' · <span style="color:#4ade80">🟢 Online</span>':''}
+          </div>
+          ${v.comision_cw_pct != null ? `<div style="font-size:11px;color:#475569;margin-top:2px">
+            💰 1ª venta: <strong style="color:#4ade80">${v.comision_cw_pct}%</strong>
+            · Recurrente: <strong style="color:#60a5fa">${v.comision_cw_recurrente_pct??'—'}%</strong>
+          </div>` : ''}
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        ${tel ? `
+        <a href="tel:${v.telefono}" style="flex:1;padding:9px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#60a5fa;font-size:12px;font-weight:700;text-decoration:none;text-align:center">📞 Llamar</a>
+        <a href="https://wa.me/549${tel}?text=${waMsg}" target="_blank"
+          style="flex:1;padding:9px;border-radius:8px;border:none;background:#25d366;color:#fff;font-size:12px;font-weight:700;text-decoration:none;text-align:center">💬 WhatsApp</a>
+        ` : `<div style="font-size:11px;color:#475569">Sin teléfono cargado</div>`}
+        <button onclick="tcVerVentasVend('${v.id}','${v.nombre} ${v.apellido}')"
+          style="flex:1;padding:9px;border-radius:8px;border:none;background:linear-gradient(135deg,#4c1d95,#7c3aed);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">
+          📊 Sus ventas</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function tcCargarVentas() {
+  const panel = document.getElementById('tc-panel-vent');
+  panel.innerHTML = '<div class="empty-state"><div class="icon">⏳</div>Cargando ventas...</div>';
+  try {
+    const vendIds = _tcVendedoresZona.map(v => v.id);
+    const [{ data: av }, { data: aj }] = await Promise.all([
+      vendIds.length ? sb.from('acuerdos').select('*, vendedora:vendedora_id(id,nombre,apellido,telefono)').in('vendedora_id', vendIds).order('created_at',{ascending:false}) : {data:[]},
+      sb.from('acuerdos').select('*, vendedora:vendedora_id(id,nombre,apellido,telefono)').eq('jefe_ventas_id', perfil.id).order('created_at',{ascending:false})
+    ]);
+    const todos = [...(av||[])];
+    (aj||[]).forEach(a => { if (!todos.find(x=>x.id===a.id)) todos.push(a); });
+    _tcAcuerdosZona = todos;
+    tcRenderVentas();
+  } catch(e) {
+    panel.innerHTML = '<div class="empty-state"><div class="icon">❌</div>Error al cargar</div>';
+  }
+}
+
+function tcRenderVentas(filtroVendId) {
+  const panel = document.getElementById('tc-panel-vent');
+  const lista = filtroVendId ? _tcAcuerdosZona.filter(a=>a.vendedora_id===filtroVendId) : _tcAcuerdosZona;
+  if (!lista.length) { panel.innerHTML = '<div class="empty-state"><div class="icon">📊</div>Sin ventas en esta zona aún.</div>'; return; }
+
+  const fmt  = d => new Date(d+'T12:00:00').toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const fmtM = n => '$' + new Intl.NumberFormat('es-AR',{maximumFractionDigits:0}).format(n);
+
+  const optsVend = ['<option value="">Todos los vendedores</option>',
+    ..._tcVendedoresZona.map(v=>`<option value="${v.id}" ${filtroVendId===v.id?'selected':''}>${v.nombre} ${v.apellido}</option>`)
+  ].join('');
+
+  // Agrupar por vendedor
+  const porVend = {};
+  lista.forEach(a => {
+    const vid = a.vendedora_id;
+    if (!porVend[vid]) porVend[vid] = { vend: a.vendedora||{}, acuerdos:[], total:0 };
+    porVend[vid].acuerdos.push(a);
+    porVend[vid].total += (a.total || a.precio_total || 0);
+  });
+
+  let html = `<div style="margin-bottom:12px">
+    <select onchange="tcRenderVentas(this.value||undefined)"
+      style="width:100%;background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:9px 12px;border-radius:10px;font-size:13px;font-family:inherit">
+      ${optsVend}
+    </select>
+  </div>`;
+
+  html += Object.values(porVend).map(g => {
+    const v = g.vend;
+    const ini = ((v.nombre||'?')[0]+(v.apellido||'?')[0]).toUpperCase();
+    return `<div style="background:#1e293b;border:1px solid #334155;border-radius:14px;overflow:hidden;margin-bottom:12px">
+      <div style="padding:12px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #334155">
+        <div style="width:36px;height:36px;border-radius:50%;background:#1e3a5f;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#60a5fa;flex-shrink:0">${ini}</div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:700;color:#e2e8f0">${v.nombre||'—'} ${v.apellido||''}</div>
+          <div style="font-size:11px;color:#64748b">${g.acuerdos.length} acuerdo${g.acuerdos.length!==1?'s':''} · Total: ${fmtM(g.total)}</div>
+        </div>
+      </div>
+      ${g.acuerdos.map(a => `
+        <div style="padding:10px 14px;border-bottom:1px solid #1e293b;display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600;color:#cbd5e1">${a.comercio||a.nombre_negocio||'—'}</div>
+            <div style="font-size:11px;color:#475569;margin-top:2px">${a.tipo_publicidad||a.pack||'—'}</div>
+            ${a.fecha_inicio?`<div style="font-size:10px;color:#334155">📅 ${fmt(a.fecha_inicio)}</div>`:''}
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:13px;font-weight:700;color:#94a3b8">${fmtM(a.total||a.precio_total||0)}</div>
+            <div style="font-size:10px;color:${a.estado==='activo'?'#4ade80':'#64748b'};margin-top:2px">${a.estado||'—'}</div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+
+  panel.innerHTML = html;
+}
+
+function tcVerVentasVend(vendId, nombre) {
+  tcTabEquipo('ventas');
+  if (!_tcAcuerdosZona.length) {
+    tcCargarVentas().then(() => tcRenderVentas(vendId));
+  } else {
+    tcRenderVentas(vendId);
+  }
+}
+
+// ── PWA Service Worker ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
