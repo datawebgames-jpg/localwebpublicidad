@@ -1453,7 +1453,7 @@ async function eliminarCuenta(id, nombre) {
 // ── Clientes ──
 async function cargarClientes() {
   const { data } = await sb.from('clientes')
-    .select('*, perfiles(nombre, apellido)')
+    .select('*, perfiles!clientes_vendedora_id_fkey(nombre, apellido)')
     .order('created_at', { ascending: false });
   todosClientes = data || [];
   filtrarClientes();
