@@ -224,6 +224,63 @@
   .empty-state { text-align: center; padding: 40px 20px; color: #475569; }
   .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
 
+  /* ── BUSCADOR COMERCIO ── */
+  .busq-result {
+    background: #1e293b; border: 1px solid #334155; border-radius: 10px;
+    padding: 12px 14px; margin-bottom: 8px; cursor: pointer; transition: border-color .15s;
+  }
+  .busq-result:hover { border-color: #7c3aed; }
+  .busq-presencia { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .ptag { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 10px; }
+  .ptag.si  { background: #052e16; color: #4ade80; }
+  .ptag.no  { background: #1a1a1a; color: #475569; }
+  .ptag.na  { background: #1e1b4b; color: #a5b4fc; }
+
+  /* ── PUBLICIDAD CANAL ── */
+  .pub-canal {
+    background: #0f172a; border: 1px solid #1e293b; border-radius: 10px;
+    padding: 12px 14px; margin-bottom: 8px;
+  }
+  .pub-canal-header { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+  .pub-canal-body { display: none; margin-top: 10px; }
+  .pub-canal-body.open { display: block; }
+  .pub-toggle {
+    width: 36px; height: 20px; background: #334155; border-radius: 10px;
+    position: relative; flex-shrink: 0; transition: background .2s;
+  }
+  .pub-toggle.on { background: #7c3aed; }
+  .pub-toggle::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: left .2s;
+  }
+  .pub-toggle.on::after { left: 18px; }
+  .pub-canal-label { font-weight: 700; color: #e2e8f0; }
+  .pub-canal-sub { font-size: 12px; color: #64748b; margin-left: auto; }
+
+  /* ── ESTADO CLIENTE ── */
+  .estado-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .estado-btn {
+    padding: 9px 16px; border-radius: 20px; border: 2px solid #334155;
+    background: #1e293b; color: #64748b; font-weight: 700; font-size: 13px;
+    cursor: pointer; font-family: inherit; transition: all .15s;
+  }
+  .estado-btn.potencial.sel    { background: #1e3a5f; border-color: #3b82f6; color: #60a5fa; }
+  .estado-btn.bueno.sel        { background: #052e16; border-color: #16a34a; color: #4ade80; }
+  .estado-btn.amargado.sel     { background: #2d1515; border-color: #dc2626; color: #f87171; }
+  .estado-btn.desinteresado.sel{ background: #1c1917; border-color: #78716c; color: #d6d3d1; }
+
+  /* ── ESTADO BADGE ── */
+  .est-badge {
+    display: inline-block; font-size: 10px; font-weight: 800;
+    padding: 2px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: .4px;
+  }
+  .est-potencial    { background:#1e3a5f; color:#60a5fa; }
+  .est-bueno        { background:#052e16; color:#4ade80; }
+  .est-amargado     { background:#2d1515; color:#f87171; }
+  .est-desinteresado{ background:#1c1917; color:#d6d3d1; }
+  .est-activo       { background:#052e16; color:#4ade80; }
+  .est-no_interesado{ background:#2d1515; color:#f87171; }
+
   /* ── MODAL GUARDAR ── */
   .modal-overlay {
     display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7);
@@ -460,6 +517,22 @@
     <div class="sec-title">Nuevo cliente</div>
   </div>
 
+  <!-- BUSCADOR DEL SISTEMA -->
+  <div class="section-divider">🔍 Buscar en el sistema</div>
+  <div style="display:flex;gap:8px;margin-bottom:8px">
+    <input type="text" id="rc-buscar" placeholder="Nombre del negocio..."
+      style="flex:1;padding:12px 14px;background:#1e293b;border:1px solid #334155;border-radius:10px;color:#fff;font-size:14px;outline:none;font-family:inherit"
+      onkeydown="if(event.key==='Enter')buscarComercio()" oninput="if(this.value.length===0)resetBusqueda()">
+    <button onclick="buscarComercio()" style="padding:12px 18px;background:linear-gradient(135deg,#4c1d95,#7c3aed);border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer;font-size:14px;font-family:inherit;white-space:nowrap">Buscar</button>
+  </div>
+  <div id="rc-resultados" style="display:none;margin-bottom:6px"></div>
+  <div id="rc-encontrado-badge" style="display:none;background:#1e3a5f;border:1px solid #3b82f6;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#60a5fa">
+    ✅ Datos cargados desde el sistema. Completá la información que falta.
+  </div>
+  <div id="rc-no-encontrado" style="display:none;background:#2d1b00;border:1px solid #92400e;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#fbbf24">
+    🆕 No está en el sistema. Completá el formulario para agregarlo.
+  </div>
+
   <!-- PACK (preseleccionado desde la guía o elegible acá) -->
   <div class="section-divider">📦 Pack de interés</div>
   <div class="pack-grid">
@@ -547,8 +620,8 @@
     <input type="text" id="rc-rubro" placeholder="Ej: Ferretería, Panadería...">
   </div>
 
-  <!-- REDES -->
-  <div class="section-divider">📱 Redes sociales</div>
+  <!-- PRESENCIA DIGITAL -->
+  <div class="section-divider">📱 Presencia digital</div>
   <div class="form-group">
     <label>Instagram</label>
     <input type="text" id="rc-ig" placeholder="@usuario o URL">
@@ -558,8 +631,101 @@
     <input type="text" id="rc-fb" placeholder="Página o URL">
   </div>
   <div class="form-group">
-    <label>Sitio web (si tiene)</label>
+    <label>Sitio web propio</label>
     <input type="url" id="rc-web" placeholder="https://...">
+  </div>
+  <div class="row2" style="margin-top:4px">
+    <div style="display:flex;align-items:center;gap:10px;background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:12px">
+      <input type="checkbox" id="rc-tiene-toko" style="width:18px;height:18px;cursor:pointer;accent-color:#7c3aed">
+      <label for="rc-tiene-toko" style="margin:0;font-size:13px;color:#e2e8f0;cursor:pointer;text-transform:none;letter-spacing:0">🛒 Toko / portal</label>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:12px">
+      <input type="checkbox" id="rc-tiene-mercado" style="width:18px;height:18px;cursor:pointer;accent-color:#7c3aed">
+      <label for="rc-tiene-mercado" style="margin:0;font-size:13px;color:#e2e8f0;cursor:pointer;text-transform:none;letter-spacing:0">🛍️ MercadoShops</label>
+    </div>
+  </div>
+
+  <!-- PUBLICIDAD ACTUAL -->
+  <div class="section-divider" style="margin-top:20px">📢 Publicidad actual (¿qué ya tienen?)</div>
+  <div class="pub-canal">
+    <div class="pub-canal-header" onclick="togglePub('radio')">
+      <div class="pub-toggle" id="tog-radio"></div>
+      <span class="pub-canal-label">📻 Radio</span>
+      <span class="pub-canal-sub" id="pub-radio-sub"></span>
+    </div>
+    <div class="pub-canal-body" id="pub-radio-body">
+      <div class="row2" style="margin-top:0">
+        <div class="form-group" style="margin:0"><label>¿En cuál?</label><input type="text" id="pub-radio-nombre" placeholder="Ej: FM Sol" oninput="actualizarTotalPub()"></div>
+        <div class="form-group" style="margin:0"><label>$/mes</label><input type="number" id="pub-radio-precio" placeholder="50000" oninput="actualizarTotalPub()"></div>
+      </div>
+    </div>
+  </div>
+  <div class="pub-canal">
+    <div class="pub-canal-header" onclick="togglePub('tv')">
+      <div class="pub-toggle" id="tog-tv"></div>
+      <span class="pub-canal-label">📺 Televisión</span>
+      <span class="pub-canal-sub" id="pub-tv-sub"></span>
+    </div>
+    <div class="pub-canal-body" id="pub-tv-body">
+      <div class="row2" style="margin-top:0">
+        <div class="form-group" style="margin:0"><label>¿En cuál?</label><input type="text" id="pub-tv-nombre" placeholder="Ej: Canal 3" oninput="actualizarTotalPub()"></div>
+        <div class="form-group" style="margin:0"><label>$/mes</label><input type="number" id="pub-tv-precio" placeholder="80000" oninput="actualizarTotalPub()"></div>
+      </div>
+    </div>
+  </div>
+  <div class="pub-canal">
+    <div class="pub-canal-header" onclick="togglePub('diario')">
+      <div class="pub-toggle" id="tog-diario"></div>
+      <span class="pub-canal-label">📰 Diario / Gráfica</span>
+      <span class="pub-canal-sub" id="pub-diario-sub"></span>
+    </div>
+    <div class="pub-canal-body" id="pub-diario-body">
+      <div class="row2" style="margin-top:0">
+        <div class="form-group" style="margin:0"><label>¿Cuál?</label><input type="text" id="pub-diario-nombre" placeholder="Ej: La Arena" oninput="actualizarTotalPub()"></div>
+        <div class="form-group" style="margin:0"><label>$/mes</label><input type="number" id="pub-diario-precio" placeholder="30000" oninput="actualizarTotalPub()"></div>
+      </div>
+    </div>
+  </div>
+  <div class="pub-canal">
+    <div class="pub-canal-header" onclick="togglePub('portal')">
+      <div class="pub-toggle" id="tog-portal"></div>
+      <span class="pub-canal-label">🌐 Portal / Página de terceros</span>
+      <span class="pub-canal-sub" id="pub-portal-sub"></span>
+    </div>
+    <div class="pub-canal-body" id="pub-portal-body">
+      <div class="row2" style="margin-top:0">
+        <div class="form-group" style="margin:0"><label>¿Cuál?</label><input type="text" id="pub-portal-nombre" placeholder="Ej: Toko, pagina propia" oninput="actualizarTotalPub()"></div>
+        <div class="form-group" style="margin:0"><label>$/mes</label><input type="number" id="pub-portal-precio" placeholder="20000" oninput="actualizarTotalPub()"></div>
+      </div>
+    </div>
+  </div>
+  <div id="pub-total-box" style="display:none;background:#1e1b4b;border:1px solid #4c1d95;border-radius:10px;padding:12px 16px;margin-top:6px">
+    <div style="font-size:10px;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:.5px">💸 Total gasto publicidad/mes estimado</div>
+    <div id="pub-total-val" style="font-size:22px;font-weight:900;color:#a78bfa">$0</div>
+  </div>
+
+  <!-- ESTADO DEL CLIENTE -->
+  <div class="section-divider" style="margin-top:20px">🏷️ Estado del cliente</div>
+  <div class="estado-btns">
+    <button class="estado-btn potencial sel" id="est-potencial"     onclick="selEstado('potencial')">🎯 Potencial</button>
+    <button class="estado-btn bueno"          id="est-bueno"         onclick="selEstado('bueno')">👍 Bueno</button>
+    <button class="estado-btn amargado"        id="est-amargado"      onclick="selEstado('amargado')">😤 Amargado</button>
+    <button class="estado-btn desinteresado"   id="est-desinteresado" onclick="selEstado('desinteresado')">😐 Desinteresado</button>
+  </div>
+
+  <!-- VISITA Y NOTAS -->
+  <div class="section-divider" style="margin-top:20px">📝 Visita y seguimiento</div>
+  <div style="display:flex;align-items:center;gap:10px;background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:12px 14px;margin-bottom:12px">
+    <input type="checkbox" id="rc-visitado" style="width:18px;height:18px;cursor:pointer;accent-color:#7c3aed">
+    <label for="rc-visitado" style="margin:0;font-size:14px;color:#e2e8f0;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:600">✅ Ya lo visité</label>
+  </div>
+  <div class="form-group">
+    <label>Qué dijeron / Observaciones</label>
+    <textarea id="rc-obs" placeholder="Notas sobre la visita, interés, objeciones..." style="background:#1e293b;border:1px solid #334155;border-radius:10px;color:#fff;font-size:14px;outline:none;font-family:inherit;width:100%;padding:12px 14px;min-height:80px;resize:vertical"></textarea>
+  </div>
+  <div class="form-group">
+    <label>Próximo contacto</label>
+    <input type="date" id="rc-prox-contacto">
   </div>
 
   <button class="btn-primary" id="btn-guardar-cliente" onclick="guardarNuevoCliente()"
@@ -899,8 +1065,7 @@ async function cargarAVisitar2() {
   el.innerHTML = '<div style="text-align:center;padding:40px;color:#475569">⏳ Cargando...</div>';
   const { data } = await sb.from('clientes')
     .select('*')
-    .eq('asignado_a', perfil.id)
-    .eq('fuente', 'webzonal')
+    .or(`asignado_a.eq.${perfil.id},vendedora_id.eq.${perfil.id}`)
     .order('created_at', { ascending: false });
   prospectosMios2 = data || [];
   const pend = prospectosMios2.filter(p => p.estado === 'a_visitar').length;
@@ -1299,9 +1464,130 @@ function selFormaPago(f) {
 
 // ── PASO 1: Guardar cliente (solo datos del comercio) ──
 let _clienteGuardadoId = null;  // ID del registro guardado en paso 1
+let _clienteEncontradoId = null; // ID de clientes table si se encontró en búsqueda
+let _estadoClienteSel = 'potencial';
+let _pubToggle = { radio: false, tv: false, diario: false, portal: false };
 let _cerradoPor  = 'vendedor';  // 'vendedor' | 'jefe_ventas'
 let _jefeVentasId = null;        // ID del jefe si aplica
 let _jefesDisponibles = [];      // Lista de jefes cargados
+
+/* ═══════════════════════════════════════════
+   BUSCADOR DE COMERCIO
+═══════════════════════════════════════════ */
+function resetBusqueda() {
+  _clienteEncontradoId = null;
+  document.getElementById('rc-resultados').style.display = 'none';
+  document.getElementById('rc-encontrado-badge').style.display = 'none';
+  document.getElementById('rc-no-encontrado').style.display = 'none';
+}
+
+async function buscarComercio() {
+  const q = document.getElementById('rc-buscar').value.trim();
+  if (q.length < 2) return;
+  const div = document.getElementById('rc-resultados');
+  div.style.display = 'block';
+  div.innerHTML = '<div style="color:#64748b;font-size:13px;padding:8px">Buscando...</div>';
+  document.getElementById('rc-encontrado-badge').style.display = 'none';
+  document.getElementById('rc-no-encontrado').style.display = 'none';
+
+  const { data } = await sb.from('clientes')
+    .select('id,nombre_negocio,rubro,ciudad,tiene_web,tiene_instagram,tiene_facebook,tiene_whatsapp,tiene_toko,estado_cliente,fuente')
+    .ilike('nombre_negocio', `%${q}%`)
+    .limit(8);
+
+  if (!data || data.length === 0) {
+    div.innerHTML = '';
+    document.getElementById('rc-no-encontrado').style.display = 'block';
+    _clienteEncontradoId = null;
+    return;
+  }
+
+  div.innerHTML = data.map(c => {
+    const est = c.estado_cliente || 'prospecto';
+    return `<div class="busq-result" onclick='seleccionarComercio(${JSON.stringify(c)})'>
+      <div style="font-weight:700;color:#e2e8f0">${c.nombre_negocio}</div>
+      <div style="font-size:12px;color:#64748b;margin-top:2px">${c.rubro||''} ${c.ciudad?'· '+c.ciudad:''}</div>
+      <div class="busq-presencia">
+        ${c.tiene_web       ? '<span class="ptag si">🌐 Web</span>'      : '<span class="ptag no">🌐 Sin web</span>'}
+        ${c.tiene_instagram ? '<span class="ptag si">📸 IG</span>'       : '<span class="ptag no">📸 Sin IG</span>'}
+        ${c.tiene_facebook  ? '<span class="ptag si">📘 FB</span>'       : '<span class="ptag no">📘 Sin FB</span>'}
+        ${c.tiene_whatsapp  ? '<span class="ptag si">💬 WA</span>'       : ''}
+        ${c.tiene_toko      ? '<span class="ptag si">🛒 Toko</span>'     : ''}
+        <span class="ptag na est-${est}">${est}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function seleccionarComercio(c) {
+  _clienteEncontradoId = c.id;
+  document.getElementById('rc-negocio').value  = c.nombre_negocio || '';
+  document.getElementById('rc-rubro').value    = c.rubro || '';
+  if (c.estado_cliente) selEstado(c.estado_cliente);
+  document.getElementById('rc-resultados').style.display = 'none';
+  document.getElementById('rc-encontrado-badge').style.display = 'block';
+  document.getElementById('rc-no-encontrado').style.display = 'none';
+  document.getElementById('rc-buscar').value = c.nombre_negocio;
+}
+
+/* ═══════════════════════════════════════════
+   ESTADO DEL CLIENTE
+═══════════════════════════════════════════ */
+function selEstado(est) {
+  _estadoClienteSel = est;
+  ['potencial','bueno','amargado','desinteresado'].forEach(e => {
+    document.getElementById('est-'+e)?.classList.remove('sel');
+  });
+  document.getElementById('est-'+est)?.classList.add('sel');
+}
+
+/* ═══════════════════════════════════════════
+   PUBLICIDAD ACTUAL
+═══════════════════════════════════════════ */
+function togglePub(canal) {
+  _pubToggle[canal] = !_pubToggle[canal];
+  const tog  = document.getElementById('tog-'+canal);
+  const body = document.getElementById('pub-'+canal+'-body');
+  tog.classList.toggle('on', _pubToggle[canal]);
+  body.classList.toggle('open', _pubToggle[canal]);
+  actualizarTotalPub();
+}
+
+function actualizarTotalPub() {
+  let total = 0;
+  ['radio','tv','diario','portal'].forEach(c => {
+    const sub = document.getElementById('pub-'+c+'-sub');
+    if (_pubToggle[c]) {
+      const p = parseFloat(document.getElementById('pub-'+c+'-precio')?.value) || 0;
+      const n = document.getElementById('pub-'+c+'-nombre')?.value || '';
+      total += p;
+      if (sub) sub.textContent = n ? (n + (p ? ' · $'+p.toLocaleString('es-AR') : '')) : '';
+    } else {
+      if (sub) sub.textContent = '';
+    }
+  });
+  const box = document.getElementById('pub-total-box');
+  const val = document.getElementById('pub-total-val');
+  if (box) box.style.display = total > 0 ? 'block' : 'none';
+  if (val) val.textContent = '$' + total.toLocaleString('es-AR') + '/mes';
+}
+
+function getPubPayload() {
+  return {
+    publica_radio:   _pubToggle.radio,
+    radio_nombre:    _pubToggle.radio  ? (document.getElementById('pub-radio-nombre')?.value.trim()||null)  : null,
+    radio_precio:    _pubToggle.radio  ? (parseFloat(document.getElementById('pub-radio-precio')?.value)||null) : null,
+    publica_tv:      _pubToggle.tv,
+    tv_nombre:       _pubToggle.tv     ? (document.getElementById('pub-tv-nombre')?.value.trim()||null)     : null,
+    tv_precio:       _pubToggle.tv     ? (parseFloat(document.getElementById('pub-tv-precio')?.value)||null) : null,
+    publica_diario:  _pubToggle.diario,
+    diario_nombre:   _pubToggle.diario ? (document.getElementById('pub-diario-nombre')?.value.trim()||null) : null,
+    diario_precio:   _pubToggle.diario ? (parseFloat(document.getElementById('pub-diario-precio')?.value)||null) : null,
+    publica_portal:  _pubToggle.portal,
+    portal_nombre:   _pubToggle.portal ? (document.getElementById('pub-portal-nombre')?.value.trim()||null) : null,
+    portal_precio:   _pubToggle.portal ? (parseFloat(document.getElementById('pub-portal-precio')?.value)||null) : null,
+  };
+}
 
 async function guardarNuevoCliente() {
   const negocio     = document.getElementById('rc-negocio').value.trim();
@@ -1312,6 +1598,23 @@ async function guardarNuevoCliente() {
   const numAcuerdo = 'CW-' + Date.now().toString().slice(-6);
   const pack = _packSel ? PACKS[_packSel] : null;
 
+  const tel      = document.getElementById('rc-tel').value.trim()   || null;
+  const email    = document.getElementById('rc-email').value.trim() || null;
+  const ig       = document.getElementById('rc-ig').value.trim()    || null;
+  const fb       = document.getElementById('rc-fb').value.trim()    || null;
+  const web      = document.getElementById('rc-web').value.trim()   || null;
+  const rubro    = document.getElementById('rc-rubro').value.trim() || null;
+  const dir      = document.getElementById('rc-dir').value.trim()   || null;
+  const obs      = document.getElementById('rc-obs').value.trim()   || null;
+  const proxCont = document.getElementById('rc-prox-contacto').value || null;
+  const visitado = document.getElementById('rc-visitado').checked;
+  const tieneToko    = document.getElementById('rc-tiene-toko').checked;
+  const tieneMercado = document.getElementById('rc-tiene-mercado').checked;
+  const provincia = document.getElementById('rc-provincia')?.value || null;
+  const ciudad    = document.getElementById('rc-ciudad')?.value    || null;
+  const pub = getPubPayload();
+
+  // ─── 1. Guardar en acuerdos_cw (flujo comercial existente) ───
   const { data, error } = await sb.from('acuerdos_cw').insert({
     vendedora_id: perfil.id,
     num_acuerdo: numAcuerdo,
@@ -1319,28 +1622,49 @@ async function guardarNuevoCliente() {
     nombre_negocio: negocio,
     propietario: responsable,
     cuit:      document.getElementById('rc-cuit').value.trim() || null,
-    telefono:  document.getElementById('rc-tel').value.trim()  || null,
-    email:     document.getElementById('rc-email').value.trim()|| null,
-    direccion: document.getElementById('rc-dir').value.trim()  || null,
-    rubro:     document.getElementById('rc-rubro').value.trim()|| null,
-    instagram: document.getElementById('rc-ig').value.trim()   || null,
-    facebook:  document.getElementById('rc-fb').value.trim()   || null,
-    web:       document.getElementById('rc-web').value.trim()  || null,
+    telefono: tel, email, direccion: dir, rubro, instagram: ig, facebook: fb, web,
     pack: pack ? pack.nombre : null,
     precio_mensual: _precioCWActual || (pack ? pack.precio : null),
-    provincia: document.getElementById('rc-provincia')?.value || null,
-    ciudad: document.getElementById('rc-ciudad')?.value || null,
+    provincia, ciudad,
     estado_cierre: 'futuro',
     estado_acuerdo: 'pendiente'
   }).select('id').single();
 
-  btn.disabled = false; btn.textContent = '💾 Guardar cliente';
-  if (error) return showMsg('msg-rc','error','Error al guardar: ' + error.message);
+  if (error) {
+    btn.disabled = false; btn.textContent = '💾 Guardar cliente';
+    return showMsg('msg-rc','error','Error al guardar: ' + error.message);
+  }
 
+  // ─── 2. Guardar / actualizar en clientes (prospecting) ───
+  const datosCompletos = !!(negocio && responsable && (tel || email));
+  const clientePayload = {
+    nombre_negocio: negocio,
+    rubro, telefono: tel, email, direccion: dir,
+    instagram: ig, facebook: fb,
+    tiene_web: !!web, tiene_instagram: !!ig, tiene_facebook: !!fb,
+    tiene_toko: tieneToko, tiene_mercadoshops: tieneMercado,
+    estado_cliente: _estadoClienteSel || 'potencial',
+    visitado, observaciones: obs, proximo_contacto: proxCont,
+    vendedora_id: perfil.id,
+    asignado_a: perfil.id,
+    agregado_por_nombre: `${perfil.nombre||''} ${perfil.apellido||''}`.trim(),
+    fuente: 'vendedor_cw',
+    estado: 'prospecto',
+    contratado_con: 'ninguno',
+    datos_completos: datosCompletos,
+    ...pub
+  };
+
+  if (_clienteEncontradoId) {
+    await sb.from('clientes').update(clientePayload).eq('id', _clienteEncontradoId);
+  } else {
+    await sb.from('clientes').insert(clientePayload);
+  }
+
+  btn.disabled = false; btn.textContent = '💾 Guardar cliente';
   _clienteGuardadoId = data.id;
   _clientesCargados  = false;
 
-  // Mostrar popup
   document.getElementById('modal-cliente-nombre2').textContent = negocio;
   document.getElementById('modal-post-cliente').classList.add('open');
 }
@@ -1713,8 +2037,31 @@ async function guardarAcuerdoCW() {
 }
 
 function limpiarFormRC() {
-  ['rc-negocio','rc-responsable','rc-cuit','rc-tel','rc-email','rc-dir','rc-rubro','rc-ig','rc-fb','rc-web']
+  ['rc-negocio','rc-responsable','rc-cuit','rc-tel','rc-email','rc-dir','rc-rubro','rc-ig','rc-fb','rc-web',
+   'rc-buscar','rc-obs','rc-prox-contacto',
+   'pub-radio-nombre','pub-radio-precio','pub-tv-nombre','pub-tv-precio',
+   'pub-diario-nombre','pub-diario-precio','pub-portal-nombre','pub-portal-precio']
     .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['rc-visitado','rc-tiene-toko','rc-tiene-mercado'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.checked = false;
+  });
+  // reset publicidad toggles
+  _pubToggle = { radio: false, tv: false, diario: false, portal: false };
+  ['radio','tv','diario','portal'].forEach(c => {
+    document.getElementById('tog-'+c)?.classList.remove('on');
+    document.getElementById('pub-'+c+'-body')?.classList.remove('open');
+    const sub = document.getElementById('pub-'+c+'-sub'); if(sub) sub.textContent = '';
+  });
+  const ptb = document.getElementById('pub-total-box'); if(ptb) ptb.style.display='none';
+  // reset estado
+  _estadoClienteSel = 'potencial';
+  document.querySelectorAll('.estado-btn').forEach(b => b.classList.remove('sel'));
+  document.getElementById('est-potencial')?.classList.add('sel');
+  // reset búsqueda
+  _clienteEncontradoId = null;
+  ['rc-resultados','rc-encontrado-badge','rc-no-encontrado'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.style.display = 'none';
+  });
   _packSel = null; _durSel = null; _durMeses = null; _ofertasSel = null;
   _pagoSel = null; _formapagoSel = null; _modalidadPago = null; _clienteGuardadoId = null;
   document.querySelectorAll('.pack-card').forEach(c => c.classList.remove('selected'));

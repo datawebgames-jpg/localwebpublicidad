@@ -375,18 +375,29 @@
 <!-- PROSPECTOS WEBZONAL -->
 <div id="panel-prospectos" class="panel">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-    <span class="sec-title" style="margin:0">🎯 Prospectos WebZonal</span>
+    <span class="sec-title" style="margin:0">🎯 Prospectos y Clientes</span>
     <button onclick="cargarProspectosAdmin()" style="padding:7px 14px;border-radius:8px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:12px;cursor:pointer;font-family:inherit">🔄 Actualizar</button>
   </div>
-  <div style="font-size:12px;color:#475569;margin-bottom:14px">Locales importados desde WebZonal. Asignales una vendedora para que los visite.</div>
-  <!-- Filtros prospectos -->
-  <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-    <button id="pf-todos"         onclick="filtrarProspectos('todos')"          style="padding:7px 14px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">📋 Todos</button>
-    <button id="pf-sinasignar"    onclick="filtrarProspectos('sinasignar')"     style="padding:7px 14px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">⭕ Sin asignar</button>
-    <button id="pf-asignados"     onclick="filtrarProspectos('a_visitar')"      style="padding:7px 14px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">📌 Asignados</button>
-    <button id="pf-visitados"     onclick="filtrarProspectos('visitado')"       style="padding:7px 14px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✅ Visitados</button>
-    <button id="pf-clientes"      onclick="filtrarProspectos('cliente')"        style="padding:7px 14px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">💚 Clientes</button>
-    <button id="pf-noint"         onclick="filtrarProspectos('no_interesado')"  style="padding:7px 14px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">❌ No interesados</button>
+  <div style="font-size:12px;color:#475569;margin-bottom:14px">Todos los clientes y prospectos del sistema.</div>
+  <!-- Filtros por estado workflow -->
+  <div style="font-size:10px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Por etapa</div>
+  <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+    <button id="pf-todos"         onclick="filtrarProspectos('todos')"         style="padding:6px 12px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">📋 Todos</button>
+    <button id="pf-sinasignar"    onclick="filtrarProspectos('sinasignar')"    style="padding:6px 12px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">⭕ Sin asignar</button>
+    <button id="pf-avisitar"      onclick="filtrarProspectos('a_visitar')"     style="padding:6px 12px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">📌 A visitar</button>
+    <button id="pf-visitado"      onclick="filtrarProspectos('visitado')"      style="padding:6px 12px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">✅ Visitados</button>
+    <button id="pf-cliente"       onclick="filtrarProspectos('cliente')"       style="padding:6px 12px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">💚 Clientes</button>
+    <button id="pf-nointeresado"  onclick="filtrarProspectos('no_interesado')" style="padding:6px 12px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">❌ No interesan</button>
+  </div>
+  <!-- Filtros por calidad del cliente -->
+  <div style="font-size:10px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Por calidad</div>
+  <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+    <button id="pf-potencial"     onclick="filtrarProspectos('potencial')"     style="padding:6px 12px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🎯 Potencial</button>
+    <button id="pf-bueno"         onclick="filtrarProspectos('bueno')"         style="padding:6px 12px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">👍 Bueno</button>
+    <button id="pf-amargado"      onclick="filtrarProspectos('amargado')"      style="padding:6px 12px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">😤 Amargado</button>
+    <button id="pf-desinteresado" onclick="filtrarProspectos('desinteresado')" style="padding:6px 12px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">😐 Desinteresado</button>
+    <button id="pf-incompleto"    onclick="filtrarProspectos('incompleto')"    style="padding:6px 12px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">⚠️ Datos incompletos</button>
+    <button id="pf-agregados"     onclick="filtrarProspectos('agregados')"     style="padding:6px 12px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">➕ Agregados por vendedor</button>
   </div>
   <div id="lista-prospectos"><div class="empty">Cargando prospectos...</div></div>
 </div>
@@ -1568,7 +1579,6 @@ async function cargarProspectosAdmin() {
   el.innerHTML = '<div class="empty">Cargando...</div>';
   const { data } = await sb.from('clientes')
     .select('*, perfiles!clientes_asignado_a_fkey(nombre, apellido)')
-    .eq('fuente', 'webzonal')
     .order('created_at', { ascending: false });
   todosProspectos = data || [];
   filtrarProspectos(filtroProspectoActual);
@@ -1576,14 +1586,23 @@ async function cargarProspectosAdmin() {
 
 function filtrarProspectos(filtro) {
   filtroProspectoActual = filtro;
-  // resaltar botón activo
-  ['todos','sinasignar','a_visitar','visitado','cliente','no_interesado'].forEach(f => {
-    const btn = document.getElementById('pf-' + (f === 'a_visitar' ? 'asignados' : f === 'no_interesado' ? 'noint' : f));
-    if (btn) btn.style.borderColor = f === filtro ? '#818cf8' : '#334155';
+  const allIds = ['todos','sinasignar','a_visitar','visitado','cliente','no_interesado',
+                  'potencial','bueno','amargado','desinteresado','incompleto','agregados'];
+  allIds.forEach(f => {
+    const btn = document.getElementById('pf-' + f.replace('_',''));
+    if (btn) {
+      btn.style.borderColor = f === filtro ? '#818cf8' : '#334155';
+      btn.style.color = f === filtro ? '#c4b5fd' : '#94a3b8';
+      btn.style.background = f === filtro ? '#2d1b69' : '#1e293b';
+    }
   });
   let lista = todosProspectos;
-  if (filtro === 'sinasignar') lista = lista.filter(p => !p.asignado_a);
-  else if (filtro !== 'todos')  lista = lista.filter(p => p.estado === filtro);
+  if      (filtro === 'sinasignar')    lista = lista.filter(p => !p.asignado_a);
+  else if (filtro === 'incompleto')    lista = lista.filter(p => !p.datos_completos);
+  else if (filtro === 'agregados')     lista = lista.filter(p => p.fuente === 'vendedor_cw' || p.agregado_por_nombre);
+  else if (['potencial','bueno','amargado','desinteresado'].includes(filtro))
+                                       lista = lista.filter(p => p.estado_cliente === filtro);
+  else if (filtro !== 'todos')         lista = lista.filter(p => p.estado === filtro);
   const el = document.getElementById('lista-prospectos');
   el.innerHTML = lista.length ? lista.map(cardProspecto).join('') : '<div class="empty">Sin prospectos para este filtro.</div>';
 }
@@ -1598,35 +1617,56 @@ function cardProspecto(p) {
     cliente:       '<span style="background:#14532d;color:#86efac;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700">💚 Cliente</span>',
     no_interesado: '<span style="background:#450a0a;color:#f87171;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700">❌ No interesado</span>',
   };
+  const estClienteBadge = {
+    potencial:     '<span style="background:#1e3a5f;color:#60a5fa;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700">🎯 Potencial</span>',
+    bueno:         '<span style="background:#052e16;color:#4ade80;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700">👍 Bueno</span>',
+    amargado:      '<span style="background:#2d1515;color:#f87171;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700">😤 Amargado</span>',
+    desinteresado: '<span style="background:#1c1917;color:#d6d3d1;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700">😐 Desinteresado</span>',
+  };
   const vendOptions = todasVendedoras.filter(v => v.rol !== 'pendiente')
     .map(v => `<option value="${v.id}" ${p.asignado_a === v.id ? 'selected' : ''}>${v.nombre} ${v.apellido}</option>`).join('');
   const asignadaNombre = p.perfiles ? `${p.perfiles.nombre} ${p.perfiles.apellido}` : null;
 
+  // Publicidad actual resumida
+  const pubs = [];
+  if (p.publica_radio)  pubs.push(`📻 ${p.radio_nombre||'Radio'}${p.radio_precio ? ' $'+Number(p.radio_precio).toLocaleString('es-AR') : ''}`);
+  if (p.publica_tv)     pubs.push(`📺 ${p.tv_nombre||'TV'}${p.tv_precio ? ' $'+Number(p.tv_precio).toLocaleString('es-AR') : ''}`);
+  if (p.publica_diario) pubs.push(`📰 ${p.diario_nombre||'Diario'}${p.diario_precio ? ' $'+Number(p.diario_precio).toLocaleString('es-AR') : ''}`);
+  if (p.publica_portal) pubs.push(`🌐 ${p.portal_nombre||'Portal'}${p.portal_precio ? ' $'+Number(p.portal_precio).toLocaleString('es-AR') : ''}`);
+
   return `<div class="cl-card" onclick="toggleDet('pdet-${p.id}')">
     <div class="cl-head">
       <div style="min-width:0;flex:1">
-        <div class="cl-name">${p.nombre_negocio}</div>
-        <div class="cl-sub">🏪 ${p.rubro||'—'} · ${p.ciudad||'Santa Rosa'}</div>
+        <div class="cl-name">${p.nombre_negocio}${!p.datos_completos ? ' <span style="font-size:10px;color:#fbbf24">⚠️ Incompleto</span>' : ''}</div>
+        <div class="cl-sub">🏪 ${p.rubro||'—'} · ${p.ciudad||'—'}</div>
         ${p.presencia_nivel ? `<div style="font-size:11px;color:${presColor[p.presencia_nivel]||'#64748b'};margin-top:2px;font-weight:600">${presLabel[p.presencia_nivel]||''} · ${p.presencia_score||0}/100</div>` : ''}
+        ${p.agregado_por_nombre ? `<div style="font-size:10px;color:#64748b;margin-top:2px">➕ Agregado por: <span style="color:#a78bfa">${p.agregado_por_nombre}</span></div>` : ''}
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
         ${estadoBadge[p.estado] || estadoBadge.prospecto}
+        ${estClienteBadge[p.estado_cliente] || ''}
         ${asignadaNombre ? `<div style="font-size:10px;color:#94a3b8">👤 ${asignadaNombre}</div>` : ''}
       </div>
     </div>
     <div class="cl-detail" id="pdet-${p.id}">
       <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
         <span style="padding:4px 10px;border-radius:20px;border:1px solid ${p.tiene_web ? '#22c55e' : '#475569'};color:${p.tiene_web ? '#4ade80' : '#64748b'};font-size:11px;font-weight:700">🌐 Web ${p.tiene_web ? '✓' : '✗'}</span>
-        <span style="padding:4px 10px;border-radius:20px;border:1px solid ${p.tiene_instagram ? '#e879f9' : '#475569'};color:${p.tiene_instagram ? '#e879f9' : '#64748b'};font-size:11px;font-weight:700">📸 Instagram ${p.tiene_instagram ? '✓' : '✗'}</span>
-        <span style="padding:4px 10px;border-radius:20px;border:1px solid ${p.tiene_facebook ? '#60a5fa' : '#475569'};color:${p.tiene_facebook ? '#60a5fa' : '#64748b'};font-size:11px;font-weight:700">📘 Facebook ${p.tiene_facebook ? '✓' : '✗'}</span>
+        <span style="padding:4px 10px;border-radius:20px;border:1px solid ${p.tiene_instagram ? '#e879f9' : '#475569'};color:${p.tiene_instagram ? '#e879f9' : '#64748b'};font-size:11px;font-weight:700">📸 IG ${p.tiene_instagram ? '✓' : '✗'}</span>
+        <span style="padding:4px 10px;border-radius:20px;border:1px solid ${p.tiene_facebook ? '#60a5fa' : '#475569'};color:${p.tiene_facebook ? '#60a5fa' : '#64748b'};font-size:11px;font-weight:700">📘 FB ${p.tiene_facebook ? '✓' : '✗'}</span>
         <span style="padding:4px 10px;border-radius:20px;border:1px solid ${p.tiene_whatsapp ? '#4ade80' : '#475569'};color:${p.tiene_whatsapp ? '#4ade80' : '#64748b'};font-size:11px;font-weight:700">💬 WA ${p.tiene_whatsapp ? '✓' : '✗'}</span>
+        ${p.tiene_toko ? '<span style="padding:4px 10px;border-radius:20px;border:1px solid #7c3aed;color:#a78bfa;font-size:11px;font-weight:700">🛒 Toko ✓</span>' : ''}
       </div>
+      ${pubs.length ? `<div style="background:#0f172a;border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:12px;color:#fbbf24">
+        📢 Publica en: ${pubs.join(' · ')}
+      </div>` : ''}
       ${p.telefono ? `<div class="dr">📞 <a href="tel:${p.telefono}" onclick="event.stopPropagation()" style="color:#38bdf8">${p.telefono}</a></div>` : ''}
       ${p.google_rating ? `<div class="dr">⭐ Google: ${p.google_rating} (${p.google_reviews} reseñas)</div>` : ''}
       ${p.instagram ? `<div class="dr">📸 <a href="https://instagram.com/${p.instagram}" target="_blank" onclick="event.stopPropagation()" style="color:#e879f9">@${p.instagram}</a></div>` : ''}
       ${p.pitch_venta ? `<div class="dr" style="font-size:12px;color:#a78bfa;font-style:italic">"${p.pitch_venta}"</div>` : ''}
+      ${p.observaciones && p.observaciones !== p.pitch_venta ? `<div class="dr" style="font-size:12px;color:#94a3b8">📝 ${p.observaciones}</div>` : ''}
       ${p.resultado_visita ? `<div class="dr" style="margin-top:6px">📋 <strong>Resultado visita:</strong> <em style="color:#94a3b8">${p.resultado_visita}</em></div>` : ''}
       ${p.fecha_visita ? `<div class="dr">📅 Visitado: ${fmtFecha(p.fecha_visita)}</div>` : ''}
+      ${p.proximo_contacto ? `<div class="dr">📆 Próximo contacto: <span style="color:#fbbf24">${p.proximo_contacto}</span></div>` : ''}
       <!-- Asignar a vendedora -->
       <div style="margin-top:12px;display:flex;gap:8px;align-items:center" onclick="event.stopPropagation()">
         <select id="sel-vend-${p.id}" style="flex:1;padding:8px 10px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#fff;font-size:13px;font-family:inherit;outline:none">
