@@ -399,6 +399,12 @@
     <button id="pf-incompleto"    onclick="filtrarProspectos('incompleto')"    style="padding:6px 12px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">⚠️ Datos incompletos</button>
     <button id="pf-agregados"     onclick="filtrarProspectos('agregados')"     style="padding:6px 12px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">➕ Agregados por vendedor</button>
   </div>
+  <!-- Buscador -->
+  <div style="margin-bottom:12px">
+    <input id="buscador-prospectos" type="text" placeholder="🔍 Buscar por nombre, rubro, ciudad..."
+      oninput="filtrarProspectos(filtroProspectoActual)"
+      style="width:100%;padding:11px 14px;border-radius:10px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-size:13px;font-family:inherit;box-sizing:border-box;outline:none">
+  </div>
   <div id="lista-prospectos"><div class="empty">Cargando prospectos...</div></div>
 </div>
 
@@ -1603,6 +1609,14 @@ function filtrarProspectos(filtro) {
   else if (['potencial','bueno','amargado','desinteresado'].includes(filtro))
                                        lista = lista.filter(p => p.estado_cliente === filtro);
   else if (filtro !== 'todos')         lista = lista.filter(p => p.estado === filtro);
+  // Filtro de texto del buscador
+  const q = (document.getElementById('buscador-prospectos')?.value || '').toLowerCase().trim();
+  if (q) lista = lista.filter(p =>
+    (p.nombre_negocio||'').toLowerCase().includes(q) ||
+    (p.rubro||'').toLowerCase().includes(q) ||
+    (p.ciudad||'').toLowerCase().includes(q) ||
+    (p.telefono||'').includes(q)
+  );
   const el = document.getElementById('lista-prospectos');
   el.innerHTML = lista.length ? lista.map(cardProspecto).join('') : '<div class="empty">Sin prospectos para este filtro.</div>';
 }

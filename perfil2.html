@@ -1490,10 +1490,16 @@ async function buscarComercio() {
   document.getElementById('rc-encontrado-badge').style.display = 'none';
   document.getElementById('rc-no-encontrado').style.display = 'none';
 
-  const { data } = await sb.from('clientes')
-    .select('id,nombre_negocio,rubro,ciudad,tiene_web,tiene_instagram,tiene_facebook,tiene_whatsapp,tiene_toko,estado_cliente,fuente')
+  // Solo columnas que existen antes de la migración para evitar errores
+  const { data, error } = await sb.from('clientes')
+    .select('id,nombre_negocio,rubro,ciudad,telefono,tiene_web,tiene_instagram,tiene_facebook,tiene_whatsapp,fuente,estado')
     .ilike('nombre_negocio', `%${q}%`)
-    .limit(8);
+    .limit(10);
+
+  if (error) {
+    div.innerHTML = `<div style="color:#f87171;font-size:12px;padding:8px">Error: ${error.message}</div>`;
+    return;
+  }
 
   if (!data || data.length === 0) {
     div.innerHTML = '';
@@ -1503,17 +1509,15 @@ async function buscarComercio() {
   }
 
   div.innerHTML = data.map(c => {
-    const est = c.estado_cliente || 'prospecto';
-    return `<div class="busq-result" onclick='seleccionarComercio(${JSON.stringify(c)})'>
+    return `<div class="busq-result" onclick='seleccionarComercio(${JSON.stringify(c).replace(/'/g,"&#39;")})'>
       <div style="font-weight:700;color:#e2e8f0">${c.nombre_negocio}</div>
-      <div style="font-size:12px;color:#64748b;margin-top:2px">${c.rubro||''} ${c.ciudad?'· '+c.ciudad:''}</div>
+      <div style="font-size:12px;color:#64748b;margin-top:2px">${c.rubro||''} ${c.ciudad?'· '+c.ciudad:''} ${c.telefono?'· 📞'+c.telefono:''}</div>
       <div class="busq-presencia">
         ${c.tiene_web       ? '<span class="ptag si">🌐 Web</span>'      : '<span class="ptag no">🌐 Sin web</span>'}
         ${c.tiene_instagram ? '<span class="ptag si">📸 IG</span>'       : '<span class="ptag no">📸 Sin IG</span>'}
         ${c.tiene_facebook  ? '<span class="ptag si">📘 FB</span>'       : '<span class="ptag no">📘 Sin FB</span>'}
         ${c.tiene_whatsapp  ? '<span class="ptag si">💬 WA</span>'       : ''}
-        ${c.tiene_toko      ? '<span class="ptag si">🛒 Toko</span>'     : ''}
-        <span class="ptag na est-${est}">${est}</span>
+        <span class="ptag" style="background:#1e293b;color:#475569">${c.fuente||'manual'}</span>
       </div>
     </div>`;
   }).join('');
