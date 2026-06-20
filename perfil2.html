@@ -1492,7 +1492,7 @@ async function buscarComercio() {
 
   // Solo columnas que existen antes de la migración para evitar errores
   const { data, error } = await sb.from('clientes')
-    .select('id,nombre_negocio,rubro,ciudad,telefono,tiene_web,tiene_instagram,tiene_facebook,tiene_whatsapp,fuente,estado')
+    .select('id,nombre_negocio,rubro,telefono,tiene_web,tiene_instagram,tiene_facebook,tiene_whatsapp,fuente,estado,direccion')
     .ilike('nombre_negocio', `%${q}%`)
     .limit(10);
 
